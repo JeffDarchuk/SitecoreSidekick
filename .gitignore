@@ -1,0 +1,28 @@
+######## GENERAL IGNORES #######
+
+# ignore logs, OS cache files
+*.log
+.DS_Store*
+ehthumbs.db
+Icon?
+Thumbs.db
+
+######## GENERAL .NET IGNORES ########
+
+# Ignore binaries in the source
+bin/
+obj/
+
+# Ignore user-scoped solution and project settings
+*.user
+*.suo
+
+# Ignore generated Version.cs files
+/*/Properties/Version.cs
+
+# NuGet packages
+packages/*
+!packages/repositories.config
+
+# Any Sitecore assemblies copied local
+Dependencies/Libraries/Sitecore/*

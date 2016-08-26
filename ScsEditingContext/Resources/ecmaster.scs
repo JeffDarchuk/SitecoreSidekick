@@ -1,0 +1,68 @@
+﻿<div ng-controller="ecmastercontroller as vm">
+	<div>
+		<fieldset>
+			<legend>Previously Visited Items</legend>
+			<ol>
+				<li ng-repeat="item in vm.itemHistory">
+					<a hidefocus="true" style="position: relative;" href="/sitecore/shell/Applications/Content%20Editor.aspx?sc_content={{item.DatabaseName}}&fo={{item.Id}}" class="scContentTreeNodeNormal fancybox fancybox.iframe">
+						<span class="scContentTreeSelectable">
+							<img ng-src="/temp/IconCache/{{item.Icon}}" width="16" height="16" class="scContentTreeNodeIcon" alt="" border="0"/>
+								{{item.DisplayName}}
+						</span>
+					</a>
+					- <span class="database">{{item.DatabaseName}}</span>
+				</li>
+			</ol>
+		</fieldset>
+
+	</div>
+	<div ng-if="vm.editor">
+		<fieldset>
+			<legend>Common Editor Locations</legend>
+			<ul>
+				<li ng-repeat="editor in vm.editor">
+					<a hidefocus="true" style="position: relative;" target="_top" href="/sitecore/shell/Applications/Content%20Editor.aspx?sc_content=master&fo={{editor.item.Id}}" class="scContentTreeNodeNormal fancybox fancybox.iframe">
+						<span class="scContentTreeSelectable">
+							<img ng-src="/temp/IconCache/{{editor.item.Icon}}" width="16" height="16" class="scContentTreeNodeIcon" alt="" border="0"/>
+							{{editor.item.DisplayName}}
+						</span>
+					</a>
+					(<em style="color: black;">{{editor.description}}</em>)
+				</li>
+			</ul>
+		</fieldset>
+	</div>
+	<div ng-if="vm.core">
+		<fieldset>
+			<legend>Common Core Database Locations</legend>
+			<ul>
+				<li ng-repeat="core in vm.core">
+					<a hidefocus="true" style="position: relative;" href="/sitecore/shell/Applications/Content%20Editor.aspx?sc_content=core&fo={{core.item.Id}}" class="scContentTreeNodeNormal fancybox fancybox.iframe">
+						<span class="scContentTreeSelectable">
+							<img ng-src="/temp/IconCache/{{core.item.Icon}}" width="16" height="16" class="scContentTreeNodeIcon" alt="" border="0"/>
+							{{core.item.DisplayName}} 
+						</span>
+					</a>
+					(<em style="color: black;">{{core.description}}</em>)
+				</li>
+			</ul>
+		</fieldset>
+	</div>
+	<div ng-if="vm.master">
+		<fieldset>
+			<legend>Common Master Database Locations</legend>
+			<ul>
+				<li ng-repeat="master in vm.master">
+					<a hidefocus="true" style="position: relative;" href="/sitecore/shell/Applications/Content%20Editor.aspx?sc_content=master&fo={{master.item.Id}}" class="scContentTreeNodeNormal fancybox fancybox.iframe">
+						<span class="scContentTreeSelectable">
+							<img ng-src="/temp/IconCache/{{master.item.Icon}}" width="16" height="16" class="scContentTreeNodeIcon" alt="" border="0"/>
+							{{master.item.DisplayName}} 
+						</span>
+					</a>
+					(<em style="color: black;">{{master.description}}</em>)
+				</li>
+			</ul>
+		</fieldset>
+	</div>
+	<pre ng-if="vm.error" class="scserror">{{vm.error}}</pre>
+</div>

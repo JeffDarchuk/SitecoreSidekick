@@ -1,0 +1,27 @@
+﻿<div ng-controller="cmcontenttreecontroller as vm" ng-init="init(parent, selected, events, server)">
+	<div class="scContentTreeNode">
+		<span ng-if="vm.data.Nodes.length>0">
+			<img ng-if="!vm.Open" src="/scs/cmcollapsed.png" class="scContentTreeNodeGlyph" alt="" border="0" onerror="this.onerror='';this.src='/sitecore/shell/themes/standard/Images/expand15x15.gif';" ng-click="vm.Open = true" />
+			<img ng-if="vm.Open" src="/scs/cmexpanded.png" class="scContentTreeNodeGlyph" alt="" border="0" ng-click="vm.Open = false" />
+		</span>
+		<span ng-if="vm.data.Nodes.length ===0">
+			<img src="/sitecore/shell/themes/standard/images/noexpand15x15.gif" class="scContentTreeNodeGlyph" alt="" border="0" />
+		</span>
+		<div class="scContentTreeNodeGutter">
+
+		</div>
+		<a hidefocus="true" ng-class="events.selectedItem == vm.data.Id ? 'scContentTreeNodeActive':'scContentTreeNodeNormal'" style="position: relative;" ng-click="events.click(vm.data);events.selectedItem = vm.data.Id">
+			<span ng-if="vm.data.Icon" class="scContentTreeSelectable">
+				<img ng-src="{{server}}/temp/IconCache/{{vm.data.Icon}}" width="16" height="16" class="scContentTreeNodeIcon" alt="" border="0" />
+				{{vm.data.DisplayName}}
+			</span>
+			<span ng-hide="vm.data.Icon">
+				<img src="/scs/cmspinner.gif" />
+			</span>
+		</a>
+		<div ng-if="vm.Open" class="scContentTreeIndent" ng-repeat="item in vm.data.Nodes">
+			<cmcontenttree parent="item.Id" selected="selected" events="events" server="server"></cmcontenttree>
+		</div>
+	</div>
+	<pre ng-if="vm.error" class="scserror">{{vm.error}}</pre>
+</div>

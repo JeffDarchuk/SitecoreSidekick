@@ -1,0 +1,21 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" ng-app="app">
+<head>
+	<meta charset="utf-8" />
+	<title>Sitecore Sidekick</title>
+	<link rel="stylesheet" href="/scs/main.css"/>
+	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css"/>
+</head>
+<body class="full-height full-width">
+	<div id="overlay" class="scsoverlay"></div>
+<div class="scs-root-div full-height" ng-controller="master as vm">
+	[[sidekicks]]
+</div>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+	<script src="/scs/main.js"></script>
+</body>
+
+</html>

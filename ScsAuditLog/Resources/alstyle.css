@@ -1,0 +1,78 @@
+.alpane {
+	padding: 2px;
+	position: absolute;
+	background-color: #333;
+	color: black;
+}
+
+.alnote {
+	left: 100px;
+	top: 100px;
+	min-width: 30%;
+	max-width: 80%;
+}
+
+.alpane td {
+	padding: 3px;
+}
+
+.almenu {
+	max-height: 520px;
+	overflow-y: auto;
+}
+
+.alfilter {
+	margin-top: -45px;
+	float: right;
+	position: inherit;
+
+}
+
+.aldetailpane {
+	padding: 10px;
+	background-color: #ddd;
+}
+
+.aldetailheading {
+	color: white;
+	font-size: 13pt;
+	margin: 5px;
+}
+
+.autoCompletePane {
+	position: absolute;
+	background-color: white;
+	width: 300px;
+	border: 2px solid black;
+	z-index: 99;
+	padding: 5px;
+}
+
+	.autoCompletePane li {
+		padding: 2px;
+		border: thin solid white;
+	}
+
+		.autoCompletePane li:hover {
+			border: thin solid black;
+			background-color: #eee;
+		}
+
+.arrow {
+	padding-bottom: 2px;
+}
+
+.jumpto {
+	float: right;
+	margin-top: 15px;
+	margin-right: 10px;
+}
+ins {
+    background-color: #cfc;
+    text-decoration: none;
+}
+
+del {
+    color: #999;
+    background-color:#FEC8C8;
+}

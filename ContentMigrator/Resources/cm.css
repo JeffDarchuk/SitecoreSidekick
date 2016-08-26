@@ -1,0 +1,49 @@
+﻿.cmresults li {
+	padding: 4px;
+	white-space: nowrap;
+}
+
+.cmresults h4 {
+	display: inline;
+}
+
+.cmresults {
+	padding: 0px;
+}
+
+.cmspinner {
+	height: 30px;
+	margin-bottom: -10px;
+	margin-left: 30px;
+}
+
+.cmtabpane {
+	margin-top: -6px;
+	border: thin solid darkgray;
+	padding-top: 20px;
+}
+
+.cmtab {
+	border-bottom-right-radius: 0px;
+	border-bottom-left-radius: 0px;
+	background-color: darkgray;
+}
+
+.cmselectedtab {
+	border: thin solid black;
+	border-bottom: darkgray;
+}
+
+.cmresult {
+	width: 200px;
+	white-space: normal;
+	text-decoration: none;
+}
+
+.cmresult div {
+	word-wrap: break-word;
+}
+
+.cmresult img {
+	float: left;
+}

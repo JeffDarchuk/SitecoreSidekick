@@ -39,12 +39,25 @@ namespace ScsContentMigrator
 			return status.OperationId;
 		}
 
-
+		public static bool StopOperation(string operationId)
+		{
+			if (_operation.ContainsKey(operationId))
+			{
+				_operation[operationId].CancelOperation();
+				return true;
+			}
+			return false;
+		}
 		internal static OperationStatus RegisterEvent(RemoteContentPullArgs args)
 		{
 			var ret = Guid.NewGuid().ToString();
 			_operation[ret] = new OperationStatus(args, ret);
 			return _operation[ret];
+		}
+
+		public static IEnumerable<dynamic> GetRunningOperations()
+		{
+			return _operation.Values.Select(x => new {x.Completed, x.RootNode, x.OperationId});
 		}
 
 		public static IEnumerable<dynamic> OperationStatus(string operationId, int lineNumber)

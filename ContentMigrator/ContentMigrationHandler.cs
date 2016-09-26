@@ -32,8 +32,10 @@ namespace ScsContentMigrator
 		public override string ResourcesPath { get; set; } = "ScsContentMigrator.Resources";
 		public override string Icon => "/scs/cm.png";
 		public override string Name => "Content Migrator";
-		public override bool AdminOnly => true;
 		public override string CssStyle => "width:800px";
+		public ContentMigrationHandler(string roles, string isAdmin, string users) : base(roles, isAdmin, users)
+		{
+		}
 		public override void ProcessRequest(HttpContextBase context)
 		{
 			var file = GetFile(context);
@@ -47,8 +49,23 @@ namespace ScsContentMigrator
 				ReturnJson(context, ServerList);
 			else if (file == "cmopeartionstatus.scsvc")
 				ReturnJson(context, GetOperationStatus(context));
+			else if (file == "cmoperationlist.scsvc")
+				ReturnJson(context, GetOperationList(context));
+			else if (file == "cmstopoperation.scsvc")
+				ReturnJson(context, StopOperation(context));
 			else
 				ProcessResourceRequest(context);
+		}
+
+		private object StopOperation(HttpContextBase context)
+		{
+			var data = GetPostData(context);
+			return RemoteContentPuller.StopOperation(data.operationId);
+		}
+
+		private object GetOperationList(HttpContextBase context)
+		{
+			return RemoteContentPuller.GetRunningOperations().ToList();
 		}
 
 		private object GetOperationStatus(HttpContextBase context)
@@ -138,7 +155,5 @@ namespace ScsContentMigrator
 			}
 			return string.IsNullOrWhiteSpace(data.id.ToString()) ? Root : new ContentTreeNode(Factory.GetDatabase(data.database.ToString()).GetItem(new ID(data.id)));
 		}
-
-
 	}
 }

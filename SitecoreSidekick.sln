@@ -11,10 +11,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScsEditingContext", "ScsEdi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScsAuditLog", "ScsAuditLog\ScsAuditLog.csproj", "{96A08E68-0029-4DAE-AA1B-290706A22F6A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScsUnicorn", "ScsUnicorn\ScsUnicorn.csproj", "{C1230C03-53E9-4071-A083-30BEFB163640}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScsToolbox", "ScsToolbox\ScsToolbox.csproj", "{C4975732-0AE3-4C14-A16C-EAF87908A2D8}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,14 +33,6 @@ Global
 		{96A08E68-0029-4DAE-AA1B-290706A22F6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{96A08E68-0029-4DAE-AA1B-290706A22F6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{96A08E68-0029-4DAE-AA1B-290706A22F6A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C1230C03-53E9-4071-A083-30BEFB163640}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C1230C03-53E9-4071-A083-30BEFB163640}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C1230C03-53E9-4071-A083-30BEFB163640}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C1230C03-53E9-4071-A083-30BEFB163640}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C4975732-0AE3-4C14-A16C-EAF87908A2D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C4975732-0AE3-4C14-A16C-EAF87908A2D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C4975732-0AE3-4C14-A16C-EAF87908A2D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C4975732-0AE3-4C14-A16C-EAF87908A2D8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

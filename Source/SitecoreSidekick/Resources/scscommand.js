@@ -17,6 +17,8 @@ window.onload = function () {
 
 		var scs = window.top.document.getElementById("scs");
 		if (keyChar === "s" && event.shiftKey && event.altKey) {
+			if (typeof (scForm) !== "undefined" && typeof(scForm.postEvent) !== "undefined")
+				return scForm.postEvent(this, event, 'scs:open');
 
 			if (scs.style.display === "block") {
 				scs.style.display = "none";

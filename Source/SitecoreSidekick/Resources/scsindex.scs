@@ -4,14 +4,18 @@
 <head>
 	<meta charset="utf-8" />
 	<title>Sitecore Sidekick</title>
-	<link rel="stylesheet" href="/scs/main.css"/>
-	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css"/>
+	<link rel="stylesheet" href="/scs/main.css" />
+	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css" />
 </head>
 <body class="full-height full-width">
+	<svg style="display:none;">
+		<symbol id="icon-arrow-left" viewBox="0 0 32 32"><title>arrow-left</title><path class="pathArrow" d="M1 16l15 15v-9h16v-12h-16v-9z"></path></symbol>
+	</svg>
 	<div id="overlay" class="scsoverlay"></div>
-<div class="scs-root-div full-height" ng-controller="master as vm">
-	[[sidekicks]]
-</div>
+	<div class="scs-root-div full-height" ng-controller="master as vm">
+		[[sidekicks]]
+	</div>
+
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.js"></script>

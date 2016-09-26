@@ -29,11 +29,13 @@ namespace ScsEditingContext
 		public override string ResourcesPath { get; set; } = "ScsEditingContext.Resources";
 		public override string Icon => "/scs/ec.png";
 		public override string Name => "Editing Context";
-		public override bool AdminOnly => false;
 		public override string CssStyle => "width:600px";
 
 		public static Database Core = Factory.GetDatabase("core");
 		public static Database Master = Factory.GetDatabase("master");
+		public EditingContextHandler(string roles, string isAdmin, string users) : base(roles, isAdmin, users)
+		{
+		}
 		public override void ProcessRequest(HttpContextBase context)
 		{
 			string file = GetFile(context);
@@ -88,7 +90,7 @@ namespace ScsEditingContext
 		{
 			dynamic ret = new ExpandoObject();
 			ret.editor = EditorLocations;
-			if (IsAdmin.CurrentUser())
+			if (IsAdmin.CurrentUserAdmin())
 			{
 				ret.core = CoreLocations;
 				ret.master = MasterLocations;

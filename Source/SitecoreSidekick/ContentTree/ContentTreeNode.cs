@@ -1,7 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Sitecore;
+using Sitecore.Configuration;
+using Sitecore.Data;
 using Sitecore.Data.Items;
+using Sitecore.Data.Managers;
 using Sitecore.StringExtensions;
 
 namespace SitecoreSidekick.ContentTree
@@ -37,19 +41,19 @@ namespace SitecoreSidekick.ContentTree
 		{
 			if (item != null)
 			{
-
-				Icon = null;
-				Icon = item[FieldIDs.Icon];
-				if ((Icon.IsNullOrEmpty() || Icon.StartsWith("-") || Icon.StartsWith("~")) && item.Template != null)
-				{
-					Icon = item.Template.Icon;
-				}
+				Icon = GetSrc(ThemeManager.GetIconImage(item, 32, 32, "", ""));
 			}
 			if (!string.IsNullOrWhiteSpace(Icon))
 			{
 				string[] parts = Icon.Split('/');
 				Icon = string.Join("/", parts.Skip(parts.Length - 3));
 			}
+		}
+		private string GetSrc(string imgTag)
+		{
+			int i1 = imgTag.IndexOf("src=\"", StringComparison.Ordinal) + 5;
+			int i2 = imgTag.IndexOf("\"", i1, StringComparison.Ordinal);
+			return imgTag.Substring(i1, i2 - i1);
 		}
 	}
 }

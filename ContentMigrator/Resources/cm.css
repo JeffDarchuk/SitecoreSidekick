@@ -32,6 +32,7 @@
 .cmselectedtab {
 	border: thin solid black;
 	border-bottom: darkgray;
+	background-color: darkgray;
 }
 
 .cmresult {

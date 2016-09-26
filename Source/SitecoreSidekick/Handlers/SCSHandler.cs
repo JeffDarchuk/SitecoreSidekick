@@ -25,10 +25,9 @@ namespace SitecoreSidekick.Handlers
 		public override string ResourcesPath { get; set; } = "SitecoreSidekick.Resources";
 		public override string Icon => "";
 		public override string Name => "Sitecore Sidekick";
-		public override bool AdminOnly => false;
 		public override string CssStyle => "600px";
 
-		public ScsHandler()
+		public ScsHandler(string roles, string isAdmin, string users) : base(roles, isAdmin, users)
 		{
 			js.Append(CompileEmbeddedResource(".js"));
 			css.Append(CompileEmbeddedResource(".css"));
@@ -65,6 +64,8 @@ namespace SitecoreSidekick.Handlers
 					if (file == "scs.scs")
 					{
 						var html = GetResource("scsindex.scs").Replace("[[sidekicks]]", GetAllSidekickDirectives());
+						if (context.Request.UrlReferrer != null && (context.Request.UrlReferrer.AbsoluteUri.Contains("default.aspx") || context.Request.UrlReferrer.AbsoluteUri.Contains("/externalapplication")))
+							html = html.Replace("</head>", $"<style>{GenerateDesktopStyle()}</style></head>");
 						ReturnResponse(context, html, "text/html");
 					}
 					else if (file.Equals("scscommand.js"))
@@ -84,16 +85,55 @@ namespace SitecoreSidekick.Handlers
 			}
 		}
 
+		private object GenerateDesktopStyle()
+		{
+			return @"
+#sidekickHeader{
+	display:none;
+}
+.scs-root-div{
+	margin:0px;
+	width:100% !important;
+}
+.scs-form{
+	max-height: 100% !important;
+}
+.full-width{
+	width:100%;
+}
+#overlay{
+	display:none;
+}
+body{
+	background-color: #999;
+	margin:0px;
+}
+#desktopSidekickHeader {
+	display: block;
+    padding: 5px;
+    background: url(""/sitecore/shell/client/Speak/Assets/img/Speak/Layouts/breadcrumb_red_bg.png"")
+}
+.back{
+	font-weight:bold;
+}
+.subheader-logo{
+    margin-left: 100px;
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+}
+	";
+		}
+
 		private string GetAllSidekickDirectives()
 		{
 			var basicAngularIf = $"!vm.sidekick || ({"vm.sidekick != '" + string.Join("' && vm.sidekick != '", Sidekicks.Select(x=>x.Name).ToArray())}')";
-			var sb = new StringBuilder($"<div ng-style=\"({basicAngularIf}) && {{'width':'{CssStyle}', 'background-color':'white'}}\"><h3 ng-if=\"{basicAngularIf}\">{Name}<span class='close' onclick='window.top.document.getElementById(\"scs\").style.display=\"none\";'></span></h3>");
-            bool isAdmin = IsAdmin.CurrentUser();
-			foreach (var sk in Sidekicks.Where(x => (x.AdminOnly && isAdmin) || !x.AdminOnly))
+			var sb = new StringBuilder($"<div ng-style=\"({basicAngularIf}) && {{'width':'{CssStyle}', 'background-color':'white'}}\"><h3 id=\"sidekickHeader\" ng-if=\"{basicAngularIf}\">{Name}<span class='close' onclick='window.top.document.getElementById(\"scs\").style.display=\"none\";'></span></h3>");
+			foreach (var sk in Sidekicks.Where(x => x.ApplicableSidekick()))
 			{
 				sb.Append(
 					$"<div ng-if=\"{basicAngularIf}\" ng-click=\"vm.selectSidekick('{sk.Name}')\" class=\"btn scsbtn\"><img ng-src=\"{sk.Icon}\" width=\"32\" height=\"32\" class=\"scContentTreeNodeIcon\" border=\"0\"><div>{sk.Name}</div></div>");
-				sb.Append($"<div id=\"{sk.Name.Replace(" ", string.Empty).ToLower()}\" ng-if=\"vm.sidekick == '{sk.Name}'\" targetWidth=\"{sk.CssStyle}\"><h3>{sk.Name}<span class=\"back\" ng-click=\"vm.goHome()\">Return Home</span><span class='close' onclick='window.top.document.getElementById(\"scs\").style.display=\"none\";'></span></h3><div class=\"scs-form\"><{sk.Directive} ");
+				sb.Append($"<div id=\"{sk.Name.Replace(" ", string.Empty).ToLower()}\" ng-if=\"vm.sidekick == '{sk.Name}'\" targetWidth=\"{sk.CssStyle}\"><div id=\"desktopSidekickHeader\"><span class=\"back\" ng-click=\"vm.goHome()\"><svg class=\"icon icon-arrow-left\"><use xlink:href=\"#icon-arrow-left\"></use></svg> Return Home</span><span class=\"subheader-logo\">{sk.Name}</span><span class='close' onclick='window.top.document.getElementById(\"scs\").style.display=\"none\";'></span></div><h3 id=\"sidekickHeader\">{sk.Name}<span class=\"back\" ng-click=\"vm.goHome()\">Return Home</span><span class='close' onclick='window.top.document.getElementById(\"scs\").style.display=\"none\";'></span></h3><div class=\"scs-form\"><{sk.Directive} ");
                 if (sk.DirectiveAttributes != null && sk.DirectiveAttributes.Count > 0)
 					foreach (var key in sk.DirectiveAttributes.AllKeys)
 					{

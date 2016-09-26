@@ -34,6 +34,9 @@
       <HintPath>..\..\packages\Newtonsoft.Json.4.5.9\lib\net40\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Sitecore.Client">
+      <HintPath>..\..\Dependencies\Lib\Sitecore\Sitecore.Client.dll</HintPath>
+    </Reference>
     <Reference Include="Sitecore.ContentSearch">
       <HintPath>..\..\Dependencies\Lib\Sitecore\Sitecore.ContentSearch.dll</HintPath>
     </Reference>

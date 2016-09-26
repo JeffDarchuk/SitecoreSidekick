@@ -42,6 +42,9 @@ namespace ScsContentMigrator
 		private Item root = null;
 		private Database db;
 		HashSet<Guid> allowedItems = new HashSet<Guid>();
+		internal ContentTreeNode RootNode;
+		internal bool Completed = false;
+
 		private Stopwatch sw = new Stopwatch();
 		public OperationStatus(RemoteContentPullArgs args, string operationId)
 		{
@@ -59,17 +62,14 @@ namespace ScsContentMigrator
 				using (new EventDisabler())
 				using (new SecurityDisabler())
 				{
-					while (!doneRemote || _installerQueue.Count > 0)
+					while (!Completed && (!doneRemote || _installerQueue.Count > 0))
 					{
 						try
 						{
 							IItemData tmp = null;
 							if (_installerQueue.TryDequeue(out tmp))
 							{
-								long time = sw.ElapsedMilliseconds;
 								InstallItem(tmp);
-								Log.Info("TIME install - " + (sw.ElapsedMilliseconds - time), this);
-
 							}
 							else
 							{
@@ -82,7 +82,7 @@ namespace ScsContentMigrator
 						}
 					}
 				
-				if (_args.mirror)
+				if (!Completed && _args.mirror)
 					foreach (Guid guid in allowedItems)
 					{
 						try
@@ -90,9 +90,7 @@ namespace ScsContentMigrator
 							Item item = db.GetItem(new ID(guid));
 							if (item != null)
 							{
-								long time = sw.ElapsedMilliseconds;
 								RecordEvent(item.Name, item.ID.ToString(), item.Paths.FullPath, "Recycle", GetSrc(ThemeManager.GetIconImage(item, 32, 32, "", "")));
-								Log.Info("TIME recycle - " + (sw.ElapsedMilliseconds - time), this);
 								item.Recycle();
 							}
 						}
@@ -107,9 +105,15 @@ namespace ScsContentMigrator
 				last.Items = _lines.Count;
 				lock (_listLocker)
 					Lines.Add(last);
+				Completed = true;
 			});
 		}
 
+		public void CancelOperation()
+		{
+			Completed = true;
+			doneRemote = true;
+		}
 		public void EndOperation()
 		{
 			doneRemote = true;
@@ -123,7 +127,7 @@ namespace ScsContentMigrator
 			Item parent = db.GetItem(new ID(idata.ParentId));
 			IItemData tmpData = idata;
 			root = db.GetItem(new ID(idata.Id));
-			if (_args.mirror)
+			if (_args.mirror && root != null)
 			{
 				Stack<Item> items = new Stack<Item>();
 				items.Push(root);
@@ -155,11 +159,13 @@ namespace ScsContentMigrator
 					RecordEvent(cur, "Insert", GetSrc(ThemeManager.GetIconImage(Factory.GetDatabase(cur.DatabaseName).GetItem(new ID(cur.Id)), 32, 32, "", "")));
 				}
 			}
+			RootNode = new ContentTreeNode(parent.Database.GetItem(new ID(idata.Id)));
 		}
 
 		private void GetNextItem(object o)
 		{
-
+			if (doneRemote)
+				return;
 			string item = o as string;
 			if (item.StartsWith("-"))
 			{
@@ -181,9 +187,7 @@ namespace ScsContentMigrator
 
 		private void QueueChildren(object item)
 		{
-			TimeSpan tmp = sw.Elapsed;
 			var list = GetResources.GetRemoteItemChildren(_args, item.ToString()).ToList();
-			Log.Info("TIME children- " + (sw.Elapsed - tmp).Milliseconds, this);
 			foreach (string id in list)
 			{
 				tp.Queue(GetNextItem, id);

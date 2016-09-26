@@ -13,8 +13,15 @@ using System.Web;
 using System.Web.Routing;
 using System.Web.SessionState;
 using Newtonsoft.Json;
+using Sitecore.Diagnostics;
+using Sitecore.Mvc.Extensions;
 using Sitecore.Pipelines;
+using Sitecore.Shell.Framework;
+using Sitecore.Shell.Framework.Commands;
+using Sitecore.StringExtensions;
+using Sitecore.Web.UI.Sheer;
 using SitecoreSidekick.Core;
+using SitecoreSidekick.Pipelines.HttpRequestBegin;
 
 namespace SitecoreSidekick.Handlers
 {
@@ -25,7 +32,16 @@ namespace SitecoreSidekick.Handlers
 		private readonly ConcurrentDictionary<string, byte[]> _imageCache = new ConcurrentDictionary<string, byte[]>();
 
 		public virtual bool IsReusable => true;
+		public bool AdminOnly { get; }
+		public List<string> Roles { get; }
+		public List<string> Users { get; }
 
+		protected ScsHttpHandler(string roles, string isAdmin, string users)
+		{
+			AdminOnly = isAdmin == "true";
+			Roles = roles.Split('|').Where(x => !x.IsWhiteSpaceOrNull()).ToList();
+			Users = users.Split('|').Where(x => !x.IsWhiteSpaceOrNull()).ToList();
+		}
 		public void Process(PipelineArgs args)
 		{
 			ScsHandler.RegisterSideKick(this);
@@ -71,6 +87,18 @@ namespace SitecoreSidekick.Handlers
 				ReturnImage(context, file, ImageFormat.Wmf, "image/wmf");
 			else if (file.EndsWith(".svg"))
 				ReturnResource(context, file, "image/svg+xml");
+		}
+
+		public bool ApplicableSidekick()
+		{
+			bool admin = IsAdmin.CurrentUserAdmin();
+			if (admin)
+				return true;
+			if (AdminOnly)
+				return false;
+			if (Roles.Count == 0)
+				return true;
+			return IsAdmin.CurrentUserInRoleList(Roles);
 		}
 
 		/// <summary>
@@ -237,7 +265,6 @@ namespace SitecoreSidekick.Handlers
 		public abstract string ResourcesPath { get; set; }
 		public abstract string Icon { get; }
 		public abstract string Name { get; }
-		public abstract bool AdminOnly { get; }
 		public abstract string CssStyle { get; }
 		public abstract void ProcessRequest(HttpContextBase context);
 	}

@@ -14,7 +14,7 @@ namespace ScsContentMigrator
 	{
 		private OperationStatus _status;
 		private int _maxThreads = 10;
-		private int _runningThreads = 0;
+		private List<IAsyncResult> _runningThreads = new List<IAsyncResult>();
 		private ConcurrentQueue<Tuple<WaitCallback, object>> _state = new ConcurrentQueue<Tuple<WaitCallback, object>>();
 		private bool starting = true;
 
@@ -23,17 +23,24 @@ namespace ScsContentMigrator
 			_status = status;
 			Task.Run(() =>
 			{
-				while (_runningThreads > 0 || _state.Count > 0 || starting)
+				while (_runningThreads.Count > 0 || _state.Count > 0 || starting)
 				{
 					try
 					{
-						if (_runningThreads < _maxThreads)
+						for (int i = 0; i < _runningThreads.Count; i++)
+						{
+							if (_runningThreads[i] == null || _runningThreads[i].IsCompleted)
+							{
+								_runningThreads.RemoveAt(i);
+								i--;
+							}
+						}
+						if (_runningThreads.Count < _maxThreads)
 						{
 							Tuple<WaitCallback, object> stateTuple = null;
 							if (_state.TryDequeue(out stateTuple))
 							{
-								_runningThreads++;
-								stateTuple.Item1.BeginInvoke(stateTuple.Item2, ThreadReturn, null);
+								_runningThreads.Add(stateTuple.Item1.BeginInvoke(stateTuple.Item2, null, null));
 							}
 							else
 							{
@@ -45,7 +52,7 @@ namespace ScsContentMigrator
 					{
 						Log.Error("problem initializing the content migration thread", e, this);
 					}
-					if (_runningThreads == _maxThreads)
+					if (_runningThreads.Count == _maxThreads)
 						Thread.Sleep(10);
 				}
 				_status.EndOperation();
@@ -55,10 +62,6 @@ namespace ScsContentMigrator
 		{
 			_state.Enqueue(new Tuple<WaitCallback, object>(f, state));
 			starting = false;
-		}
-		private void ThreadReturn(IAsyncResult ar)
-		{
-			_runningThreads--;
 		}
 	}
 }

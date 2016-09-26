@@ -1,13 +1,13 @@
 .alpane {
-	padding: 2px;
 	position: absolute;
-	background-color: #333;
 	color: black;
+	background-color: #ddd;
+	border: thin solid black;
 }
 
 .alnote {
 	left: 100px;
-	top: 100px;
+	margin-top: -100px;
 	min-width: 30%;
 	max-width: 80%;
 }
@@ -18,14 +18,17 @@
 
 .almenu {
 	max-height: 520px;
-	overflow-y: auto;
+	padding: 2px;
+}
+
+.almenu .tab {
+    background-color: #aaa;
 }
 
 .alfilter {
 	margin-top: -45px;
 	float: right;
 	position: inherit;
-
 }
 
 .aldetailpane {
@@ -33,10 +36,28 @@
 	background-color: #ddd;
 }
 
+.alqueryfilterpane {
+	margin-top: 5px;
+	border: thin solid black;
+	background-color: #eee;
+	margin-left: -3px;
+	margin-right: -2px;
+	margin-bottom: -3px;
+	overflow: hidden;
+	border-right: 0px;
+	padding: 7px;
+}
+
+.alactive {
+    background-color: #eee !important;
+    border-bottom: thin solid #eee;
+}
+
 .aldetailheading {
 	color: white;
 	font-size: 13pt;
-	margin: 5px;
+	margin: 0px;
+	background-color: #2b2b2b;
 }
 
 .autoCompletePane {
@@ -67,12 +88,21 @@
 	margin-top: 15px;
 	margin-right: 10px;
 }
+
 ins {
-    background-color: #cfc;
-    text-decoration: none;
+	background-color: #cfc;
+	text-decoration: none;
 }
 
 del {
-    color: #999;
-    background-color:#FEC8C8;
+	color: #999;
+	background-color: #FEC8C8;
+}
+
+.axis path,
+.axis line {
+	fill: none;
+	stroke: grey;
+	stroke-width: 1;
+	shape-rendering: crispEdges;
 }

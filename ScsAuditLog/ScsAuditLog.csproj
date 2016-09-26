@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ScsAuditLog</RootNamespace>
     <AssemblyName>ScsAuditLog</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -34,9 +34,6 @@
     <Reference Include="Esent.Collections">
       <HintPath>Dependencies\Esent.Collections.dll</HintPath>
     </Reference>
-    <Reference Include="Esent.Interop">
-      <HintPath>Dependencies\Esent.Interop.dll</HintPath>
-    </Reference>
     <Reference Include="Esent.Isam">
       <HintPath>Dependencies\Esent.Isam.dll</HintPath>
     </Reference>
@@ -52,9 +49,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Dependencies\Lib\Sitecore\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="Rhino.PersistentHashTable, Version=1.7.0.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
-      <HintPath>..\packages\Rhino.PersistentHashTable.1.7.0.0\lib\4.0\Rhino.PersistentHashTable.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Sitecore.Client">
+      <HintPath>..\Dependencies\Lib\Sitecore\Sitecore.Client.dll</HintPath>
     </Reference>
     <Reference Include="Sitecore.Kernel">
       <HintPath>..\Dependencies\Lib\Sitecore\Sitecore.Kernel.dll</HintPath>
@@ -69,10 +65,6 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="Wintellect.Threading, Version=4.2.3353.29511, Culture=neutral, PublicKeyToken=167f00fdf109b063, processorArchitecture=MSIL">
-      <HintPath>..\packages\Rhino.ServiceBus.References.2.1.0.0\lib\Wintellect.Threading.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AuditLogger.cs" />

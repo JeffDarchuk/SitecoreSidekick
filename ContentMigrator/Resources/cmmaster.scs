@@ -28,19 +28,34 @@
 		</fieldset>
 
 		<a class="btn" ng-click="vm.pull()">Pull</a>
+		<fieldset class="cmresults" ng-if="vm.runningOperations && vm.runningOperations.length > 0">
+			<legend>Currently Running Operations</legend>
+			<a class="btn cmresult" ng-click="vm.streamResults(item.operationId)" ng-repeat="item in vm.runningOperations">
+				<img ng-src="/temp/IconCache/{{item.Icon}}" />
+				<h4>{{item.DisplayName}}</h4>
+			</a>
+		</fieldset>
+		<fieldset class="cmresults" ng-if="vm.completedOperations && vm.completedOperations.length > 0">
+			<legend>Completed Operations</legend>
+			<a class="btn cmresult" ng-click="vm.streamResults(item.operationId)" ng-repeat="item in vm.completedOperations">
+				<img ng-src="/temp/IconCache/{{item.Icon}}" />
+				<h4>{{item.DisplayName}}</h4>
+			</a>
+		</fieldset>
 	</div>
 	<div ng-if="vm.operationId">
-		<span class="btn" style="float: right;" ng-click="vm.reset()">Start New Content Migration</span>
-		<input id="showpath" type="checkbox" ng-model="vm.showPath"/><label for="showpath">Show the path for results</label>
+		<span class="btn" style="float: right;" ng-click="vm.reset()">Content Migrator Home</span>
+		<span ng-if="vm.spinner" class="btn" style="float: right;" ng-click="vm.stopOperation()">Cancel Operation</span>
+		<input id="showpath" type="checkbox" ng-model="vm.showPath" /><label for="showpath">Show the path for results</label>
 		<h4 class="cmoperationheader">Operation results <img ng-if="vm.spinner" class="cmspinner" src="/scs/scsspinner.gif" /></h4>
 		<ul ng-if="vm.response.Items">
 			<li>Items: {{vm.response.Items}}</li>
 			<li>Elapsed time: {{vm.response.Time}} seconds</li>
 		</ul>
-		<a class="btn cmtab"  ng-class="{cmselectedtab: vm.response.update.show}" ng-show="vm.response.update.length > 0" ng-click="vm.toggle('update')"> Updates - {{vm.response.update.length}}</a>
-		<a class="btn cmtab"  ng-class="{cmselectedtab: vm.response.insert.show}" ng-show="vm.response.insert.length > 0" ng-click="vm.toggle('insert')"> Inserts - {{vm.response.insert.length}}</a>
-		<a class="btn cmtab"  ng-class="{cmselectedtab: vm.response.recycle.show}" ng-show="vm.response.recycle.length > 0" ng-click="vm.toggle('recycle')"> Recycles - {{vm.response.recycle.length}}</a>
-		<a class="btn cmtab"  ng-class="{cmselectedtab: vm.response.error.show}"  ng-show="vm.response.error.length > 0" ng-click="vm.toggle('error')"> Errors - {{vm.response.error.length}}</a>
+		<a class="btn cmtab" ng-class="{cmselectedtab: vm.response.update.show}" ng-show="vm.response.update.length > 0" ng-click="vm.toggle('update')"> Updates - {{vm.response.update.length}}</a>
+		<a class="btn cmtab" ng-class="{cmselectedtab: vm.response.insert.show}" ng-show="vm.response.insert.length > 0" ng-click="vm.toggle('insert')"> Inserts - {{vm.response.insert.length}}</a>
+		<a class="btn cmtab" ng-class="{cmselectedtab: vm.response.recycle.show}" ng-show="vm.response.recycle.length > 0" ng-click="vm.toggle('recycle')"> Recycles - {{vm.response.recycle.length}}</a>
+		<a class="btn cmtab" ng-class="{cmselectedtab: vm.response.error.show}" ng-show="vm.response.error.length > 0" ng-click="vm.toggle('error')"> Errors - {{vm.response.error.length}}</a>
 	</div>
 	<div class="cmtabpane" ng-if="vm.response.update.show">
 		<dir-pagination-controls pagination-id="updatepagination" template-url="/scs/scsdirpagination.scs">
@@ -48,8 +63,8 @@
 		<div class="cmresults">
 			<span dir-paginate="item in vm.response.update | itemsPerPage:100" pagination-id="updatepagination">
 				<a class="btn cmresult fancybox fancybox.iframe" href="/sitecore/shell/Applications/Content%20Editor.aspx?sc_content=master&fo={{item.Id}}">
-					<img src="{{item.Icon}}" />
-					<h4>{{item.Name}}</h4>	
+					<img ng-src="{{item.Icon}}" />
+					<h4>{{item.Name}}</h4>
 					<div ng-if="vm.showPath">{{item.Path}}</div>
 				</a>
 			</span>
@@ -61,7 +76,7 @@
 		<div class="cmresults">
 			<span dir-paginate="item in vm.response.insert | itemsPerPage:100" pagination-id="insertpagination">
 				<a class="btn cmresult fancybox fancybox.iframe" href="/sitecore/shell/Applications/Content%20Editor.aspx?sc_content=master&fo={{item.Id}}">
-					<img src="{{item.Icon}}" />
+					<img ng-src="{{item.Icon}}" />
 					<h4>{{item.Name}}</h4>
 					<div ng-if="vm.showPath">{{item.Path}}</div>
 				</a>
@@ -74,7 +89,7 @@
 		<div class="cmresults">
 			<span dir-paginate="item in vm.response.recycle | itemsPerPage:100" pagination-id="recyclepagination">
 				<a class="btn cmresult fancybox fancybox.iframe" href="/sitecore/shell/Applications/Content%20Editor.aspx?sc_content=master&fo={{item.Id}}">
-					<img src="{{item.Icon}}" />
+					<img ng-src="{{item.Icon}}" />
 					<h4>{{item.Name}}</h4>
 					<div ng-if="vm.showPath">{{item.Path}}</div>
 				</a>
@@ -87,7 +102,7 @@
 		<div class="cmresults">
 			<span dir-paginate="item in vm.response.error | itemsPerPage:100" pagination-id="errorpagination">
 				<a class="btn cmresult fancybox fancybox.iframe" href="/sitecore/shell/Applications/Content%20Editor.aspx?sc_content=master&fo={{item.Id}}">
-					<img src="{{item.Icon}}" />
+					<img ng-src="{{item.Icon}}" />
 					<h4>{{item.Name}}</h4>
 					<div>{{item.Path}}</div>
 				</a>

@@ -38,6 +38,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Dependencies\Lib\Sitecore\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="Sitecore.Client">
+      <HintPath>..\Dependencies\Lib\Sitecore\Sitecore.Client.dll</HintPath>
+    </Reference>
     <Reference Include="Sitecore.Kernel">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Dependencies\Lib\Sitecore\Sitecore.Kernel.dll</HintPath>

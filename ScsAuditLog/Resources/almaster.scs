@@ -1,32 +1,7 @@
 <div ng-controller="alcontroller as vm" ng-click="vm.mainClick($event)">
-	<style>
-		/* set the CSS */
-
-		body { font: 12px Arial;}
-
-		path {
-		stroke: steelblue;
-		stroke-width: 2;
-		fill: none;
-		}
-
-		.axis path,
-		.axis line {
-		fill: none;
-		stroke: grey;
-		stroke-width: 1;
-		shape-rendering: crispEdges;
-		}
-		.almenu{
-		background-color: #ddd;
-		border: thin solid black;
-		padding: 10px;
-		}
-
-	</style>
 	<div>
 		<div>
-			<a href="#" class="btn" ng-click="vm.resetPanes('viewQuery')">Query</a>
+			<a href="#" class="btn" ng-click="vm.resetPanes('viewQuery')">Filter</a>
 		</div>
 		<div ng-show="vm.panes.viewQuery" ng-click="vm.autoComplete = false" class="alpane">
 			<div class="almenu">
@@ -37,28 +12,36 @@
 					<label for="alEndDate">End Date</label>
 					<input type="text" id="alEndDate" ng-model="vm.end"/>
 				</fieldset>
-				<fieldset>
-					<legend>Text Search</legend>
-					<input id="alTextSearch" onfocus="this.select();" ng-model="vm.queryText" ng-keyup="vm.queryAutoComplete($event)" />
-					<a class="btn" ng-click="vm.query(vm.queryText, 'content')">Query</a>
-					<ul ng-if="vm.autoComplete" class="autoCompletePane">
-						<li ng-repeat="(key, value) in vm.autoComplete" value="{{key}}" ng-click="vm.query(key, 'content')">{{value}} - {{key}}</li>
-					</ul>
-				</fieldset>
-				<fieldset>
-					<legend>Item Search</legend>
-					<alcontenttree parent="''" events="vm.treeEvents" ></alcontenttree>
-				</fieldset>
-				<fieldset>
-					<legend>User</legend>
-					<select ng-model="vm.user" ng-change="vm.query(vm.user, 'user')">
-						<option ng-repeat="user in vm.users" value="{{user}}" >{{user}}</option>
-					</select>
-				</fieldset>
+				<span ng-click="vm.filterType='none'" ng-class="['tab', {alactive: vm.filterType==='none' || !vm.filterType}]">No Additional Filters</span>
+				<span ng-click="vm.filterType='text'" ng-class="['tab', {alactive: vm.filterType==='text'}]">Content Filter</span>
+				<span ng-click="vm.filterType='item'" ng-class="['tab', {alactive: vm.filterType==='item'}]">Item Filter</span>
+				<span ng-click="vm.filterType='user'" ng-class="['tab', {alactive: vm.filterType==='user'}]">User Filter</span>
+				<div class="alqueryfilterpane">
+					<div class="alqueryfilter" ng-if="!vm.filterType || vm.filterType === 'none'">
+						<a class="btn" ng-click="vm.query('*', 'content')">Query Without Additional Filters</a>
+					</div>
+					<div class="alqueryfilter" ng-if="vm.filterType === 'text'">
+						<span>Text to filter by</span>
+						<input id="alTextSearch" onfocus="this.select();" ng-model="vm.queryText" ng-keyup="vm.queryAutoComplete($event)" />
+						<a class="btn" ng-click="vm.query(vm.queryText, 'content')">Query</a>
+						<ul ng-if="vm.autoComplete" class="autoCompletePane">
+							<li ng-repeat="(key, value) in vm.autoComplete" value="{{key}}" ng-click="vm.query(key, 'content')">{{value}} - {{key}}</li>
+						</ul>
+					</div>
+					<div class="alqueryfilter" ng-if="vm.filterType === 'item'">
+						<alcontenttree parent="''" events="vm.treeEvents" ></alcontenttree>
+					</div>
+					<div class="alqueryfilter" ng-if="vm.filterType === 'user'">
+						<span>User to filter by</span>
+						<select ng-model="vm.user" ng-change="vm.query(vm.user, 'user')">
+							<option ng-repeat="user in vm.users" value="{{user}}" >{{user}}</option>
+						</select>
+					</div>
+				</div>
 			</div>
 		</div>
 		<div class ="alpane alfilter">
-			<h3>Filters</h3>
+			<h3>Events</h3>
 			<div class="almenu" >
 				<div class="graph-colors">
 					<div>
@@ -126,14 +109,16 @@
 			<table>
 				<tr>
 					<th>Time</th>
+					<th>User</th>
 					<th>Type</th>
 					<th>Details</th>
 				</tr>
 				<tr ng-repeat="item in vm.events"  ng-class="{even: $even, odd: $odd}">
 					<td ng-bind="item.TimeStamp | date:'h:mm ss a MMM, dd yyyy'"></td>
+					<td ng-bind="item.User"></td>
 					<td ng-style="{'border-left':'solid 10px ' + vm.eventList[item.EventId].Color}">{{vm.eventList[item.EventId].Label}}</td>
 					<td>
-						<a href="#" ng-click="vm.resetPanes(item.Uid)">See Details</a>
+						<a class="lite-btn" ng-click="vm.resetPanes(item.Uid)">See Details</a>
 						<div ng-if="vm.panes[item.Uid]" class="alpane alnote">
 							<h5 ng-if="item.User" class="aldetailheading">User</h5>
 							<div ng-if="item.User" class="aldetailpane">{{item.User}}</div>

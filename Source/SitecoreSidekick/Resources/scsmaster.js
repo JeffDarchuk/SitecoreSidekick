@@ -1,4 +1,5 @@
 ﻿/// <reference path="angular.js" />
+var scsActiveModule = "";
 (function () {
 	'use strict';
 
@@ -11,19 +12,25 @@
 		var vm = this;
 		vm.selectSidekick = function (sk) {
 			vm.sidekick = sk;
-			setTimeout(function() {
-				var active = $("#" + sk.replace(" ", "").toLowerCase());
-				active.parent().parent().attr("style", active.attr("targetwidth"));
-				$(".scs-form").css("max-height", $(window).height()*.8 + "px");
+			setTimeout(function () {
+				if ($(".scs-form").length === 0)
+					vm.goHome();
+				else {
+					var active = $("#" + sk.replace(" ", "").toLowerCase());
+					active.parent().parent().attr("style", active.attr("targetwidth"));
+					$(".scs-form").css("max-height", $(window).height() * .8 + "px");
+				}
 			}, 1);
-			$cookies.put("sidekick",sk);
+			$cookies.put("sidekick", sk);
+			scsActiveModule = sk;
 		}
 		vm.goHome = function () {
 			$(".scs-form").css("max-height", window.top.screen.height + "px");
 			var active = $("#" + vm.sidekick.replace(" ", "").toLowerCase());
 			active.parent().parent().attr("style", "width:600px;");
 			vm.sidekick = "";
-			$cookies.put("sidekick","");
+			$cookies.put("sidekick", "");
+			scsActiveModule = "";
 		}
 		vm.selectSidekick($cookies.get("sidekick"));
 	}

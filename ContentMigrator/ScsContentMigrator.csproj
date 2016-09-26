@@ -54,6 +54,9 @@
       <HintPath>..\packages\Rainbow.Storage.Yaml.1.3.1\lib\net45\Rainbow.Storage.Yaml.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Sitecore.Client">
+      <HintPath>..\Dependencies\Lib\Sitecore\Sitecore.Client.dll</HintPath>
+    </Reference>
     <Reference Include="Sitecore.Kernel">
       <HintPath>..\Dependencies\Lib\Sitecore\Sitecore.Kernel.dll</HintPath>
     </Reference>

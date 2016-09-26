@@ -34,8 +34,9 @@ namespace ScsAuditLog
 		public override string Icon { get; } = "/scs/portfoliofolder.png";
 		public override string Name { get; } = "Audit Log";
 		public override string CssStyle { get; } = "width:1000px";
+		private List<string> _luceneSpecialChars = new List<string>() { "+", "-", "&&", "||", "!", "(", ")", "{", "}", "[", "]", "^", "\"", "~", "*", "?", ":", "\\" };
 
-		public AuditLogHandler(string keepBackups, string keepRecords)
+		public AuditLogHandler(string keepBackups, string keepRecords, string roles, string isAdmin, string users) : base(roles, isAdmin, users)
 		{
 			Database db = Factory.GetDatabase(Root.DatabaseName, false);
 			if (db != null)
@@ -59,10 +60,6 @@ namespace ScsAuditLog
 			var file = GetFile(context);
 			if (file == "alcontenttree.scsvc")
 				ReturnJson(context, GetContentTree(context));
-			else if (file == "algettoday.scsvc")
-				ReturnJson(context, GetFilteredLogEntries(context));
-			else if (file == "alquery.scsvc")
-				ReturnJson(context, GetQueryResults(context));
 			else if (file == "alqueryactivity.scsvc")
 				ReturnJson(context, GetUserActivity(context));
 			else if (file == "aleventtypes.scsvc")
@@ -109,7 +106,7 @@ namespace ScsAuditLog
 			foreach (string term in terms)
 			{
 				if (term != "*")
-					sb.Append($"{key}:{term} OR ");
+					sb.Append($"{key}:{ReplaceReservedChars(term)} OR ");
 			}
 			if (sb.Length > 1)
 			{
@@ -123,7 +120,7 @@ namespace ScsAuditLog
 		private IEnumerable<IAuditEntry> getResults(TopDocs ids, int page, IndexSearcher searcher)
 		{
 			int skip = page*20;
-			return ids.ScoreDocs.Skip(skip).Take(20).Select(x => new BasicAuditEntry(searcher.Doc(x.Doc), x.Doc));
+			return ids.ScoreDocs.Reverse().Skip(skip).Take(20).Select(x => new BasicAuditEntry(searcher.Doc(x.Doc), x.Doc));
 		} 
 		private object GetAutocomplete(HttpContextBase context)
 		{
@@ -212,25 +209,9 @@ namespace ScsAuditLog
 			ret.LogEntries = null;// timeSet;
 			return ret;
 		}
-		private object GetQueryResults(HttpContextBase context)
+		private string ReplaceReservedChars(string rawInput)
 		{
-			//var data = GetPostData(context);
-			//return AuditLogger.Current.Query(data.query).Reverse();
-			return null;
+			return _luceneSpecialChars.Aggregate(rawInput, (current, c) => current.Replace(c, "*"));
 		}
-
-		private object GetFilteredLogEntries(HttpContextBase context)
-		{
-			//return AuditLogger.Current.Query(DateTime.Now.ToString("yyyyMMdd")).Reverse();
-			return null;
-		}
-
-		private object GetAllLogEntries(HttpContextBase context)
-		{
-			//return AuditLogger.Current.Query("*").Reverse();
-			return null;
-		}
-
-		public override bool AdminOnly { get; } = true;
 	}
 }

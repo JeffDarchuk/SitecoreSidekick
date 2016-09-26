@@ -36,7 +36,7 @@ namespace ScsAuditLog.Core
 		AuditTrie<string> trie = new AuditTrie<string>(null);
 		private bool _updateLog = false;
 		private object locker = new object();
-		private List<string> users = new List<string>(); 
+		private HashSet<string> users = new HashSet<string>(); 
 		private static Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_29);
 		private static readonly MultiFieldQueryParser Parser = new MultiFieldQueryParser(Lucene.Net.Util.Version.LUCENE_29,
 				new[] { "content", "date" },
@@ -113,7 +113,7 @@ namespace ScsAuditLog.Core
 			return null;
 		}
 
-		public List<string> GetUsers()
+		public HashSet<string> GetUsers()
 		{
 			return users;
 		} 
@@ -158,18 +158,20 @@ namespace ScsAuditLog.Core
 		{
 
 			Document doc = new Document();
-			AddField(doc, "user", entry.User.ToLower());
-			AddField(doc, "path", entry.Path);
-			AddField(doc, "id", entry.Id.ToShortID().ToString().ToLower());
-			AddField(doc, "date", entry.TimeStamp.ToString("yyyyMMdd"));
-			AddField(doc, "timestamp", entry.TimeStamp.ToString("yyyy-MM-ddTHH:mm:ss.fff"));
-			AddField(doc, "note", entry.Note);
-			AddField(doc, "database", entry.Database);
+			AddField(doc, "user", entry.User.ToLower(), Field.Index.NOT_ANALYZED);
+			if (!users.Contains(entry.User.ToLower()))
+				users.Add(entry.User.ToLower());
+			AddField(doc, "path", entry.Path, Field.Index.ANALYZED);
+			AddField(doc, "id", entry.Id.ToShortID().ToString().ToLower(), Field.Index.ANALYZED);
+			AddField(doc, "date", entry.TimeStamp.ToString("yyyyMMdd"), Field.Index.ANALYZED);
+			AddField(doc, "timestamp", entry.TimeStamp.ToString("yyyy-MM-ddTHH:mm:ss.fff"), Field.Index.ANALYZED);
+			AddField(doc, "note", entry.Note, Field.Index.ANALYZED);
+			AddField(doc, "database", entry.Database, Field.Index.ANALYZED);
 			foreach (var role in entry.Role)
-				AddField(doc, "role", role.ToLower());
-			AddField(doc, "event", entry.EventId);
+				AddField(doc, "role", role.ToLower(), Field.Index.NOT_ANALYZED);
+			AddField(doc, "event", entry.EventId, Field.Index.ANALYZED);
 			if (!string.IsNullOrWhiteSpace(content))
-				AddField(doc, "content", content);
+				AddField(doc, "content", content, Field.Index.ANALYZED);
 			writeQueue.Enqueue(doc);
 			KickOptimizeTimer();
 		}
@@ -213,9 +215,9 @@ namespace ScsAuditLog.Core
 			}
 		}
 
-		private void AddField(Document doc, string name, string value)
+		private void AddField(Document doc, string name, string value, Field.Index type)
 		{
-			Field f = new Field(name, value, Field.Store.YES, Field.Index.ANALYZED);
+			Field f = new Field(name, value, Field.Store.YES, type);
 			doc.Add(f);
 		}
 
@@ -240,7 +242,7 @@ namespace ScsAuditLog.Core
 			try
 			{
 				var lq = Parser.Parse(query);
-				var sorter = new Sort(new SortField("timestamp", CultureInfo.CurrentCulture, true));
+				var sorter = new Sort(new SortField("timestamp", SortField.LONG, true));
 				return searcher.Search(lq, null, int.MaxValue, sorter);
 			}
 			catch (Exception e)

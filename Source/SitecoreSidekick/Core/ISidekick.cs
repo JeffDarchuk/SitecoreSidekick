@@ -13,9 +13,12 @@ namespace SitecoreSidekick.Core
 		string Name { get; }
 		string CssStyle { get; }
 		bool AdminOnly { get; }
+		List<string> Roles { get; }
+		List<string> Users { get; } 
 		string CompileEmbeddedResource(string fileExtension);
 		void ProcessRequest(HttpContextBase context);
 		void ProcessResourceRequest(HttpContextBase context);
+		bool ApplicableSidekick();
 
 	}
 }

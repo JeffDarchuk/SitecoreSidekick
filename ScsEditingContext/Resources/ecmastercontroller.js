@@ -29,8 +29,10 @@
 				vm.error = response.data;
 			});
 		}
-		$interval(function () {
+		var running = $interval(function () {
 			vm.refreshHistory();
+			if (scsActiveModule !== "Editing Context")
+				$interval.cancel(running);
 		}, 5000);
 		vm.refreshHistory();
 	}

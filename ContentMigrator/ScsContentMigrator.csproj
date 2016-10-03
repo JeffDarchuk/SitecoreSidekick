@@ -135,6 +135,5 @@
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="C:\inetpub\wwwroot\Debut\Source\Debut.Web\bin" />
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="C:\inetpub\wwwroot\APGit\Source\AirProducts.Web\bin" />
     <Copy SourceFiles="C:\Development\Sitecore Sidekick\packages\Lucene.Net.3.0.3\lib\net40\Lucene.Net.dll" DestinationFolder="C:\inetpub\wwwroot\Debut\Source\Debut.Web\bin" />
-    <Copy SourceFiles="C:\Development\Sitecore Sidekick\ContentMigrator\zSCSContentMigrator.config" DestinationFolder="C:\inetpub\wwwroot\Debut\Source\Debut.Web\App_Config\Include" />
   </Target>
 </Project>

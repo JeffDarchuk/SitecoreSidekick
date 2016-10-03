@@ -27,7 +27,7 @@ namespace ScsAuditLog
 {
 	public class AuditLogHandler : ScsHttpHandler
 	{
-		private static ContentTreeNode Root = new ContentTreeNode() { DatabaseName = "master", DisplayName = "Root", Icon = "Applications/32x32/media_stop.png", Open = true, Nodes = new List<ContentTreeNode>() };
+		private static ContentTreeNode Root = new ContentTreeNode() { DatabaseName = "master", DisplayName = "Root", Icon = "/~/icon/Applications/32x32/media_stop.png", Open = true, Nodes = new List<ContentTreeNode>() };
 		public override string Directive { get; set; } = "aldirective";
 		public override NameValueCollection DirectiveAttributes { get; set; }
 		public override string ResourcesPath { get; set; } = "ScsAuditLog.Resources";
@@ -146,8 +146,7 @@ namespace ScsAuditLog
 				string[] parts = attr["type"].Value.Split(',');
 				var assembly = Assembly.Load(parts[1].Trim());
 				var type = assembly.GetType(parts[0]);
-				var method = type.GetMethod("Process");
-				IEventType o = Activator.CreateInstance(type) as IEventType;
+				AuditEventType o = Activator.CreateInstance(type) as AuditEventType;
 				if (o != null)
 				{
 					o.Color = attr["color"].Value;
@@ -156,7 +155,7 @@ namespace ScsAuditLog
 					AuditLogger.Current.RegisterEventType(o);
 					EventHandler e = (sender, args) =>
 					{
-						method.Invoke(o, new[] { sender, args });
+						o.Process(sender, args);
 					};
 					Event.Subscribe(attr["event"].Value, e);
 				}

@@ -57,7 +57,14 @@ namespace ScsContentMigrator
 
 		public static IEnumerable<dynamic> GetRunningOperations()
 		{
-			return _operation.Values.Select(x => new {x.Completed, x.RootNode, x.OperationId});
+			return _operation.Values.Select(x => new {x.Completed, x.RootNode, x.OperationId, x.IsPreview, x.Cancelled});
+		}
+
+		public static OperationStatus GetOperation(string id)
+		{
+			if (_operation.ContainsKey(id))
+				return _operation[id];
+			return null;
 		}
 
 		public static IEnumerable<dynamic> OperationStatus(string operationId, int lineNumber)

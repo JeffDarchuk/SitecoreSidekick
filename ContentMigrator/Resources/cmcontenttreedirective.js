@@ -17,7 +17,8 @@
                 parent: '=',
                 events: '=',
                 selected: '=',
-				server: '='
+                server: '=',
+				database: '='
             },
             compile: function(tElement, tAttr) {
                 var contents = tElement.contents().remove();

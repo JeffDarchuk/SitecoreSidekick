@@ -1,4 +1,6 @@
-﻿using System.Web.Routing;
+﻿using System.Web;
+using System.Web.Routing;
+using System.Xml;
 using Sitecore.Configuration;
 using Sitecore.Data;
 using Sitecore.Data.Items;
@@ -51,12 +53,23 @@ namespace SitecoreSidekick.Pipelines.Initialize
 				using (new EditContext(sk))
 				{
 					sk["Display name"] = "Sitecore Sidekick";
-					sk["Icon"] = "office/32x32/sword.png";
+					if (IsSc8())
+						sk["Icon"] = "office/32x32/sword.png";
+					else
+						sk["Icon"] = "Network/32x32/knight.png";
 					sk["Message"] = "scs:open";
 					sk["Tool tip"] = "Open the Sitecore Sidekick";
 				}
 			}
 
+		}
+
+		private static bool IsSc8()
+		{
+			XmlDocument doc = new XmlDocument();
+			doc.Load(HttpRuntime.AppDomainAppPath + "/sitecore/shell/sitecore.version.xml");
+			var selectSingleNode = doc.SelectSingleNode("/information/version/major");
+			return selectSingleNode != null && selectSingleNode.InnerText == "8";
 		}
 
 		public static void RegisterRoutes(string route)

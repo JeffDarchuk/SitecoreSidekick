@@ -24,18 +24,39 @@ namespace ScsContentMigrator
 	public class ContentMigrationHandler : ScsHttpHandler
 	{
 		private static readonly RemoteContentPuller Puller = new RemoteContentPuller();
-		private static ContentTreeNode Root = new ContentTreeNode() { DatabaseName = "master", DisplayName = "Root", Icon = "Applications/32x32/media_stop.png", Open = true, Nodes = new List<ContentTreeNode>() };
+		private static ContentTreeNode Root = new ContentTreeNode() { DatabaseName = "master", DisplayName = "Root", Icon = "/~/icon/Applications/32x32/media_stop.png", Open = true, Nodes = new List<ContentTreeNode>() };
 		private static List<string> ServerList = new List<string>();
-
+		internal static int remoteThreads = 1;
+		internal static int writerThreads = 1;
 		public override string Directive { get; set; } = "cmmasterdirective";
 		public override NameValueCollection DirectiveAttributes { get; set; }
 		public override string ResourcesPath { get; set; } = "ScsContentMigrator.Resources";
 		public override string Icon => "/scs/cm.png";
 		public override string Name => "Content Migrator";
 		public override string CssStyle => "width:800px";
-		public ContentMigrationHandler(string roles, string isAdmin, string users) : base(roles, isAdmin, users)
+		public ContentMigrationHandler(string roles, string isAdmin, string users, string remotePullingThreads, string databaseWriterThreads) : base(roles, isAdmin, users)
 		{
+			if (remoteThreads == 1)
+				int.TryParse(remotePullingThreads, out remoteThreads);
+			if (writerThreads == 1)
+				int.TryParse(databaseWriterThreads, out writerThreads);
 		}
+		public void BuildRoot(XmlNode node)
+		{
+			string dbName = "master";
+			if (node.Attributes != null && node.Attributes["database"] != null && !string.IsNullOrWhiteSpace(node.Attributes["database"].Value))
+			{
+				dbName = node.Attributes["database"].Value;
+			}
+			var db = Factory.GetDatabase(dbName, false);
+			using (new SecurityDisabler())
+			{
+				var item = db.GetItem(node.InnerText);
+				if (item != null)
+					Root.Nodes.Add(new ContentTreeNode(item, false));
+			}
+		}
+
 		public override void ProcessRequest(HttpContextBase context)
 		{
 			var file = GetFile(context);
@@ -53,8 +74,25 @@ namespace ScsContentMigrator
 				ReturnJson(context, GetOperationList(context));
 			else if (file == "cmstopoperation.scsvc")
 				ReturnJson(context, StopOperation(context));
+			else if (file == "cmapprovepreview.scsvc")
+				ReturnJson(context, StartPreviewAsPull(context));
+			else if (file == "cmqueuelength.scsvc")
+				ReturnJson(context, OperationQueueLength(context));
 			else
 				ProcessResourceRequest(context);
+		}
+
+		private object OperationQueueLength(HttpContextBase context)
+		{
+			var data = GetPostData(context);
+			return RemoteContentPuller.GetOperation(data.operationId).QueuedItems();
+		}
+
+		private object StartPreviewAsPull(HttpContextBase context)
+		{
+			var data = GetPostData(context);
+			RemoteContentPuller.GetOperation(data.operationId).RunPreviewAsFullOperation();
+			return true;
 		}
 
 		private object StopOperation(HttpContextBase context)
@@ -77,14 +115,6 @@ namespace ScsContentMigrator
 		public void BuildServerList(XmlNode node)
 		{
 			ServerList.Add(node.InnerText);
-		}
-
-		public void BuildRoot(XmlNode node)
-		{
-
-			var db = Factory.GetDatabase(Root.DatabaseName, false);
-			var item = db.GetItem(node.InnerText);
-			Root.Nodes.Add(new ContentTreeNode(item, false));
 		}
 
 		private dynamic PullItem(HttpContextBase context)
@@ -127,10 +157,13 @@ namespace ScsContentMigrator
 
 			}
 			var db = Factory.GetDatabase(data.database);
-			Item item = db.GetItem(data.id);
-			if (data.children)
-				return item.GetYamlTree().ToList();
-			return new List<string>() { item.GetYaml() };
+			using (new SecurityDisabler())
+			{
+				Item item = db.GetItem(data.id);
+				if (data.children)
+					return item.GetYamlTree().ToList();
+				return new List<string>() {item.GetYaml()};
+			}
 		}
 
 		/// <summary>
@@ -153,7 +186,8 @@ namespace ScsContentMigrator
 			{
 
 			}
-			return string.IsNullOrWhiteSpace(data.id.ToString()) ? Root : new ContentTreeNode(Factory.GetDatabase(data.database.ToString()).GetItem(new ID(data.id)));
+			using (new SecurityDisabler())
+				return string.IsNullOrWhiteSpace(data.id.ToString()) ? Root : new ContentTreeNode(Factory.GetDatabase(data.database.ToString()).GetItem(new ID(data.id)));
 		}
 	}
 }

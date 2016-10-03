@@ -28,7 +28,7 @@
 							<li ng-repeat="(key, value) in vm.autoComplete" value="{{key}}" ng-click="vm.query(key, 'content')">{{value}} - {{key}}</li>
 						</ul>
 					</div>
-					<div class="alqueryfilter" ng-if="vm.filterType === 'item'">
+					<div class="alqueryfilter" ng-show="vm.filterType === 'item'">
 						<alcontenttree parent="''" events="vm.treeEvents" ></alcontenttree>
 					</div>
 					<div class="alqueryfilter" ng-if="vm.filterType === 'user'">
@@ -119,7 +119,7 @@
 					<td ng-style="{'border-left':'solid 10px ' + vm.eventList[item.EventId].Color}">{{vm.eventList[item.EventId].Label}}</td>
 					<td>
 						<a class="lite-btn" ng-click="vm.resetPanes(item.Uid)">See Details</a>
-						<div ng-if="vm.panes[item.Uid]" class="alpane alnote">
+						<div ng-attr-id="{{'note' + item.Uid}}" ng-class="{'alvisible': vm.panes[item.Uid], 'alinvisible' : !vm.panes[item.Uid]}" class="alpane alnote">
 							<h5 ng-if="item.User" class="aldetailheading">User</h5>
 							<div ng-if="item.User" class="aldetailpane">{{item.User}}</div>
 							<h5 ng-if="item.Path" class="aldetailheading">Path</h5>

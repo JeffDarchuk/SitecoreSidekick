@@ -106,3 +106,9 @@ del {
 	stroke-width: 1;
 	shape-rendering: crispEdges;
 }
+.alinvisible {
+	visibility: hidden;
+}
+.alvisible {
+	visibility: visible;
+}

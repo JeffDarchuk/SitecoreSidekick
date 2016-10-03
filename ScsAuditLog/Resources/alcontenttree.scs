@@ -12,7 +12,7 @@
 		</div>
 		<a hidefocus="true" ng-class="events.selectedItem == vm.data.Id ? 'scContentTreeNodeActive':'scContentTreeNodeNormal'" style="position: relative;" ng-click="events.click(vm.data);events.selectedItem = vm.data.Id">
 			<span ng-if="vm.data.Icon" class="scContentTreeSelectable">
-				<img ng-src="/temp/IconCache/{{vm.data.Icon}}" width="16" height="16" class="scContentTreeNodeIcon" alt="" border="0" />
+				<img ng-src="{{vm.data.Icon}}" width="16" height="16" class="scContentTreeNodeIcon" alt="" border="0" />
 				{{vm.data.DisplayName}}
 			</span>
 			<span ng-hide="vm.data.Icon">

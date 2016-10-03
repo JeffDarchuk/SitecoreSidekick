@@ -18,6 +18,7 @@ namespace SitecoreSidekick.ContentTree
 		public string Id;
 		public bool Open;
 		public List<ContentTreeNode> Nodes;
+		public string Server;
 
 		public ContentTreeNode()
 		{
@@ -43,11 +44,11 @@ namespace SitecoreSidekick.ContentTree
 			{
 				Icon = GetSrc(ThemeManager.GetIconImage(item, 32, 32, "", ""));
 			}
-			if (!string.IsNullOrWhiteSpace(Icon))
-			{
-				string[] parts = Icon.Split('/');
-				Icon = string.Join("/", parts.Skip(parts.Length - 3));
-			}
+			//if (!string.IsNullOrWhiteSpace(Icon))
+			//{
+			//	string[] parts = Icon.Split('/');
+			//	Icon = string.Join("/", parts.Skip(parts.Length - 3));
+			//}
 		}
 		private string GetSrc(string imgTag)
 		{

@@ -3,9 +3,15 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Drawing.Imaging;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Web;
+using Microsoft.CSharp.RuntimeBinder;
+using Newtonsoft.Json;
+using Sitecore.Configuration;
+using Sitecore.Data.Items;
 using Sitecore.Diagnostics;
+using SitecoreSidekick.ContentTree;
 using SitecoreSidekick.Core;
 using SitecoreSidekick.Pipelines.HttpRequestBegin;
 
@@ -64,7 +70,7 @@ namespace SitecoreSidekick.Handlers
 					if (file == "scs.scs")
 					{
 						var html = GetResource("scsindex.scs").Replace("[[sidekicks]]", GetAllSidekickDirectives());
-						if (context.Request.UrlReferrer != null && (context.Request.UrlReferrer.AbsoluteUri.Contains("default.aspx") || context.Request.UrlReferrer.AbsoluteUri.Contains("/externalapplication")))
+						if (context.Request.QueryString["desktop"] == "true")
 							html = html.Replace("</head>", $"<style>{GenerateDesktopStyle()}</style></head>");
 						ReturnResponse(context, html, "text/html");
 					}
@@ -74,6 +80,8 @@ namespace SitecoreSidekick.Handlers
 						ReturnResponse(context, js.ToString(), "application/javascript");
 					else if (file.EndsWith(".css"))
 						ReturnResponse(context, css.ToString(), "text/css");
+					else if (file == "contenttreeselectedrelated.scsvc")
+						ReturnJson(context, GetContentSelectedRelated(context));
 					else
 						NotFound(context);
 				}
@@ -83,6 +91,39 @@ namespace SitecoreSidekick.Handlers
 				Log.Error("Sitecore sidekick failed to return the proper resource", e, this);
 				Error(context, e);
 			}
+		}
+
+		private object GetContentSelectedRelated(HttpContextBase context)
+		{
+			var data = GetPostData(context);
+			try
+			{
+				if (data.server != null)
+				{
+					WebClient wc = new WebClient { Encoding = Encoding.UTF8 };
+					var node = JsonConvert.DeserializeObject<bool>(wc.UploadString($"{data.server}/scs/contenttreeselectedrelated.scsvc", "POST",
+									$@"{{ ""currentId"": ""{data.currentId}"", ""selectedId"": ""{data.selectedId}""}}"));
+					return node;
+				}
+			}
+			catch (RuntimeBinderException)
+			{
+
+			}
+			var db = Factory.GetDatabase("master", false);
+			if (db == null)
+				return false;
+			if (data.currentId == "")
+				return true;
+			Item current = db.GetItem(data.currentId);
+			Item selected = db.GetItem(data.selectedId);
+			if (current == null || selected == null)
+				return false;
+			var spath = selected.Paths.FullPath;
+			var cpath = current.Paths.FullPath;
+			if (spath == cpath)
+				return false;
+			return spath.StartsWith(cpath);
 		}
 
 		private object GenerateDesktopStyle()

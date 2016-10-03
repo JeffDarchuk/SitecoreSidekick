@@ -5,6 +5,10 @@ namespace ScsContentMigrator.Args
 		public bool overwrite;
 		public bool pullParent;
 		public bool mirror;
+		public bool preview;
+
+		public bool eventDisabler;
+		public bool bulkUpdate;
 
 		public RemoteContentPullArgs()
 		{
@@ -19,6 +23,9 @@ namespace ScsContentMigrator.Args
 			overwrite = data.overwrite;
 			pullParent = data.pullParent;
 			mirror = data.mirror;
+			preview = data.preview;
+			eventDisabler = data.eventDisabler;
+			bulkUpdate = data.bulkUpdate;
 
 		}
 		public override string GetSerializedData()
@@ -29,7 +36,7 @@ namespace ScsContentMigrator.Args
 		public string GetSerializedData(string altId, bool altChildren)
 		{
 			return
-				$"{{\"id\":\"{altId}\",\"database\":\"{database}\",\"children\":{JsonBool(altChildren)},\"overwrite\":{JsonBool(overwrite)},\"pullParent\":{JsonBool(pullParent)}}}";
+				$"{{\"id\":\"{altId}\",\"database\":\"{database}\",\"children\":{JsonBool(altChildren)},\"overwrite\":{JsonBool(overwrite)},\"pullParent\":{JsonBool(pullParent)},\"preview\":{JsonBool(preview)},\"bulkUpdate\":{JsonBool(bulkUpdate)},\"eventDisabler\":{JsonBool(eventDisabler)}}}";
 		}
 		private string JsonBool(bool b)
 		{

@@ -40,7 +40,8 @@ $('.fancybox').fancybox({
 });
 window.onload = function () {
 	document.onkeydown = function (event) {
-		window.parent.document.onkeydown(event);
+		if (window.parent && window.parent.document)
+			window.parent.document.onkeydown(event);
 	};
 };
 $(document).click(function (event) {

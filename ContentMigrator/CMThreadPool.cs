@@ -13,7 +13,6 @@ namespace ScsContentMigrator
 	public class CMThreadPool
 	{
 		private OperationStatus _status;
-		private int _maxThreads = 10;
 		private List<IAsyncResult> _runningThreads = new List<IAsyncResult>();
 		private ConcurrentQueue<Tuple<WaitCallback, object>> _state = new ConcurrentQueue<Tuple<WaitCallback, object>>();
 		private bool starting = true;
@@ -35,7 +34,7 @@ namespace ScsContentMigrator
 								i--;
 							}
 						}
-						if (_runningThreads.Count < _maxThreads)
+						if (_runningThreads.Count < ContentMigrationHandler.remoteThreads)
 						{
 							Tuple<WaitCallback, object> stateTuple = null;
 							if (_state.TryDequeue(out stateTuple))
@@ -52,7 +51,7 @@ namespace ScsContentMigrator
 					{
 						Log.Error("problem initializing the content migration thread", e, this);
 					}
-					if (_runningThreads.Count == _maxThreads)
+					if (_runningThreads.Count == ContentMigrationHandler.writerThreads)
 						Thread.Sleep(10);
 				}
 				_status.EndOperation();

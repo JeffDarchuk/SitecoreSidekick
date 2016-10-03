@@ -58,10 +58,14 @@
 		vm.resetPanes = function (identifier) {
 			if (typeof (vm.panes) === "undefined")
 				vm.panes = new Object();
-			setTimeout(function() {
-				document.getElementById("alTextSearch").focus();
-			}, 10);
 			
+			var el = document.getElementById('note' + identifier);
+			if (el) {
+				if (el.offsetHeight > el.offsetTop)
+					el.style.marginTop = "-" + el.offsetTop + "px";
+				else
+					el.style.marginTop = "-" + el.offsetHeight + "px";
+			}
 			vm.panes[identifier] = true;
 			for (var key in vm.panes) {
 				if (key !== identifier)
@@ -87,6 +91,8 @@
 			else
 				vm.field = "content";
 			vm.lastQuery = text;
+			if (vm.field === "content")
+				vm.queryText = text;
 			ALfactory.query(text.split(/[\s,]+/), field, vm.getFilters(), vm.start, vm.end).then(function (response) {
 				buildGraph(response.data);
 				for (var key in response.data.GraphEntries) {
@@ -110,7 +116,7 @@
 			for (var key in vm.eventList)
 				if (vm[key])
 					arr.push(key);
-			ALfactory.getData(vm.lastQuery.split(/[\s,]+/),vm.field, arr, vm.start, vm.end, vm.page).then(function (response) {
+			ALfactory.getData(vm.lastQuery.split(/[\s,]+/), vm.field, arr, vm.start, vm.end, vm.page).then(function (response) {
 				vm.events = response.data.results;
 				vm.totalResults = response.data.total;
 				vm.resultsPerPage = response.data.perPage;

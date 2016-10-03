@@ -30,9 +30,9 @@
 }
 
 .cmselectedtab {
-	border: thin solid black;
-	border-bottom: darkgray;
-	background-color: darkgray;
+	border: thin solid darkgray;
+    border-bottom: white;
+    background-color: white;
 }
 
 .cmresult {
@@ -47,4 +47,23 @@
 
 .cmresult img {
 	float: left;
+}
+.cmpreviewbtn {
+	background-color: aquamarine;
+}
+.cmresultswrapper {
+    background-color: white;
+}
+.cmresultswrapper td {
+    border: none;
+	padding-bottom: 5px;
+}
+td.cmresultslabel {
+    float: right;
+    white-space: nowrap;
+}
+.cmexecuteoperation {
+	background-color: #fdd;
+    float: right;
+	margin-top: -43px;
 }

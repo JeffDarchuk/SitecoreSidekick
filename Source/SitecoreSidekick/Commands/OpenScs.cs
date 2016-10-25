@@ -17,7 +17,7 @@ namespace SitecoreSidekick.Commands
 			{
 				typeof(Sitecore.Shell.Framework.Windows).GetMethod("RunUri", new [] {typeof(string), typeof(string), typeof(string), typeof(string), typeof(string) }).Invoke(null, new object[]
 				{
-					$"http://{HttpContext.Current.Request.Url.Host}/scs/scs.scs?desktop=true", "office/32x32/sword.png",
+					$"//{HttpContext.Current.Request.Url.Host}/scs/scs.scs?desktop=true", "office/32x32/sword.png",
 					"Sitecore Sidekick", "1000px", "600px"
 				});
 			}

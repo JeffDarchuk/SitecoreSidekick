@@ -24,6 +24,7 @@ using Sitecore.Diagnostics;
 using Lucene.Net.QueryParsers;
 using Lucene.Net.Search;
 using Lucene.Net.Store;
+using Newtonsoft.Json;
 using Directory = Lucene.Net.Store.Directory;
 using Version = Lucene.Net.Util.Version;
 
@@ -42,13 +43,16 @@ namespace ScsAuditLog.Core
 				new[] { "content", "date" },
 				new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29));
 		private int _optimizeTimer = 0;
-		ConcurrentQueue<Document> writeQueue = new ConcurrentQueue<Document>(); 
+		ConcurrentQueue<Tuple<AuditSourceRecord, Document>> writeQueue = new ConcurrentQueue<Tuple<AuditSourceRecord, Document>>(); 
 		//private IndexWriter _writer;
 		private Directory _dir;
 		private int _logDays;
 		private int _recordDays;
 		private bool _clearOld = false;
-		private HashSet<string> _backupDays = new HashSet<string>(); 
+		private HashSet<string> _backupDays = new HashSet<string>();
+		private static string _dataDirectory = "";
+		internal bool rebuilding = false;
+		internal int rebuilt = -1;
 		public AuditLog(int DaysToKeepLog, int DaysToKeepRecords)
 		{
 			string dir = GetDataDirectory();
@@ -154,7 +158,7 @@ namespace ScsAuditLog.Core
 			}
 		}
 
-		public void Log(IAuditEntry entry, string content = "")
+		public void Log(IAuditEntry entry, string content = "", bool newRecord = true)
 		{
 
 			Document doc = new Document();
@@ -172,10 +176,54 @@ namespace ScsAuditLog.Core
 			AddField(doc, "event", entry.EventId, Field.Index.ANALYZED);
 			if (!string.IsNullOrWhiteSpace(content))
 				AddField(doc, "content", content, Field.Index.ANALYZED);
-			writeQueue.Enqueue(doc);
+			writeQueue.Enqueue(newRecord
+				? new Tuple<AuditSourceRecord, Document>(new AuditSourceRecord(entry as ItemAuditEntry, content), doc)
+				: new Tuple<AuditSourceRecord, Document>(null, doc));
 			KickOptimizeTimer();
 		}
 
+		private void WriteSource(AuditSourceRecord record, StringBuilder sb)
+		{
+			if (record.Entry == null) return;
+			sb.Append("<|||>" + JsonConvert.SerializeObject(record) + "<|||>");
+		}
+
+		public void Rebuild()
+		{
+			if (rebuilding) return;
+			rebuilt = 0;
+			Task.Run(() =>
+			{
+				rebuilding = true;
+				lock (locker)
+				{
+					_dir.ClearLock("rebuilding");
+					using (var _writer = new IndexWriter(_dir, analyzer, IndexWriter.MaxFieldLength.UNLIMITED))
+					{
+						_writer.DeleteAll();
+					}
+				}
+				DateTime start = DateTime.Now.Subtract(TimeSpan.FromDays(_recordDays));
+				while (start < DateTime.Now.AddDays(1))
+				{
+					string file = _dataDirectory + "/source/" + start.ToString("yyyy-MMM-dd") + "/source.src";
+					if (File.Exists(file))
+					{
+						byte[] txt = File.ReadAllBytes(file);
+						foreach (string entry in StringZipper.Unzip(txt).Split(new[] {"<|||>"}, StringSplitOptions.RemoveEmptyEntries))
+						{
+							AuditSourceRecord record = JsonConvert.DeserializeObject<AuditSourceRecord>(entry);
+							Task.Delay(1000).Wait();
+							Log(record.Entry, record.Content, false);
+							rebuilt++;
+						}
+					}
+					start = start.AddDays(1);
+				}
+				rebuilt = -1;
+				rebuilding = false;
+			});
+		}
 		private void KickOptimizeTimer()
 		{
 			if (_optimizeTimer == 0)
@@ -183,28 +231,65 @@ namespace ScsAuditLog.Core
 				_optimizeTimer = 100;
 				Task.Run(() =>
 				{
-					ValidateBackup();
-					using (var _writer = new IndexWriter(_dir, analyzer, IndexWriter.MaxFieldLength.UNLIMITED))
+					try
 					{
-						if (_recordDays > 0 && _clearOld)
+						ValidateBackup();
+						lock (locker)
 						{
-							var query = Parser.Parse($"date:[0 TO {DateTime.Now.AddDays(_recordDays*-1).ToString("yyyyMMdd")}]");
-							_writer.DeleteDocuments(query);
-							_clearOld = false;
-						}
-						while (_optimizeTimer > 1)
-						{
-							while (writeQueue.Any())
+							StringBuilder sb = new StringBuilder();
+							using (var _writer = new IndexWriter(_dir, analyzer, IndexWriter.MaxFieldLength.UNLIMITED))
 							{
-								Document doc;
-								if (writeQueue.TryDequeue(out doc))
-									_writer.AddDocument(doc);
+								if (_recordDays > 0 && _clearOld)
+								{
+									var query = Parser.Parse($"date:[0 TO {DateTime.Now.AddDays(_recordDays*-1).ToString("yyyyMMdd")}]");
+									_writer.DeleteDocuments(query);
+									_clearOld = false;
+								}
+								while (_optimizeTimer > 1)
+								{
+									while (writeQueue.Any())
+									{
+										Tuple<AuditSourceRecord, Document> doc;
+										if (writeQueue.TryDequeue(out doc))
+										{
+											_writer.AddDocument(doc.Item2);
+											if (doc.Item1 != null)
+												WriteSource(doc.Item1, sb);
+										}
+									}
+									_optimizeTimer--;
+									Thread.Sleep(100);
+								}
+								try
+								{
+									string dir = _dataDirectory + "/source/" + DateTime.Now.ToString("yyyy-MMM-dd");
+									if (!System.IO.Directory.Exists(dir))
+										System.IO.Directory.CreateDirectory(dir);
+									if (!System.IO.File.Exists(dir + "/source.src"))
+										System.IO.File.Create(dir + "/source.src");
+									byte[] bytes = File.ReadAllBytes(dir + "/source.src");
+									int count = 1;
+									while (count < 100 && IsFileLocked(new FileInfo(dir + "/source.src")))
+									{
+										Task.Delay(100).Wait();
+										count++;
+									}
+									File.WriteAllBytes(dir + "/source.src",
+										bytes.Length != 0 ? StringZipper.Zip(StringZipper.Unzip(bytes) + sb) : StringZipper.Zip(sb.ToString()));
+								}
+								catch (Exception e)
+								{
+									Sitecore.Diagnostics.Log.Error("Unable to write the audit logger source", e, this);
+								}
+								_writer.Commit();
+								_writer.Optimize();
+								_optimizeTimer = 0;
 							}
-							_optimizeTimer--;
-							Thread.Sleep(100);
 						}
-						_writer.Commit();
-						_writer.Optimize();
+					}
+					catch (Exception e)
+					{
+						Sitecore.Diagnostics.Log.Error("Unable to commit to audit logger log", e, this);
 						_optimizeTimer = 0;
 					}
 				});
@@ -232,6 +317,7 @@ namespace ScsAuditLog.Core
 						   @"\AuditLog";
 			if (!System.IO.Directory.Exists(filepath))
 				System.IO.Directory.CreateDirectory(filepath);
+			_dataDirectory = filepath;
 			return filepath;
 		}
 
@@ -254,6 +340,8 @@ namespace ScsAuditLog.Core
 
 		public IndexSearcher GetSearcher()
 		{
+			if (_dir == null)
+				_dir = FSDirectory.Open(new DirectoryInfo(GetDataDirectory()));
 			return new IndexSearcher(_dir, false);
 		}
 		public TopDocs QueryIds(DateTime start, DateTime end, string query, IndexSearcher searcher = null)
@@ -309,16 +397,23 @@ namespace ScsAuditLog.Core
 				{
 					ZipFile.CreateFromDirectory(dir, backupDir + "\\" + date);
 				}
+				string sourceDir = dir + "/source";
 				if (_logDays > 0)
 				{
 					for (int i = 0; i < _logDays; i++)
 					{
 						_backupDays.Add(DateTime.Now.AddDays(i * -1).ToString("yyyy-MMM-dd") + ".zip");
+						_backupDays.Add(DateTime.Now.AddDays(i * -1).ToString("yyyy-MMM-dd"));
 					}
 					foreach (string backup in System.IO.Directory.EnumerateFiles(backupDir))
 					{
 						if (!_backupDays.Contains(Path.GetFileName(backup)))
 							File.Delete(backup);
+					}
+					foreach (string source in System.IO.Directory.EnumerateDirectories(sourceDir))
+					{
+						if (!_backupDays.Contains(Path.GetFileName(source)))
+							System.IO.Directory.Delete(source, true);
 					}
 				}
 			}

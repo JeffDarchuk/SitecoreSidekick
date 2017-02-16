@@ -87,6 +87,8 @@ namespace SitecoreSidekick.Handlers
 				ReturnImage(context, file, ImageFormat.Wmf, "image/wmf");
 			else if (file.EndsWith(".svg"))
 				ReturnResource(context, file, "image/svg+xml");
+			else if (file.EndsWith(".js"))
+				ReturnResource(context, file, "text/javascript");
 		}
 
 		public bool ApplicableSidekick()

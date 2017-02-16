@@ -70,6 +70,21 @@ namespace ScsAuditLog
 				ReturnJson(context, GetActivityData(context));
 			else if (file == "alusers.scsvc")
 				ReturnJson(context, GetUsers(context));
+			else if (file == "alrebuild.scsvc")
+				ReturnJson(context, RebuildLog(context));
+			else if (file == "alrebuildstatus.scsvc")
+				ReturnJson(context, RebuildLogStatus(context));
+		}
+
+		private object RebuildLogStatus(HttpContextBase context)
+		{
+			return AuditLogger.Log.rebuilt;
+		}
+
+		private object RebuildLog(HttpContextBase context)
+		{
+			AuditLogger.Log.Rebuild();
+			return true;
 		}
 
 		private object GetUsers(HttpContextBase context)

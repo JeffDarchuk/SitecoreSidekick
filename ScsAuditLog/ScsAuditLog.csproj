@@ -70,6 +70,7 @@
     <Compile Include="AuditLogger.cs" />
     <Compile Include="AuditLogHandler.cs" />
     <Compile Include="ConcurrentHashSet.cs" />
+    <Compile Include="Model\AuditSourceRecord.cs" />
     <Compile Include="Model\AuditEventType.cs" />
     <Compile Include="Model\AuditGraphCoordinates.cs" />
     <Compile Include="Model\AuditStorage.cs" />
@@ -82,17 +83,17 @@
     <Compile Include="Model\AuditGraphEntry.cs" />
     <Compile Include="Core\AuditLog.cs" />
     <Compile Include="Model\Interface\IAuditEntry.cs" />
-    <Compile Include="ObjectCopier.cs" />
     <Compile Include="Pipelines\GeneralEvent.cs" />
     <Compile Include="Pipelines\OnRename.cs" />
     <Compile Include="Pipelines\OnMoved.cs" />
     <Compile Include="Pipelines\OnDeleted.cs" />
     <Compile Include="Pipelines\OnCreated.cs" />
+    <Compile Include="Pipelines\OnSaveStandardValues.cs" />
     <Compile Include="Pipelines\OnSave.cs" />
     <Compile Include="Pipelines\Publish\AuditPublish.cs" />
     <Compile Include="Pipelines\Publish\AuditPublishItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ZipUtil.cs" />
+    <Compile Include="StringZipper.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Source\SitecoreSidekick\SitecoreSidekick.csproj">
@@ -138,6 +139,14 @@
     <None Include="packages.config" />
     <None Include="zSCSAuditLog.config" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\algear.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
@@ -150,6 +159,7 @@
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="C:\inetpub\wwwroot\Spectrum\Source\Spectrum.Web\bin" />
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="C:\inetpub\wwwroot\Debut\Source\Debut.Web\bin" />
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="C:\inetpub\wwwroot\APGit\Source\AirProducts.Web\bin" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="C:\inetpub\wwwroot\IHN\website\bin" />
     <Copy SourceFiles="C:\Development\Sitecore Sidekick\ScsAuditLog\zScsAuditLog.config" DestinationFolder="C:\inetpub\wwwroot\Debut\Source\Debut.Web\App_Config\Include" />
   </Target>
 </Project>

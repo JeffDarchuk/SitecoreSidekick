@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package>
+	<metadata>
+		<id>SitecoreSidekickCore</id>
+		<title>Sitecore Sidekick Complete</title>
+		<version>$version$</version>
+		<authors>Jeff Darchuk</authors>
+		<owners>Jeff Darchuk</owners>
+		<licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
+		<projectUrl>https://github.com/JeffDarchuk/SitecoreSidekick</projectUrl>
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>
+		<description>Collection of Sitecore Sidekick Apps</description>
+        <summary>Collection of Sitecore Sidekick Apps</summary>
+		<copyright>Copyright 2017 Jeff Darchuk</copyright>
+		<tags>sitecore</tags>
+	<dependencies>
+		<dependency id="SitecoreSidekickFoundation" version="$version$" />
+		<dependency id="SitecoreSidekickEditingContext" version="$version$" />
+		<dependency id="SitecoreSidekickAuditLog" version="$version$" />
+		<dependency id="SitecoreSidekickContentMigrator" version="$version$" />
+	</dependencies>
+	</metadata>
+</package>

@@ -67,3 +67,6 @@ td.cmresultslabel {
     float: right;
 	margin-top: -43px;
 }
+.cmresult img {
+    width: 16px;
+}

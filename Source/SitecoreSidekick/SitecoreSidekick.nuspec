@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>SitecoreSidekickFoundation</id>
+    <version>$version$</version>
+    <title>Sitecore Sidekick Foundation</title>
+    <authors>Jeff Darchuk</authors>
+    <owners>Jeff Darchuk</owners>
+	<licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
+	<projectUrl>https://github.com/JeffDarchuk/SitecoreSidekick</projectUrl>
+
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+	<description>Sitecore Sidekick is a platform for sitecore tools using angularjs.</description>
+	<copyright>Copyright 2017 Jeff Darchuk</copyright>
+	<tags>sitecore</tags>
+  </metadata>
+  	<files>
+		<file src="..\..\Source\SitecoreSidekick\zSCS.config" target="content\App_Config\Include" />
+	</files>
+</package>

@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using Sitecore;
 using Sitecore.Configuration;
 using Sitecore.Data;
+using Sitecore.Data.Items;
 using Sitecore.Pipelines.HttpRequest;
 using SitecoreSidekick.ContentTree;
 
@@ -32,7 +35,10 @@ namespace ScsEditingContext.Pipelines.HttpRequestBegin
 					{
 						return;
 					}
-					ContentTreeNode current = new ContentTreeNode(database.GetItem(tmp), false);
+					Item item = database.GetItem(tmp);
+					if (item != null)
+						EditingContextHandler.Related[HttpContext.Current.Request.Cookies["ASP.NET_SessionId"]?.Value ?? ""] = Globals.LinkDatabase.GetItemReferences(item, true).Select(x => new ContentTreeNode(x.GetTargetItem())).ToList();
+					ContentTreeNode current = new ContentTreeNode(item, false);
 					if (string.IsNullOrWhiteSpace(current.DisplayName))
 						return;
 					if (myCookie?.Value != null)

@@ -5,31 +5,54 @@
         .module('app')
         .controller('cmmastercontroller', cmmastercontroller);
 
-	cmmastercontroller.$inject = ['CMfactory', '$scope', '$timeout'];
+	cmmastercontroller.$inject = ['CMfactory', '$scope', '$timeout', '$window'];
 
-	function cmmastercontroller(CMfactory, $scope, $timeout) {
+	function cmmastercontroller(CMfactory, $scope, $timeout, $window) {
 		/* jshint validthis:true */
 		var vm = this;
 		vm.children = true;
 		vm.overwrite = true;
 		vm.pullParent = true;
 		vm.mirror = false;
-		vm.eventDisabler = false;
-		vm.bulkUpdate = false;
+		vm.eventDisabler = true;
+		vm.bulkUpdate = true;
 		vm.server = "";
 		vm.spinner = false;
 		vm.isPreview = false;
 		vm.events = {
+			'selectedIds': [],
+			'selected': [],
 			'click': function (val) {
-				vm.events.selected = val;
+				if (!vm.events.control) {
+					vm.events.selected = [];
+					vm.events.selectedIds = [];
+				}
+				var index = vm.events.selectedIds.indexOf(val.Id);
+				if (index === -1) {
+					vm.events.selected.push(val);
+					vm.events.selectedIds.push(val.Id);
+				} else {
+					vm.events.selected.splice(index, 1);
+					vm.events.selectedIds.splice(index, 1);
+				}
 			}
 		};
+		angular.element($window)
+			.bind("keydown",
+				function($event) {
+					vm.events.control = $event.ctrlKey;
+				});
+		angular.element($window)
+			.bind("keyup",
+				function ($event) {
+					vm.events.control = false;
+				});
 		vm.pull = function (preview) {
-			if (preview || confirm("Are you sure you would like to pull content from the item " + vm.events.selected.DisplayName)) {
+			if (preview || confirm("Are you sure you would like to pull content from the items " + vm.listSources())) {
 				vm.spinner = true;
-				if (!vm.serverModified && vm.events.selected && vm.events.selected.Id)
-					CMfactory.contentTreePullItem(vm.events.selected.Id, vm.events.selected.DatabaseName, vm.events.server, vm.children, vm.overwrite, vm.pullParent, vm.mirror, preview, vm.eventDisabler, vm.bulkUpdate).then(function (response) {
-						vm.streamResults(response.data, vm.events.server, vm.events.selected.Id, vm.events.selected.DisplayName, preview);
+				if (!vm.serverModified && vm.events.selected && vm.events.selectedIds.length > 0)
+					CMfactory.contentTreePullItem(vm.events.selectedIds, vm.events.selected[0].DatabaseName, vm.events.server, vm.children, vm.overwrite, vm.pullParent, vm.mirror, preview, vm.eventDisabler, vm.bulkUpdate).then(function (response) {
+						vm.streamResults(response.data, vm.events.server, vm.listIds(), vm.listSources(), preview);
 					}, function(response) {
 						vm.error = response.data;
 					});
@@ -39,14 +62,44 @@
 				}
 			}
 		}
+		vm.listSources = function () {
+			var ret = [];
+			for (var i = 0; i < vm.events.selected.length; i++) {
+				ret.push(vm.events.selected[i].DisplayName);
+			}
+			return ret.join(", ");
+		}
+		vm.listIds = function () {
+			var ret = [];
+			for (var i = 0; i < vm.events.selected.length; i++) {
+				ret.push(vm.events.selected[i].Id);
+			}
+			return ret.join(", ");
+		}
 		vm.streamResults = function(id, server, itemId, name, preview) {
 			vm.operationId = id;
 			vm.spinner = true;
 			vm.getStatus();
 			vm.streaming = new Object();
 			vm.streaming.server = server;
-			vm.streaming.id = itemId;
-			vm.streaming.name = name;
+			if (typeof (itemId) === "string")
+				vm.streaming.id = itemId;
+			else {
+				var ret = [];
+				for (var i = 0; i < itemId.length; i++) {
+					ret.push(itemId[i].Id);
+				}
+				vm.streaming.id = ret.join(", ");
+			}
+			if (typeof (name) === "string")
+				vm.streaming.name = name;
+			else {
+				var ret = [];
+				for (var i = 0; i < itemId.length; i++) {
+					ret.push(itemId[i].DisplayName);
+				}
+				vm.streaming.name = ret.join(", ");
+			}
 			vm.response = new Object();
 			vm.response.lineNumber = 0;
 			vm.response.viewingNone = true;
@@ -70,8 +123,10 @@
 				vm.previewOperations = new Array();
 				vm.cancelledOperations = new Array();
 				for (var i = 0; i < response.data.length; i++) {
-					var tmp = response.data[i].RootNode;
+					var tmp = new Object();
+					tmp["rootNodes"] = response.data[i].RootNodes;
 					tmp["operationId"] = response.data[i].OperationId;
+					tmp["finished"] = response.data[i].FinishedTime;
 					if (response.data[i].IsPreview) {
 						vm.previewOperations.push(tmp);
 					}else if (response.data[i].Cancelled) {
@@ -112,6 +167,7 @@
 										if (typeof (vm.response[response.data[i].Operation]) === "undefined") {
 											vm.response[response.data[i].Operation] = new Array();
 											vm.response[response.data[i].Operation].name = response.data[i].Operation;
+											vm.response[response.data[i].Operation].displayName = response.data[i].Operation.replace(/_/g," ");
 											if (vm.response.viewingNone) {
 												vm.response.viewingNone = false;
 												vm.response[response.data[i].Operation].show = true;

@@ -11,19 +11,11 @@
 		/* jshint validthis:true */
 		var vm = this;
 		vm.Open = false;
-		vm.selected = "";
-		vm.selectNode = function (id) {
-			vm.selected = id;
-		}
 		$scope.init = function (nodeId, selectedId, events, server, database) {
 			CMfactory.contentTree(nodeId, database, server).then(function (response) {
 				vm.data = response.data;
 				if (server)
 					events.server = server;
-				if (selectedId === nodeId) {
-					events.selectedItem = vm.data.Id;
-					events.click(vm.data);
-				}
 			}, function(response) {
 				vm.error = response.data;
 			});

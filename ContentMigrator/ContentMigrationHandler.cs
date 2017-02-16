@@ -41,10 +41,15 @@ namespace ScsContentMigrator
 			if (writerThreads == 1)
 				int.TryParse(databaseWriterThreads, out writerThreads);
 		}
+
+		public static void StartContentSync(RemoteContentPullArgs args)
+		{
+			Puller.PullContentItem(args);
+		}
 		public void BuildRoot(XmlNode node)
 		{
 			string dbName = "master";
-			if (node.Attributes != null && node.Attributes["database"] != null && !string.IsNullOrWhiteSpace(node.Attributes["database"].Value))
+			if (!string.IsNullOrWhiteSpace(node.Attributes?["database"]?.Value))
 			{
 				dbName = node.Attributes["database"].Value;
 			}

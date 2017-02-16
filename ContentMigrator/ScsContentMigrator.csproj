@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ScsContentMigrator</RootNamespace>
     <AssemblyName>ScsContentMigrator</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFrameworkProfile />
@@ -42,16 +42,16 @@
       <HintPath>..\packages\Newtonsoft.Json.4.5.9\lib\net40\Newtonsoft.Json.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="Rainbow, Version=1.3.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Rainbow.Core.1.3.1\lib\net45\Rainbow.dll</HintPath>
+    <Reference Include="Rainbow, Version=1.4.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Rainbow.Core.1.4.2\lib\net452\Rainbow.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Rainbow.Storage.Sc, Version=1.3.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Rainbow.Storage.Sc.1.3.1\lib\net45\Rainbow.Storage.Sc.dll</HintPath>
+    <Reference Include="Rainbow.Storage.Sc, Version=1.4.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Rainbow.Storage.Sc.1.4.2\lib\net452\Rainbow.Storage.Sc.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Rainbow.Storage.Yaml, Version=1.3.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Rainbow.Storage.Yaml.1.3.1\lib\net45\Rainbow.Storage.Yaml.dll</HintPath>
+    <Reference Include="Rainbow.Storage.Yaml, Version=1.4.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Rainbow.Storage.Yaml.1.4.2\lib\net452\Rainbow.Storage.Yaml.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Sitecore.Client">
@@ -73,17 +73,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="Args\RemoteContentPullArgs.cs" />
     <Compile Include="Args\RemoteContentTreeArgs.cs" />
+    <Compile Include="CMRainbow\DefaultItemComparer.cs" />
     <Compile Include="CMThreadPool.cs" />
+    <Compile Include="ConcurrentHashSet.cs" />
+    <Compile Include="ContentAgent.cs" />
     <Compile Include="ContentMigrationHandler.cs" />
     <Compile Include="ErrorItemData.cs" />
     <Compile Include="GetResources.cs" />
     <Compile Include="ItemExtensions.cs" />
     <Compile Include="OperationStatus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Rainbow\DefaultFieldFilter.cs" />
-    <Compile Include="Rainbow\DefaultLogger.cs" />
+    <Compile Include="CMRainbow\DefaultFieldFilter.cs" />
+    <Compile Include="CMRainbow\DefaultLogger.cs" />
     <Compile Include="RemoteContentPuller.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -101,8 +101,9 @@ namespace SitecoreSidekick.Handlers
 				if (data.server != null)
 				{
 					WebClient wc = new WebClient { Encoding = Encoding.UTF8 };
-					var node = JsonConvert.DeserializeObject<bool>(wc.UploadString($"{data.server}/scs/contenttreeselectedrelated.scsvc", "POST",
-									$@"{{ ""currentId"": ""{data.currentId}"", ""selectedId"": ""{data.selectedId}""}}"));
+					bool node = JsonConvert.DeserializeObject<bool>(wc.UploadString($"{data.server}/scs/contenttreeselectedrelated.scsvc", "POST",
+									$@"{{ ""currentId"": ""{data.currentId}"", ""selectedId"": {JsonConvert.SerializeObject(data.selectedId.Count == 1 ? data.selectedId.FirstOrDefault() : data.selectedId)}}}"));
+				
 					return node;
 				}
 			}
@@ -110,13 +111,25 @@ namespace SitecoreSidekick.Handlers
 			{
 
 			}
+			if (data.selectedId is string)
+				return ContentSelectedRelated(data.currentId, data.selectedId);
+			foreach (object selectedId in data.selectedId)
+			{
+				if (ContentSelectedRelated(data.currentId, selectedId.ToString()))
+					return true;
+			}
+			return false;
+		}
+
+		private static object ContentSelectedRelated(string currentId, string selectedId)
+		{
 			var db = Factory.GetDatabase("master", false);
 			if (db == null)
 				return false;
-			if (data.currentId == "")
+			if (currentId == "")
 				return true;
-			Item current = db.GetItem(data.currentId);
-			Item selected = db.GetItem(data.selectedId);
+			Item current = db.GetItem(currentId);
+			Item selected = db.GetItem(selectedId);
 			if (current == null || selected == null)
 				return false;
 			var spath = selected.Paths.FullPath;

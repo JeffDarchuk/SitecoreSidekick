@@ -1,7 +1,11 @@
+using System.Collections.Generic;
+using System.Linq;
+
 namespace ScsContentMigrator.Args
 {
 	public class RemoteContentPullArgs : RemoteContentTreeArgs
 	{
+		public IEnumerable<string> ids;
 		public bool overwrite;
 		public bool pullParent;
 		public bool mirror;
@@ -16,7 +20,7 @@ namespace ScsContentMigrator.Args
 
 		public RemoteContentPullArgs(dynamic data)
 		{
-			id = data.id;
+			ids = ((List<object>)data.ids).Select(x => x.ToString());
 			database = data.database;
 			server = data.server;
 			children = data.children;
@@ -27,10 +31,6 @@ namespace ScsContentMigrator.Args
 			eventDisabler = data.eventDisabler;
 			bulkUpdate = data.bulkUpdate;
 
-		}
-		public override string GetSerializedData()
-		{
-			return GetSerializedData(id, children);
 		}
 
 		public string GetSerializedData(string altId, bool altChildren)

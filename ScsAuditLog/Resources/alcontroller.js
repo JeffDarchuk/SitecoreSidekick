@@ -16,11 +16,12 @@
 	}
 	var xScale;
 	var yScale;
+
 	function alcontroller(ALfactory) {
 		/* jshint validthis:true */
 		var vm = this;
 		vm.treeEvents = {
-			'click': function (val) {
+			'click': function(val) {
 				vm.treeEvents.selected = val;
 				vm.query(val.Id.replace(/\W/g, ''), "id");
 			}
@@ -33,32 +34,36 @@
 		vm.page = 0;
 		vm.pageNum = 1;
 		vm.pagination = new Object();
-		ALfactory.getUsers().then(function(response) {
-			vm.users = response.data;
-		});
-		ALfactory.eventTypeList().then(function(response) {
-			vm.eventList = response.data;
-			for (var key in vm.eventList) {
-				vm[key] = true;
-			}
-			vm.query(vm.queryText, "content");
-		});
-		vm.queryAutoComplete = function (event) {
+		vm.rebuildNum = -1;
+		ALfactory.getUsers()
+			.then(function(response) {
+				vm.users = response.data;
+			});
+		ALfactory.eventTypeList()
+			.then(function(response) {
+				vm.eventList = response.data;
+				for (var key in vm.eventList) {
+					vm[key] = true;
+				}
+				vm.query(vm.queryText, "content");
+			});
+		vm.queryAutoComplete = function(event) {
 			if (event.which === 13)
 				vm.query(vm.queryText, "content");
 			else if (vm.queryText.length > 2) {
-				ALfactory.getAutoComplete(vm.queryText, vm.start, vm.end, vm.getFilters()).then(function (response) {
-					if (Object.keys(response.data).length !== 0)
-						vm.autoComplete = response.data;
-					else 
-						vm.autoComplete = false;
-				});
+				ALfactory.getAutoComplete(vm.queryText, vm.start, vm.end, vm.getFilters())
+					.then(function(response) {
+						if (Object.keys(response.data).length !== 0)
+							vm.autoComplete = response.data;
+						else
+							vm.autoComplete = false;
+					});
 			}
 		}
-		vm.resetPanes = function (identifier) {
+		vm.resetPanes = function(identifier) {
 			if (typeof (vm.panes) === "undefined")
 				vm.panes = new Object();
-			
+
 			var el = document.getElementById('note' + identifier);
 			if (el) {
 				if (el.offsetHeight > el.offsetTop)
@@ -74,7 +79,8 @@
 		}
 		vm.mainClick = function($event) {
 			var el = $event.target;
-			if (typeof (el.attributes["ng-click"]) == "object" && el.attributes["ng-click"].nodeValue.indexOf("vm.resetPanes") > -1)
+			if (typeof (el.attributes["ng-click"]) == "object" &&
+				el.attributes["ng-click"].nodeValue.indexOf("vm.resetPanes") > -1)
 				return;
 			while (el && el.localName !== "aldirective") {
 				if (typeof(el.className) == "string" && el.className.indexOf("alpane") > -1)
@@ -85,7 +91,32 @@
 			}
 			vm.resetPanes();
 		}
-		vm.query = function (text, field) {
+		vm.rebuild = function() {
+			if (confirm("Are you sure you would like to rebuild the index?")) {
+				ALfactory.rebuild()
+					.then(function(response) {
+						if (!response.data)
+							alert("error has occurred rebuilding");
+						else {
+							vm.rebuildStatus();
+						}
+					});
+			}
+		}
+		vm.rebuildStatus = function() {
+			ALfactory.rebuildStatus()
+				.then(function(response) {
+					vm.rebuildNum = response.data;
+					if (vm.rebuildNum > -1) {
+						setTimeout(function() {
+								vm.rebuildStatus();
+							},
+							500);
+					}
+				});
+		}
+
+	vm.query = function (text, field) {
 			if (field)
 				vm.field = field;
 			else

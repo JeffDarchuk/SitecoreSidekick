@@ -15,6 +15,7 @@ using Rainbow.Storage.Sc;
 using Rainbow.Storage.Sc.Deserialization;
 using Rainbow.Storage.Yaml;
 using ScsContentMigrator.Args;
+using ScsContentMigrator.CMRainbow;
 using Sitecore.Configuration;
 using Sitecore.Data;
 using Sitecore.Data.Events;
@@ -24,7 +25,6 @@ using Sitecore.Diagnostics;
 using Sitecore.SecurityModel;
 using Sitecore.StringExtensions;
 using SitecoreSidekick.ContentTree;
-using SitecoreSidekick.Rainbow;
 
 namespace ScsContentMigrator
 {
@@ -57,7 +57,7 @@ namespace ScsContentMigrator
 
 		public static IEnumerable<dynamic> GetRunningOperations()
 		{
-			return _operation.Values.Select(x => new {x.Completed, x.RootNode, x.OperationId, x.IsPreview, x.Cancelled});
+			return _operation.Values.Select(x => new {x.Completed, x.RootNodes, x.OperationId, x.IsPreview, x.Cancelled, x.StartedTime, x.FinishedTime});
 		}
 
 		public static OperationStatus GetOperation(string id)

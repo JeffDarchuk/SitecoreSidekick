@@ -7,7 +7,7 @@
 		<fieldset>
 			<legend>Select content to pull</legend>
 			<div ng-if="!vm.serverModified">
-				<cmcontenttree parent="''" database="'master'" selected="vm.events.selected.Id" events="vm.events" server="vm.server"></cmcontenttree>
+				<cmcontenttree parent="''" database="'master'" selected="vm.events.selectedIds" events="vm.events" server="vm.server"></cmcontenttree>
 			</div>
 		</fieldset>
 		<fieldset>
@@ -38,30 +38,46 @@
 		<a class="btn" ng-click="vm.pull(false)">Pull</a><a class="btn cmpreviewbtn" ng-click="vm.pull(true)">Preview</a>
 		<fieldset class="cmresults" ng-if="vm.runningOperations && vm.runningOperations.length > 0">
 			<legend>Currently Running Operations</legend>
-			<a class="btn cmresult" ng-click="vm.streamResults(item.operationId, item.Server, item.Id, item.DisplayName, false)" ng-repeat="item in vm.runningOperations">
-				<img ng-src="{{item.Icon}}" />
-				<h4>{{item.DisplayName}}</h4>
+			<a class="btn cmresult" ng-click="vm.streamResults(item.operationId, item.rootNodes[0].Server, item.rootNodes, item.rootNodes, false)" ng-repeat="item in vm.runningOperations">
+				<span>{{item.finished}}</span>
+				<div ng-repeat="root in item.rootNodes | limitTo:4">
+					<img ng-src="{{root.Icon}}" />
+					<h4>{{root.DisplayName}}</h4>
+				</div>
+				<span ng-if="item.rootNodes.length > 4">...</span>
 			</a>
 		</fieldset>
 		<fieldset class="cmresults" ng-if="vm.completedOperations && vm.completedOperations.length > 0">
 			<legend>Completed Operations</legend>
-			<a class="btn cmresult" ng-click="vm.streamResults(item.operationId, item.Server, item.Id, item.DisplayName, false)" ng-repeat="item in vm.completedOperations">
-				<img ng-src="{{item.Icon}}" />
-				<h4>{{item.DisplayName}}</h4>
+			<a class="btn cmresult" ng-click="vm.streamResults(item.operationId, item.rootNodes[0].Server, item.rootNodes, item.rootNodes, false)" ng-repeat="item in vm.completedOperations">
+				<span>{{item.finished}}</span>
+				<div ng-repeat="root in item.rootNodes | limitTo:4">
+					<img ng-src="{{root.Icon}}" />
+					<h4>{{root.DisplayName}}</h4>
+				</div>
+				<span ng-if="item.rootNodes.length > 4">...</span>
 			</a>
 		</fieldset>
 		<fieldset class="cmresults cmresultspreview" ng-if="vm.previewOperations && vm.previewOperations.length > 0">
 			<legend>Preview Operations</legend>
-			<a class="btn cmresult" ng-click="vm.streamResults(item.operationId, item.Server, item.Id, item.DisplayName, true)" ng-repeat="item in vm.previewOperations">
-				<img ng-src="{{item.Icon}}" />
-				<h4>{{item.DisplayName}}</h4>
+			<a class="btn cmresult" ng-click="vm.streamResults(item.operationId, item.rootNodes[0].Server, item.rootNodes, item.rootNodes, true)" ng-repeat="item in vm.previewOperations">
+				<span>{{item.finished}}</span>
+				<div ng-repeat="root in item.rootNodes | limitTo:4">
+					<img ng-src="{{root.Icon}}" />
+					<h4>{{root.DisplayName}}</h4>
+				</div>
+				<span ng-if="item.rootNodes.length > 4">...</span>
 			</a>
 		</fieldset>
 		<fieldset class="cmresults cmresultspreview" ng-if="vm.cancelledOperations && vm.cancelledOperations.length > 0">
 			<legend>Cancelled Operations</legend>
-			<a class="btn cmresult" ng-click="vm.streamResults(item.operationId, item.Server, item.Id, item.DisplayName, false)" ng-repeat="item in vm.cancelledOperations">
-				<img ng-src="{{item.Icon}}" />
-				<h4>{{item.DisplayName}}</h4>
+			<a class="btn cmresult" ng-click="vm.streamResults(item.operationId, item.rootNodes[0].Server, item.rootNodes, item.rootNodes, false)" ng-repeat="item in vm.cancelledOperations">
+				<span>{{item.finished}}</span>
+				<div ng-repeat="root in item.rootNodes | limitTo:4">
+					<img ng-src="{{root.Icon}}" />
+					<h4>{{root.DisplayName}}</h4>
+				</div>
+				<span ng-if="item.rootNodes.length > 4">...</span>
 			</a>
 		</fieldset>
 	</div>
@@ -85,7 +101,7 @@
 			<tr><td class="cmresultslabel"><strong>Date Completed:</strong></td><td>{{vm.response.Date}}</td> </tr>
 		</table>
 		<div ng-if="vm.spinner">Items in queue: {{vm.queuedItems}}</div>
-		<a ng-repeat="results in vm.response" class="btn cmtab" ng-class="{cmselectedtab: vm.response[results.name].show}" ng-show="results.length > 0 && results.name" ng-click="vm.toggle(results.name)"> {{results.name}} - {{results.length}}</a>
+		<a ng-repeat="results in vm.response" class="btn cmtab" ng-class="{cmselectedtab: vm.response[results.name].show}" ng-show="results.length > 0 && results.name" ng-click="vm.toggle(results.name)"> {{results.displayName}} - {{results.length}}</a>
 	</div>
 	<div ng-repeat="results in vm.response">
 		<div class="cmtabpane" ng-if="results.show">

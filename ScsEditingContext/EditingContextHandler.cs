@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Drawing.Imaging;
@@ -7,6 +8,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Security;
 using System.Xml;
+using ScsEditingContext.Pipelines.HttpRequestBegin;
 using Sitecore;
 using Sitecore.Configuration;
 using Sitecore.Data;
@@ -33,6 +35,12 @@ namespace ScsEditingContext
 
 		public static Database Core = Factory.GetDatabase("core");
 		public static Database Master = Factory.GetDatabase("master");
+		internal static ConcurrentDictionary<string, List<ContentTreeNode>> Related { get; private set; }
+
+		static EditingContextHandler()
+		{
+			Related = new ConcurrentDictionary<string, List<ContentTreeNode>>();
+		}
 		public EditingContextHandler(string roles, string isAdmin, string users) : base(roles, isAdmin, users)
 		{
 		}
@@ -44,8 +52,18 @@ namespace ScsEditingContext
 				ReturnJson(context, GetCommonLocations());
 			else if (file == "ecgetitemhistory.json")
 				ReturnJson(context, GetItemHistory());
+			else if (file == "ecgetrelated.json")
+				ReturnJson(context, GetReferences());
 			else 
 				ProcessResourceRequest(context);
+		}
+
+		private object GetReferences()
+		{
+			string key = HttpContext.Current.Request.Cookies["ASP.NET_SessionId"]?.Value ?? "";
+			if (Related.ContainsKey(key))
+				return Related[key];
+			return new List<ContentTreeNode>();
 		}
 
 		private dynamic GetItemHistory()

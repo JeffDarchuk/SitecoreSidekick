@@ -1,7 +1,7 @@
 ﻿using System;
 using Rainbow.Filtering;
 
-namespace SitecoreSidekick.Rainbow
+namespace ScsContentMigrator.CMRainbow
 {
 	public class DefaultFieldFilter : IFieldFilter
 	{

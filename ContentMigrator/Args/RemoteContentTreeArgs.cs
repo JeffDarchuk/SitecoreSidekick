@@ -1,4 +1,5 @@
-﻿using Microsoft.CSharp.RuntimeBinder;
+﻿using System.Collections.Generic;
+using Microsoft.CSharp.RuntimeBinder;
 
 namespace ScsContentMigrator.Args
 {
@@ -11,12 +12,6 @@ namespace ScsContentMigrator.Args
 
 		public RemoteContentTreeArgs()
 		{
-		}
-		public virtual string GetSerializedData()
-		{
-			return
-				$"{{\"id\":\"{id}\",\"database\":\"{database}\"}}";
-			;
 		}
 		public RemoteContentTreeArgs(dynamic data)
 		{

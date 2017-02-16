@@ -57,6 +57,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="EditingContextHandler.cs" />
     <Compile Include="Pipelines\HttpRequestBegin\RegisterEvent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -83,6 +86,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="zSCSEditingContext.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\eccommand.js" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

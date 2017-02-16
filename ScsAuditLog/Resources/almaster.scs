@@ -1,7 +1,14 @@
 <div ng-controller="alcontroller as vm" ng-click="vm.mainClick($event)">
 	<div>
 		<div>
+			<img class="algear" ng-click="vm.resetPanes('settings')" src="/scs/algear.png"></img>
 			<a href="#" class="btn" ng-click="vm.resetPanes('viewQuery')">Filter</a>
+		</div>
+		<div ng-if="vm.panes.settings" class="alpane">
+			<div class ="almenu">
+				<a ng-if="vm.rebuildNum == -1" href="#" class="btn" ng-click="vm.rebuild()">Rebuild Index</a>
+				<h4 style="padding-left:10px; padding-right:10px" ng-if="vm.rebuildNum != -1">Rebuilding {{vm.rebuildNum}}</h4>
+			</div>
 		</div>
 		<div ng-show="vm.panes.viewQuery" ng-click="vm.autoComplete = false" class="alpane">
 			<div class="almenu">
@@ -54,7 +61,6 @@
 					</div>
 				</div>
 			</div>
-
 		</div>
 		<div class="graph">
 			<svg id="visualisation" width="750" height="400"></svg>

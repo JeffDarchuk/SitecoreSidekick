@@ -11,7 +11,7 @@ using Sitecore.Events;
 
 namespace ScsAuditLog.Pipelines
 {
-	public class OnSave : AuditEventType
+	public class OnSaveStandardValues : AuditEventType
 	{
 		public override void Process(object sender, EventArgs e)
 		{
@@ -24,7 +24,7 @@ namespace ScsAuditLog.Pipelines
 				foreach (FieldChange fieldChange in changes.FieldChanges)
 				{
 					Field field = item.Fields[fieldChange.FieldID];
-					if (!field.Name.StartsWith("__") && fieldChange.OriginalValue != field.Value)
+					if (field.Name.StartsWith("__") && fieldChange.OriginalValue != field.Value)
 					{
 						flag = true;
 						sb.Append("<tr><td>");

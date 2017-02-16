@@ -119,6 +119,11 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\scsfactory.js" />
   </ItemGroup>
+  <ItemGroup>
+	<Compile Include="..\..\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
+  </ItemGroup>
   <Target Name="AfterBuild">
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="C:\inetpub\wwwroot\Spectrum\Source\Spectrum.Web\bin" />
     <Copy SourceFiles="C:\Development\Sitecore Sidekick\Source\SitecoreSidekick\zSCS.config" DestinationFolder="C:\inetpub\wwwroot\Spectrum\Source\Spectrum.Web\App_Config\Include" />

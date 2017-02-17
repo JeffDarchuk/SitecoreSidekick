@@ -1,3 +1,7 @@
 ﻿.database{
 	color:red;
 }
+.ectype {
+	width:50px;
+	display:inline-block;
+}

@@ -33,7 +33,35 @@
 			vm.refreshHistory();
 			if (scsActiveModule !== "Editing Context")
 				$interval.cancel(running);
-		}, 5000);
+		}, 1000);
 		vm.refreshHistory();
+		vm.refreshRelated = function () {
+			ECFactory.getRelatedItems().then(function (response) {
+				var items = response.data;
+				vm.relatedItems = items;
+			}, function (response) {
+				vm.error = response.data;
+			});
+		}
+		var related = $interval(function () {
+			vm.refreshRelated();
+			if (scsActiveModule !== "Editing Context")
+				$interval.cancel(related);
+		}, 1000);
+		vm.refreshRelated();
+		vm.refreshReferrers = function () {
+			ECFactory.getReferrersItems().then(function (response) {
+				var items = response.data;
+				vm.referrersItems = items;
+			}, function (response) {
+				vm.error = response.data;
+			});
+		}
+		var referrers = $interval(function () {
+			vm.refreshReferrers();
+			if (scsActiveModule !== "Editing Context")
+				$interval.cancel(referrers);
+		}, 1000);
+		vm.refreshReferrers();
 	}
 })();

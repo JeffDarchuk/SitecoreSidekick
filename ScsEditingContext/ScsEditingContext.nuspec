@@ -14,4 +14,7 @@
         <copyright>Copyright 2017 Jeff Darchuk</copyright>
         <tags>sitecore</tags>
   </metadata>
+    <files>
+		<file src="..\ScsEditingContext\zScsEditingContext.config" target="content\App_Config\Include" />
+	</files>
 </package>

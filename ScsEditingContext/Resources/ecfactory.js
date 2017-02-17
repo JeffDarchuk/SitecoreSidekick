@@ -15,6 +15,12 @@
 			},
 			getItemHistory: function () {
 				return $http.get("/scs/ecgetitemhistory.json");
+			},
+			getRelatedItems: function () {
+				return $http.get("/scs/ecgetrelated.json");
+			},
+			getReferrersItems: function () {
+				return $http.get("/scs/ecgetreferrers.json");
 			}
 		};
 

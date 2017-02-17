@@ -35,11 +35,13 @@ namespace ScsEditingContext
 
 		public static Database Core = Factory.GetDatabase("core");
 		public static Database Master = Factory.GetDatabase("master");
-		internal static ConcurrentDictionary<string, List<ContentTreeNode>> Related { get; private set; }
+		internal static ConcurrentDictionary<string, List<TypeContentTreeNode>> Related { get; private set; }
+		internal static ConcurrentDictionary<string, List<TypeContentTreeNode>> Referrers { get; private set; }
 
 		static EditingContextHandler()
 		{
-			Related = new ConcurrentDictionary<string, List<ContentTreeNode>>();
+			Related = new ConcurrentDictionary<string, List<TypeContentTreeNode>>();
+			Referrers = new ConcurrentDictionary<string, List<TypeContentTreeNode>>();
 		}
 		public EditingContextHandler(string roles, string isAdmin, string users) : base(roles, isAdmin, users)
 		{
@@ -54,8 +56,18 @@ namespace ScsEditingContext
 				ReturnJson(context, GetItemHistory());
 			else if (file == "ecgetrelated.json")
 				ReturnJson(context, GetReferences());
+			else if (file == "ecgetreferrers.json")
+				ReturnJson(context, GetReferrers());
 			else 
 				ProcessResourceRequest(context);
+		}
+
+		private object GetReferrers()
+		{
+			string key = HttpContext.Current.Request.Cookies["ASP.NET_SessionId"]?.Value ?? "";
+			if (Referrers.ContainsKey(key))
+				return Referrers[key];
+			return new List<TypeContentTreeNode>();
 		}
 
 		private object GetReferences()
@@ -63,7 +75,7 @@ namespace ScsEditingContext
 			string key = HttpContext.Current.Request.Cookies["ASP.NET_SessionId"]?.Value ?? "";
 			if (Related.ContainsKey(key))
 				return Related[key];
-			return new List<ContentTreeNode>();
+			return new List<TypeContentTreeNode>();
 		}
 
 		private dynamic GetItemHistory()

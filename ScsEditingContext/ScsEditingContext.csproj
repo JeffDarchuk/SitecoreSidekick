@@ -63,6 +63,7 @@
     <Compile Include="EditingContextHandler.cs" />
     <Compile Include="Pipelines\HttpRequestBegin\RegisterEvent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TypeContentTreeNode.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Source\SitecoreSidekick\SitecoreSidekick.csproj">

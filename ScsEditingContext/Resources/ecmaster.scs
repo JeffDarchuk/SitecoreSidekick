@@ -14,7 +14,40 @@
 				</li>
 			</ol>
 		</fieldset>
-
+	</div>
+	<div>
+		<fieldset>
+			<legend>Referenced Items</legend>
+			<ul>
+				<li ng-repeat="item in vm.relatedItems">
+					<span class="ectype">{{item.Type}}</span>
+					<a hidefocus="true" style="position: relative;" href="/sitecore/shell/Applications/Content%20Editor.aspx?sc_content={{item.DatabaseName}}&fo={{item.Id}}" class="scContentTreeNodeNormal fancybox fancybox.iframe">
+						<span class="scContentTreeSelectable">
+							<img ng-src="{{item.Icon}}" width="16" height="16" class="scContentTreeNodeIcon" alt="" border="0"/>
+								{{item.DisplayName}}
+						</span>
+					</a>
+					- <span class="database">{{item.DatabaseName}}</span>
+				</li>
+			</ul>
+		</fieldset>
+	</div>
+	<div>
+		<fieldset>
+			<legend>Items Referencing</legend>
+			<ul>
+				<li ng-repeat="item in vm.referrersItems">
+					<span class="ectype">{{item.Type}}</span>
+					<a hidefocus="true" style="position: relative;" href="/sitecore/shell/Applications/Content%20Editor.aspx?sc_content={{item.DatabaseName}}&fo={{item.Id}}" class="scContentTreeNodeNormal fancybox fancybox.iframe">
+						<span class="scContentTreeSelectable">
+							<img ng-src="{{item.Icon}}" width="16" height="16" class="scContentTreeNodeIcon" alt="" border="0"/>
+								{{item.DisplayName}}
+						</span>
+					</a>
+					- <span class="database">{{item.DatabaseName}}</span>
+				</li>
+			</ul>
+		</fieldset>
 	</div>
 	<div ng-if="vm.editor">
 		<fieldset>

@@ -37,6 +37,10 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="HtmlDiff, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\htmldiff.net.1.3\lib\net35\HtmlDiff.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.4.5.9\lib\net40\Newtonsoft.Json.dll</HintPath>
@@ -83,6 +87,7 @@
     <Compile Include="ConcurrentHashSet.cs" />
     <Compile Include="ContentAgent.cs" />
     <Compile Include="ContentMigrationHandler.cs" />
+    <Compile Include="Data\CompareContentTreeNode.cs" />
     <Compile Include="ErrorItemData.cs" />
     <Compile Include="GetResources.cs" />
     <Compile Include="ItemExtensions.cs" />
@@ -137,9 +142,8 @@
   <Target Name="BeforeBuild">
   </Target> -->
   <Target Name="AfterBuild">
-    <Copy SourceFiles="$(TargetPath)" DestinationFolder="C:\inetpub\wwwroot\Spectrum\Source\Spectrum.Web\bin" />
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="C:\inetpub\wwwroot\Debut\Source\Debut.Web\bin" />
-    <Copy SourceFiles="$(TargetPath)" DestinationFolder="C:\inetpub\wwwroot\APGit\Source\AirProducts.Web\bin" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="C:\inetpub\wwwroot\SIM\scs82\Website\bin" />
     <Copy SourceFiles="C:\Development\Sitecore Sidekick\packages\Lucene.Net.3.0.3\lib\net40\Lucene.Net.dll" DestinationFolder="C:\inetpub\wwwroot\Debut\Source\Debut.Web\bin" />
   </Target>
 </Project>

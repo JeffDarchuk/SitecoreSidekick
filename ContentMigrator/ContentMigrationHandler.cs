@@ -10,7 +10,10 @@ using System.Web;
 using System.Xml;
 using Microsoft.CSharp.RuntimeBinder;
 using Newtonsoft.Json;
+using Rainbow.Diff;
 using ScsContentMigrator.Args;
+using ScsContentMigrator.CMRainbow;
+using ScsContentMigrator.Data;
 using Sitecore.Configuration;
 using Sitecore.Data;
 using Sitecore.Data.Items;
@@ -18,13 +21,17 @@ using Sitecore.Diagnostics;
 using Sitecore.SecurityModel;
 using SitecoreSidekick.ContentTree;
 using SitecoreSidekick.Handlers;
+using System.Timers;
+using System.Threading.Tasks;
+using System.Collections.Concurrent;
 
 namespace ScsContentMigrator
 {
 	public class ContentMigrationHandler : ScsHttpHandler
 	{
+		private static ConcurrentDictionary<string, int> _checksum = new ConcurrentDictionary<string, int>();
 		private static readonly RemoteContentPuller Puller = new RemoteContentPuller();
-		private static ContentTreeNode Root = new ContentTreeNode() { DatabaseName = "master", DisplayName = "Root", Icon = "/~/icon/Applications/32x32/media_stop.png", Open = true, Nodes = new List<ContentTreeNode>() };
+		private static CompareContentTreeNode Root = new CompareContentTreeNode() { DatabaseName = "master", DisplayName = "Root", Icon = "/~/icon/Applications/32x32/media_stop.png", Open = true, Nodes = new List<ContentTreeNode>() };
 		private static List<string> ServerList = new List<string>();
 		internal static int remoteThreads = 1;
 		internal static int writerThreads = 1;
@@ -40,8 +47,65 @@ namespace ScsContentMigrator
 				int.TryParse(remotePullingThreads, out remoteThreads);
 			if (writerThreads == 1)
 				int.TryParse(databaseWriterThreads, out writerThreads);
+			Timer t = new Timer(60 * 1000);
+			t.Elapsed += async (sender, e) => await GenerateChecksum();
+			t.Start();
 		}
-
+		private static async Task GenerateChecksum(List<CompareContentTreeNode> roots = null)
+		{
+			Task ret = Task.Run(() =>
+			{
+				var db = Factory.GetDatabase("master", false);
+				if (db == null) return;
+				foreach (CompareContentTreeNode node in roots ?? Root.Nodes.OfType<CompareContentTreeNode>())
+				{
+					GetChecksum(node.Id, true);
+				}
+			});
+			await ret;
+		}
+		public static int GetChecksum(string id, bool force = false, bool childrenOnly = true)
+		{
+			if (!_checksum.ContainsKey(id) || force)
+			{
+				using (new SecurityDisabler())
+				{
+					Database db = Factory.GetDatabase("master", false);
+					Stack<Item> processing = new Stack<Item>();
+					Stack<Item> checksumGeneration = new Stack<Item>();
+					processing.Push(db.GetItem(id));
+					while (processing.Any())
+					{
+						Item child = processing.Pop();
+						checksumGeneration.Push(child);
+						foreach (Item subchild in child.Children)
+							processing.Push(subchild);
+					}
+					while (checksumGeneration.Any())
+					{
+						Item cur = checksumGeneration.Pop();
+						int checksum = 0;
+						foreach (Item child in cur.Children.OrderBy(x => x.ID.ToString()))
+						{
+							checksum = (checksum + (_checksum.ContainsKey(child.ID.ToString()) ? _checksum[child.ID.ToString()].ToString() : "-1")).GetHashCode();
+						}
+						_checksum["children" + cur.ID.ToString()] = checksum;
+						checksum = (checksum.ToString() + cur.Statistics.Revision).GetHashCode();
+						_checksum[cur.ID.ToString()] = checksum;
+					}
+					
+				}
+			}
+			if (childrenOnly)
+			{
+				if (!_checksum.ContainsKey("children" + id))
+					return -1;
+				return _checksum["children" + id];
+			}
+			if (!_checksum.ContainsKey(id))
+				return -1;
+			return _checksum[id];
+		}
 		public static void StartContentSync(RemoteContentPullArgs args)
 		{
 			Puller.PullContentItem(args);
@@ -58,8 +122,10 @@ namespace ScsContentMigrator
 			{
 				var item = db.GetItem(node.InnerText);
 				if (item != null)
-					Root.Nodes.Add(new ContentTreeNode(item, false));
+					Root.Nodes.Add(new CompareContentTreeNode(item, false));
+				GenerateChecksum(new List<CompareContentTreeNode>() { new CompareContentTreeNode(item) });
 			}
+
 		}
 
 		public override void ProcessRequest(HttpContextBase context)
@@ -83,8 +149,18 @@ namespace ScsContentMigrator
 				ReturnJson(context, StartPreviewAsPull(context));
 			else if (file == "cmqueuelength.scsvc")
 				ReturnJson(context, OperationQueueLength(context));
+			else if (file == "cmchecksum.scsvc")
+				ReturnJson(context, GetChecksum(context));
 			else
 				ProcessResourceRequest(context);
+		}
+
+		private object GetChecksum(HttpContextBase context)
+		{
+			using (new SecurityDisabler())
+			{
+				return GetChecksum(HttpContext.Current.Request.QueryString["id"]);
+			}
 		}
 
 		private object OperationQueueLength(HttpContextBase context)
@@ -108,7 +184,15 @@ namespace ScsContentMigrator
 
 		private object GetOperationList(HttpContextBase context)
 		{
-			return RemoteContentPuller.GetRunningOperations().ToList();
+			return RemoteContentPuller.GetRunningOperations().OrderBy(x =>
+			{
+				DateTime tmp;
+				if (DateTime.TryParseExact(x.FinishedTime, "MMM d h:mm tt", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out tmp))
+				{
+					return tmp;
+				}
+				return DateTime.Now;
+			}).ToList();
 		}
 
 		private object GetOperationStatus(HttpContextBase context)
@@ -167,7 +251,7 @@ namespace ScsContentMigrator
 				Item item = db.GetItem(data.id);
 				if (data.children)
 					return item.GetYamlTree().ToList();
-				return new List<string>() {item.GetYaml()};
+				return new List<string>() { item.GetYaml() };
 			}
 		}
 
@@ -184,7 +268,7 @@ namespace ScsContentMigrator
 				var args = new RemoteContentTreeArgs(data);
 				if (args.server != null)
 				{
-					return GetResources.GetRemoteItem(args, args.id);
+					return GetResources.GetRemoteItem(args, args.id, true);
 				}
 			}
 			catch (RuntimeBinderException)
@@ -192,7 +276,7 @@ namespace ScsContentMigrator
 
 			}
 			using (new SecurityDisabler())
-				return string.IsNullOrWhiteSpace(data.id.ToString()) ? Root : new ContentTreeNode(Factory.GetDatabase(data.database.ToString()).GetItem(new ID(data.id)));
+				return string.IsNullOrWhiteSpace(data.id.ToString()) ? Root : new CompareContentTreeNode(Factory.GetDatabase(data.database.ToString()).GetItem(new ID(data.id)));
 		}
 	}
 }

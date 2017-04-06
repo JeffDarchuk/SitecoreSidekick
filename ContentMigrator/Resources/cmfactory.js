@@ -10,7 +10,7 @@
 	function CMfactory($http) {
 		var service = {
 
-			contentTree: function (id, database, server) {
+			contentTree: function (id, database, server, standardValues) {
 				var data = { "id": id, "database": database, "server": server };
 				return $http.post("/scs/cmcontenttree.scsvc", data);
 			},

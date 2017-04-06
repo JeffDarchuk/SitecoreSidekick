@@ -31,7 +31,7 @@ namespace ScsContentMigrator
 {
 	public class OperationStatus
 	{
-		
+
 		private RemoteContentPullArgs _args;
 		private bool doneRemote = false;
 		public List<dynamic> Lines => logger.Lines;
@@ -48,6 +48,7 @@ namespace ScsContentMigrator
 		internal List<ContentTreeNode> RootNodes = new List<ContentTreeNode>();
 		internal bool Completed = false;
 		private object finishLocker = new object();
+		private int threadCount = 0;
 		internal bool Cancelled = false;
 		private Stopwatch sw = new Stopwatch();
 		private HashSet<string> _ids;
@@ -56,6 +57,7 @@ namespace ScsContentMigrator
 		private DateTime? _finishedTime = null;
 		public string StartedTime => _startedTime?.ToString("MMM dd h:mm tt") ?? "";
 		public string FinishedTime => _finishedTime?.ToString("MMM dd h:mm tt") ?? "";
+		private bool processTemplates = false;
 
 		public bool IsPreview => _args.preview;
 
@@ -73,9 +75,9 @@ namespace ScsContentMigrator
 			db = Factory.GetDatabase(args.database);
 			tp = new CMThreadPool(this);
 			Init();
-			foreach(string id in _ids)
+			foreach (string id in _ids)
 				tp.Queue(GetNextItem, id);
-			for (int i = 0; i < ContentMigrationHandler.writerThreads; i++)
+			for (int i = 0; i < (processTemplates ? 1 : ContentMigrationHandler.writerThreads); i++)
 				RunDatabaseWriterProcess();
 		}
 
@@ -93,7 +95,7 @@ namespace ScsContentMigrator
 			Init(true);
 			foreach (string id in _ids)
 				tp.Queue(GetNextItem, id);
-			for (int i = 0; i < ContentMigrationHandler.writerThreads; i++)
+			for (int i = 0; i < (processTemplates ? 1 : ContentMigrationHandler.writerThreads); i++)
 				RunDatabaseWriterProcess();
 		}
 
@@ -101,7 +103,7 @@ namespace ScsContentMigrator
 		{
 			using (new SecurityDisabler())
 			{
-			foreach (string id in _args.ids)
+				foreach (string id in _args.ids)
 				{
 					IItemData idata = GetResources.GetRemoteItemData(_args, id);
 
@@ -131,8 +133,6 @@ namespace ScsContentMigrator
 						{
 							parent = db.GetItem(new ID(tmpData.ParentId));
 							path.Push(tmpData);
-							_ids.Remove(id);
-							_ids.Add(tmpData.ParentId.ToString());
 							tmpData = GetResources.GetRemoteItemData(_args, tmpData.ParentId.ToString());
 						}
 						while (path.Any())
@@ -140,12 +140,15 @@ namespace ScsContentMigrator
 							var cur = path.Pop();
 
 							InstallItem(cur);
+							_currentTracker.Add(cur.Id.ToString());
 						}
 						_args.children = tmp;
 
 					}
 					if (fromPreview) return;
 					var RootNode = new ContentTreeNode(parent.Database.GetItem(new ID(idata.Id)));
+					if (parent.Paths.FullPath.StartsWith("/sitecore/templates"))
+						processTemplates = true;
 					if (RootNode.Icon == "")
 					{
 						RootNode = new ContentTreeNode(parent.Database.GetItem(new ID(idata.TemplateId)))
@@ -156,28 +159,19 @@ namespace ScsContentMigrator
 					}
 					RootNode.Server = _args.server;
 					RootNodes.Add(RootNode);
+					
 				}
 			}
 		}
 		public void RunDatabaseWriterProcess()
 		{
-			Task.Run(() =>
+			Task.Run(async () =>
 			{
 				using (new SecurityDisabler())
 				{
-					BulkUpdateContext bu = null;
-					if (_args.bulkUpdate)
-						bu = new BulkUpdateContext();
-					EventDisabler ed = null;
-					if (_args.eventDisabler)
-						ed = new EventDisabler();
-
-					ProcessItemQueue();
-
-					bu?.Dispose();
-					ed?.Dispose();
+					bool islast = await ProcessItemQueue();
 					if (Completed) return;
-					lock (finishLocker)
+					if (islast)
 					{
 						if (Completed) return;
 						if (_args.mirror && !Cancelled)
@@ -188,10 +182,11 @@ namespace ScsContentMigrator
 									Item item = db.GetItem(new ID(guid));
 									if (item != null)
 									{
-										logger.RecordEvent(item.Name, item.ID.ToString(), item.Paths.FullPath, "Recycle",
-											logger.GetSrc(ThemeManager.GetIconImage(item, 32, 32, "", "")), item.Database.Name);
+										logger.BeginEvent(item.Name, item.ID.ToString(), item.Paths.FullPath, "Recycle",
+											logger.GetSrc(ThemeManager.GetIconImage(item, 32, 32, "", "")), item.Database.Name, false);
 										if (!_args.preview)
-											item.Recycle();
+											using (new SecurityDisabler())
+												item.Recycle();
 									}
 								}
 								catch (Exception e)
@@ -207,60 +202,70 @@ namespace ScsContentMigrator
 						last.Cancelled = Cancelled;
 						logger.Lines.Add(last);
 						_finishedTime = DateTime.Now;
+						if (_args.bulkUpdate || _args.eventDisabler)
+							Sitecore.Caching.CacheManager.ClearAllCaches();
+						foreach (var processedNode in RootNodes)
+							ContentMigrationHandler.GetChecksum(processedNode.Id, true);
 					}
 				}
 			});
 		}
 
-		private void ProcessItemQueue()
+		async private Task<bool> ProcessItemQueue()
 		{
 			IItemData tmp = null;
-			using (new SecurityDisabler())
-				while (!Completed && !Cancelled && (!doneRemote || _installerQueue.Count > 0))
+			lock (finishLocker)
+			{
+				threadCount++;
+			}
+			bool ret = false;
+			while (!Completed && !Cancelled && (!doneRemote || _installerQueue.Count > 0))
+			{
+				try
 				{
-					try
+					if (_installerQueue.TryDequeue(out tmp))
 					{
-						if (tmp == null && _installerQueue.TryDequeue(out tmp))
+						using (new SecurityDisabler())
 						{
-							if (_currentTracker.Contains(tmp.ParentId.ToString()))
+							if (_currentTracker.Contains(tmp.ParentId.ToString()) || db.GetItem(new ID(tmp.ParentId)) != null)
 							{
-								Thread.Sleep(10);
+								if (InstallItem(tmp))
+								{
+									_currentTracker.Add(tmp.Id.ToString());
+									tmp = null;
+								}
+							}
+							else
+							{
+								_installerQueue.Enqueue(tmp);
 								continue;
 							}
-							_currentTracker.Add(tmp.Id.ToString());
-							if (InstallItem(tmp))
-							{
-								_currentTracker.Remove(tmp.Id.ToString());
-								tmp = null;
-							}
-						}
-						else if (tmp != null)
-						{
-							Thread.Sleep(10);
-							if (InstallItem(tmp))
-							{
-								_currentTracker.Remove(tmp.Id.ToString());
-								tmp = null;
-							}
-						}
-						else
-						{
-							Thread.Sleep(10);
 						}
 					}
-					catch (Exception e)
+					else
 					{
-						if (tmp != null)
-						{
-							logger.RecordEvent(tmp.Name, tmp.Id.ToString(), e.ToString(), "Error", "", tmp.DatabaseName);
-							_currentTracker.Remove(tmp.Id.ToString());
-						}
-						else
-							logger.RecordEvent("unknown", "", e.ToString(), "Error", "", "");
-						Log.Error("Problem installing item", e, this);
-						tmp = null;
-					}						
+						await Task.Delay(10);
+					}
 				}
+				catch (Exception e)
+				{
+					if (tmp != null)
+					{
+						logger.BeginEvent(tmp.Name, tmp.Id.ToString(), e.ToString(), "Error", "", tmp.DatabaseName, false);
+						_currentTracker.Add(tmp.Id.ToString());
+					}
+					else
+						logger.BeginEvent("unknown", "", e.ToString(), "Error", "", "", false);
+					Log.Error("Problem installing item", e, this);
+				}
+			}
+			lock (finishLocker)
+			{
+				threadCount--;
+				if (threadCount == 0)
+					ret = true;
+			}
+			return ret;
 		}
 
 		public int QueuedItems()
@@ -287,7 +292,7 @@ namespace ScsContentMigrator
 			{
 				var errItem = item.Substring(1);
 				var err = errItem.Split('|');
-				logger.RecordEvent(new ErrorItemData { Id = Guid.Parse(err[0]), Path = err[1] }, "Error", "");
+				logger.BeginEvent(new ErrorItemData { Id = Guid.Parse(err[0]), Path = err[1] }, "Error", "", false);
 			}
 			else
 			{
@@ -314,62 +319,90 @@ namespace ScsContentMigrator
 			IItemData idata = (IItemData)o;
 			if (idata is ErrorItemData)
 			{
-				logger.RecordEvent(idata, "Error", "");
+				logger.BeginEvent(idata, "Error", "", false);
 				return true;
 			}
-			Item exists = db.GetItem(new ID(idata.Id));
-			
-			if (exists == null)
+			using (new SecurityDisabler())
 			{
-				if (!_args.preview)
+				Item exists = db.GetItem(new ID(idata.Id));
+
+				if (exists == null)
 				{
-					try
+					if (!_args.preview)
 					{
-						scDatastore.Save(idata);
+						try
+						{
+							BulkUpdateContext bu = null;
+							if (_args.bulkUpdate)
+								bu = new BulkUpdateContext();
+							EventDisabler ed = null;
+							if (_args.eventDisabler)
+								ed = new EventDisabler();
+
+
+							scDatastore.Save(idata);
+
+							bu?.Dispose();
+							ed?.Dispose();
+
+						}
+						catch (ParentItemNotFoundException)
+						{
+							logger.BeginEvent(idata, "Skipped Error on parent", "", false);
+							return true;
+						}
 					}
-					catch (ParentItemNotFoundException)
+					else
 					{
-						logger.RecordEvent(idata, "Skipped Error on parent", "");
-						return true;
+						logger.BeginEvent(idata, "Created", "", false);
 					}
+					if (_args.mirror)
+						allowedItems.Remove(idata.Id);
 				}
-				else
+				else if (_args.overwrite)
 				{
-					logger.RecordEvent(idata, "Created", "");
-				}
-				if (_args.mirror)
-					allowedItems.Remove(idata.Id);
-			}
-			else if (_args.overwrite)
-			{
-				if (!_args.preview)
-				{
-					var results = _comparer.FastCompare(idata, new Rainbow.Storage.Sc.ItemData(exists));
-					if (results.AreEqual)
-						logger.RecordEvent(idata, "Skipped", logger.GetSrc(ThemeManager.GetIconImage(exists, 32, 32, "", "")));
+					if (!_args.preview)
+					{
+						var results = _comparer.FastCompare(idata, new Rainbow.Storage.Sc.ItemData(exists));
+						if (results.AreEqual)
+							logger.BeginEvent(idata, "Skipped", logger.GetSrc(ThemeManager.GetIconImage(exists, 32, 32, "", "")), false);
+						else
+						{
+							logger.BeginEvent(idata, "Changed", logger.GetSrc(ThemeManager.GetIconImage(exists, 32, 32, "", "")), true);
+							BulkUpdateContext bu = null;
+							if (_args.bulkUpdate)
+								bu = new BulkUpdateContext();
+							EventDisabler ed = null;
+							if (_args.eventDisabler)
+								ed = new EventDisabler();
+
+							using (new SecurityDisabler())
+								scDatastore.Save(idata);
+							logger.CompleteEvent(idata.Id.ToString());
+							bu?.Dispose();
+							ed?.Dispose();
+						}
+					}
 					else
-						scDatastore.Save(idata);
+					{
+						var results = _comparer.Compare(idata, new Rainbow.Storage.Sc.ItemData(exists));
+						if (results.AreEqual)
+							logger.BeginEvent(idata, "Skipped", logger.GetSrc(ThemeManager.GetIconImage(exists, 32, 32, "", "")), false);
+						//else if (results.IsBranchChanged)
+						//	logger.RecordEvent(idata, "Branch Change", logger.GetSrc(ThemeManager.GetIconImage(exists, 32, 32, "", "")));
+						else if (results.IsMoved)
+							logger.BeginEvent(idata, "Moved", logger.GetSrc(ThemeManager.GetIconImage(exists, 32, 32, "", "")), false);
+						else if (results.IsRenamed)
+							logger.BeginEvent(idata, "Renamed", logger.GetSrc(ThemeManager.GetIconImage(exists, 32, 32, "", "")), false);
+						else if (results.IsTemplateChanged)
+							logger.BeginEvent(idata, "Template Change", logger.GetSrc(ThemeManager.GetIconImage(exists, 32, 32, "", "")),
+								false);
+						else
+							logger.BeginEvent(idata, "Changed", logger.GetSrc(ThemeManager.GetIconImage(exists, 32, 32, "", "")), false);
+					}
+					if (_args.mirror)
+						allowedItems.Remove(idata.Id);
 				}
-				else
-				{
-					var results = _comparer.Compare(idata, new Rainbow.Storage.Sc.ItemData(exists));
-					if (results.AreEqual)
-						logger.RecordEvent(idata, "Skipped", logger.GetSrc(ThemeManager.GetIconImage(exists, 32, 32, "", "")));
-					//else if (results.IsBranchChanged)
-					//	logger.RecordEvent(idata, "Branch Change", logger.GetSrc(ThemeManager.GetIconImage(exists, 32, 32, "", "")));
-					else if (results.IsMoved)
-						logger.RecordEvent(idata, "Moved", logger.GetSrc(ThemeManager.GetIconImage(exists, 32, 32, "", "")));
-					else if (results.IsRenamed)
-						logger.RecordEvent(idata, "Renamed", logger.GetSrc(ThemeManager.GetIconImage(exists, 32, 32, "", "")));
-					else if (results.IsTemplateChanged)
-						logger.RecordEvent(idata, "Template Change", logger.GetSrc(ThemeManager.GetIconImage(exists, 32, 32, "", "")));
-					else if (results.ChangedVersions.Any())
-						logger.RecordEvent(idata, "New Version", logger.GetSrc(ThemeManager.GetIconImage(exists, 32, 32, "", "")));
-					else
-						logger.RecordEvent(idata, "Changed", logger.GetSrc(ThemeManager.GetIconImage(exists, 32, 32, "", "")));
-				}
-				if (_args.mirror)
-					allowedItems.Remove(idata.Id);
 			}
 			return true;
 		}

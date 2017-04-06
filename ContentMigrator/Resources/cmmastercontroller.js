@@ -22,7 +22,19 @@
 		vm.events = {
 			'selectedIds': [],
 			'selected': [],
+			'difflang': 'none',
+			'diffreset': true,
+			'standardValues': false,
+			'validateDiffRow': function (field, diff) {
+				if (!this.standardValues && field.substring(0, 2) === "__") return false;
+				if (!this.standardValues && diff === "~") return false;
+				return true;
+			},
 			'click': function (val) {
+				if (val.MissingRemote)
+					return;
+				vm.events.lastClicked = val;
+				vm.setupCompare(val.Compare);
 				if (!vm.events.control) {
 					vm.events.selected = [];
 					vm.events.selectedIds = [];
@@ -37,6 +49,25 @@
 				}
 			}
 		};
+		vm.setupCompare = function(compare, skipValidation)
+		{
+			for (var el in compare) {
+				if (vm.events.difflang === 'clean')
+					vm.events.difflang = 'none';
+				compare[el].valid = false;
+				for (var i = 0; i < compare[el].length; i++) {
+					if (!skipValidation && !vm.events.validateDiffRow(compare[el][i].Item1, compare[el][i].Item2)) {
+						compare[el][i].valid = false;
+					} else {
+						if (vm.events.difflang === 'none') {
+							vm.events.difflang = el;
+						}
+						compare[el].valid = true;
+						compare[el][i].valid = true;
+					}
+				}
+			}
+		}
 		angular.element($window)
 			.bind("keydown",
 				function($event) {
@@ -46,6 +77,20 @@
 			.bind("keyup",
 				function ($event) {
 					vm.events.control = false;
+				});
+		angular.element($window)
+			.bind("mousedown",
+				function($event) {
+					var target = $event.target;
+					while (target && target.tagName !== "body") {
+						if (target.className && target.className.indexOf("cmdifftableroot") > -1) {
+							return;
+						}
+						target = target.parentNode;
+					}
+					vm.resultDiff = false;
+					vm.events.difflang = 'clean';
+					vm.events.diff = false;
 				});
 		vm.pull = function (preview) {
 			if (preview || confirm("Are you sure you would like to pull content from the items " + vm.listSources())) {
@@ -201,6 +246,14 @@
 					vm.response[k].show = false;
 			}
 			vm.response[el].show = true;
+		}
+		vm.isEmptyObject = function(obj) {
+			for (var prop in obj) {
+				if (Object.prototype.hasOwnProperty.call(obj, prop)) {
+					return false;
+				}
+			}
+			return true;
 		}
 		vm.reset();
 	}

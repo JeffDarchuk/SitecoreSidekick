@@ -1,5 +1,4 @@
-﻿/// <reference path="angular.js" />
-var scsActiveModule = "";
+﻿var scsActiveModule = "";
 (function () {
 	'use strict';
 

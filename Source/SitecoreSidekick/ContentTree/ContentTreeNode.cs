@@ -42,7 +42,7 @@ namespace SitecoreSidekick.ContentTree
 		{
 			if (item != null)
 			{
-				Icon = GetSrc(ThemeManager.GetIconImage(item, 32, 32, "", ""));
+				Icon = GetSrc(ThemeManager.GetIconImage(item, 32, 32, "", "")).Replace("/sitecore/shell/themes/standard/-/media/", "/-/media/");
 			}
 			//if (!string.IsNullOrWhiteSpace(Icon))
 			//{

@@ -5,9 +5,15 @@
 			<select ng-model="vm.server" ng-options="i for i in vm.serverList" ng-change="vm.serverSubmit()"> </select>
 		</fieldset>
 		<fieldset>
+			<legend>Diff Options</legend>
+			<div>
+				<input type="checkbox" ng-model="vm.events.standardValues" /><span> Show standard values in diff </span>
+			</div>
+		</fieldset>
+		<fieldset>
 			<legend>Select content to pull</legend>
 			<div ng-if="!vm.serverModified">
-				<cmcontenttree parent="''" database="'master'" selected="vm.events.selectedIds" events="vm.events" server="vm.server"></cmcontenttree>
+				<cmcontenttree parent="''" database="'master'" selected="vm.events.selectedIds" events="vm.events" server="vm.server" standardValues="vm.diffStandardValues"></cmcontenttree>
 			</div>
 		</fieldset>
 		<fieldset>
@@ -103,6 +109,20 @@
 		<div ng-if="vm.spinner">Items in queue: {{vm.queuedItems}}</div>
 		<a ng-repeat="results in vm.response" class="btn cmtab" ng-class="{cmselectedtab: vm.response[results.name].show}" ng-show="results.length > 0 && results.name" ng-click="vm.toggle(results.name)"> {{results.displayName}} - {{results.length}}</a>
 	</div>
+	<div style="position:fixed;left:100px;top:120px;" class="cmdifftableroot" ng-if="vm.resultDiff">
+		<span class="cmdifftab cmdiffselectedtab cmviewresult"><a title="Click to open this item in the Content Editor." class="cmopenresult fancybox fancybox.iframe" href="/sitecore/shell/Applications/Content%20Editor.aspx?sc_content=master&fo={{vm.resultId}}">→</a></span>
+		<span ng-repeat="(key, value) in vm.resultDiff" ng-class="{'cmdifftab cmdiffselectedtab' : key === vm.events.difflang, 'cmdifftab' : key !== vm.events.difflang}" ng-if="value.valid" ng-click="vm.events.difflang = key">{{key}}</span>
+		
+		<div ng-repeat="(key, value) in vm.resultDiff">
+
+			<table id="cmdifftable" class="cmdifftable" ng-if="vm.events.difflang === key">
+				<tr ng-repeat="compare in value">
+					<td>{{compare.Item1}}</td>
+					<td><pre ng-bind-html="compare.Item2 | sanitize"></pre></td>
+				</tr>
+			</table>
+		</div>
+	</div>
 	<div ng-repeat="results in vm.response">
 		<div class="cmtabpane" ng-if="results.show">
 			<dir-pagination-controls pagination-id="results.name  +'pagination' " template-url="/scs/scsdirpagination.scs">
@@ -113,8 +133,15 @@
 						<h4>{{item.Name}}</h4>
 						<pre>{{item.Path}}</pre>
 					</span>
-					<span ng-if="results.name !== 'Error'">
-						<a class="btn cmresult fancybox fancybox.iframe" href="/sitecore/shell/Applications/Content%20Editor.aspx?sc_content={{item.DatabaseName}}&fo={{item.Id}}">
+					<span ng-if="results.name !== 'Error' && !vm.isEmptyObject(item.Events)">
+						<a class="btn cmresult" ng-click="vm.resultDiff = item.Events;vm.resultId=item.Id;vm.setupCompare(item.Events, true)">
+							<img ng-src="{{item.Icon}}" />
+							<h4>{{item.Name}}</h4>
+							<div ng-if="vm.showPath">{{item.Path}}</div>
+						</a>
+					</span>
+					<span ng-if="results.name !== 'Error' && vm.isEmptyObject(item.Events)">
+						<a title="Click to open this item in the Content Editor." class="btn cmresult fancybox fancybox.iframe" href="/sitecore/shell/Applications/Content%20Editor.aspx?sc_content=master&fo={{vm.resultId}}">
 							<img ng-src="{{item.Icon}}" />
 							<h4>{{item.Name}}</h4>
 							<div ng-if="vm.showPath">{{item.Path}}</div>

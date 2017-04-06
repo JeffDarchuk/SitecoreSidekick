@@ -133,7 +133,9 @@
 							<h5 ng-if="item.Database" class="aldetailheading">Database</h5>
 							<div ng-if="item.Database" class="aldetailpane">{{item.Database}}</div>
 							<h5 ng-if="item.Note" class="aldetailheading">Note</h5>
-							<div ng-if="item.Note" ng-bind-html="item.Note | sanitize"></div>
+							<div ng-if="item.Note">
+								<pre ng-bind-html="item.Note | sanitize"></pre>
+							</div>
 						</div>
 					</td>
 					<td>

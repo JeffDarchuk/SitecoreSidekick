@@ -12,13 +12,18 @@
 		var vm = this;
 		vm.Open = false;
 		$scope.init = function (nodeId, selectedId, events, server, database) {
-			CMfactory.contentTree(nodeId, database, server).then(function (response) {
-				vm.data = response.data;
-				if (server)
-					events.server = server;
-			}, function(response) {
-				vm.error = response.data;
-			});
+			if (!server.MissingRemote) {
+				CMfactory.contentTree(nodeId, database, server).then(function (response) {
+					vm.data = response.data;
+					if (server)
+						events.server = server;
+				}, function (response) {
+					vm.error = response.data;
+				});
+			} else {
+				vm.data = server;
+				vm.data.Nodes = new Array();
+			}
 			if (typeof (selectedId) !== "undefined" && selectedId.length > 0)
 				ScsFactory.contentTreeSelectedRelated(nodeId, selectedId, server).then(function (response) {
 					if (response.data)

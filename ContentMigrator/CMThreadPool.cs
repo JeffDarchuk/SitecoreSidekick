@@ -20,7 +20,7 @@ namespace ScsContentMigrator
 		public CMThreadPool(OperationStatus status)
 		{
 			_status = status;
-			Task.Run(() =>
+			Task.Run(async () =>
 			{
 				while (_runningThreads.Count > 0 || _state.Count > 0 || starting)
 				{
@@ -43,7 +43,7 @@ namespace ScsContentMigrator
 							}
 							else
 							{
-								Thread.Sleep(10);
+								await Task.Delay(10);
 							}
 						}
 					}
@@ -52,7 +52,7 @@ namespace ScsContentMigrator
 						Log.Error("problem initializing the content migration thread", e, this);
 					}
 					if (_runningThreads.Count == ContentMigrationHandler.writerThreads)
-						Thread.Sleep(10);
+						await Task.Delay(10);
 				}
 				_status.EndOperation();
 			});

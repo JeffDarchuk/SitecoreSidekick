@@ -83,7 +83,7 @@ namespace SitecoreSidekick.Pipelines.Initialize
 					Defaults = new RouteValueDictionary(new { controller = "SCSHandler", action = "ProcessRequest" }),
 					Constraints = new RouteValueDictionary(new { controller = "SCSHandler", action = "ProcessRequest" })
 				};
-				routes.Add("SCSHandlerFilenameRoute", filenameRoute);
+				routes.Insert(0, filenameRoute);
 			}
 		}
 	}

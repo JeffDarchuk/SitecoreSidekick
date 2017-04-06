@@ -8,6 +8,7 @@ using Sitecore.Data.Fields;
 using Sitecore.Data.Items;
 using Sitecore.Diagnostics;
 using Sitecore.Events;
+using System.Web;
 
 namespace ScsAuditLog.Pipelines
 {
@@ -30,7 +31,7 @@ namespace ScsAuditLog.Pipelines
 						sb.Append("<tr><td>");
 						sb.Append(Cleanse(field.Name));
 						sb.Append("</td><td>");
-						HtmlDiff.HtmlDiff diff = new HtmlDiff.HtmlDiff(fieldChange.OriginalValue, field.Value);
+						HtmlDiff.HtmlDiff diff = new HtmlDiff.HtmlDiff(HttpUtility.HtmlEncode(fieldChange.OriginalValue), HttpUtility.HtmlEncode(field.Value));
 						sb.Append(diff.Build());
 						sb.Append("</td></tr>");
 					}

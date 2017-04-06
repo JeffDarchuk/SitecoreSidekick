@@ -115,7 +115,7 @@ namespace SitecoreSidekick.Handlers
 				return ContentSelectedRelated(data.currentId, data.selectedId);
 			foreach (object selectedId in data.selectedId)
 			{
-				if (ContentSelectedRelated(data.currentId, selectedId.ToString()))
+				if (selectedId != null && ContentSelectedRelated(data.currentId, selectedId.ToString()))
 					return true;
 			}
 			return false;

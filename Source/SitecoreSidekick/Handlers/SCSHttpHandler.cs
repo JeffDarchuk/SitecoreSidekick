@@ -13,13 +13,8 @@ using System.Web;
 using System.Web.Routing;
 using System.Web.SessionState;
 using Newtonsoft.Json;
-using Sitecore.Diagnostics;
 using Sitecore.Mvc.Extensions;
 using Sitecore.Pipelines;
-using Sitecore.Shell.Framework;
-using Sitecore.Shell.Framework.Commands;
-using Sitecore.StringExtensions;
-using Sitecore.Web.UI.Sheer;
 using SitecoreSidekick.Core;
 using SitecoreSidekick.Pipelines.HttpRequestBegin;
 

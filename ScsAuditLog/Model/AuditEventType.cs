@@ -1,13 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using ScsAuditLog.Model.Interface;
 using Sitecore.Data.Items;
-using Sitecore.Diagnostics;
-using Sitecore.Web.UI.HtmlControls;
 
 namespace ScsAuditLog.Model
 {

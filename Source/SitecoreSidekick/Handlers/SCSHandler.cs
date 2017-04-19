@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Drawing.Imaging;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -11,9 +10,7 @@ using Newtonsoft.Json;
 using Sitecore.Configuration;
 using Sitecore.Data.Items;
 using Sitecore.Diagnostics;
-using SitecoreSidekick.ContentTree;
 using SitecoreSidekick.Core;
-using SitecoreSidekick.Pipelines.HttpRequestBegin;
 
 namespace SitecoreSidekick.Handlers
 {
@@ -22,9 +19,9 @@ namespace SitecoreSidekick.Handlers
 	/// </summary>
 	public class ScsHandler : ScsHttpHandler
 	{
-		private static List<ISidekick> Sidekicks { get; set; } = new List<ISidekick>();
-		private static StringBuilder js = new StringBuilder();
-		private static StringBuilder css = new StringBuilder();
+		private static List<ISidekick> Sidekicks { get; } = new List<ISidekick>();
+		private static readonly StringBuilder Js = new StringBuilder();
+		private static readonly StringBuilder Css = new StringBuilder();
 
 		public override string Directive { get; set; }
 		public override NameValueCollection DirectiveAttributes { get; set; }
@@ -35,14 +32,14 @@ namespace SitecoreSidekick.Handlers
 
 		public ScsHandler(string roles, string isAdmin, string users) : base(roles, isAdmin, users)
 		{
-			js.Append(CompileEmbeddedResource(".js"));
-			css.Append(CompileEmbeddedResource(".css"));
+			Js.Append(CompileEmbeddedResource(".js"));
+			Css.Append(CompileEmbeddedResource(".css"));
 		}
 		public static void RegisterSideKick(ISidekick sk)
 		{
 			Sidekicks.Add(sk);
-			js.Append(sk.CompileEmbeddedResource(".js"));
-			css.Append(sk.CompileEmbeddedResource(".css"));
+			Js.Append(sk.CompileEmbeddedResource(".js"));
+			Css.Append(sk.CompileEmbeddedResource(".css"));
 		}
 
 		/// <summary>
@@ -77,9 +74,9 @@ namespace SitecoreSidekick.Handlers
 					else if (file.Equals("scscommand.js"))
 						ReturnResource(context, file, "application/javascript");
 					else if (file.EndsWith(".js"))
-						ReturnResponse(context, js.ToString(), "application/javascript");
+						ReturnResponse(context, Js.ToString(), "application/javascript");
 					else if (file.EndsWith(".css"))
-						ReturnResponse(context, css.ToString(), "text/css");
+						ReturnResponse(context, Css.ToString(), "text/css");
 					else if (file == "contenttreeselectedrelated.scsvc")
 						ReturnJson(context, GetContentSelectedRelated(context));
 					else

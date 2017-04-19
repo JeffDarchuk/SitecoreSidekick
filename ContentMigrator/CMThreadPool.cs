@@ -1,28 +1,23 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Remoting.Messaging;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Sitecore.Diagnostics;
 
 namespace ScsContentMigrator
 {
-	public class CMThreadPool
+	public class CmThreadPool
 	{
-		private OperationStatus _status;
-		private List<IAsyncResult> _runningThreads = new List<IAsyncResult>();
-		private ConcurrentQueue<Tuple<WaitCallback, object>> _state = new ConcurrentQueue<Tuple<WaitCallback, object>>();
-		private bool starting = true;
+		private readonly List<IAsyncResult> _runningThreads = new List<IAsyncResult>();
+		private readonly ConcurrentQueue<Tuple<WaitCallback, object>> _state = new ConcurrentQueue<Tuple<WaitCallback, object>>();
+		private bool _starting = true;
 
-		public CMThreadPool(OperationStatus status)
+		public CmThreadPool(OperationStatus status)
 		{
-			_status = status;
 			Task.Run(async () =>
 			{
-				while (_runningThreads.Count > 0 || _state.Count > 0 || starting)
+				while (_runningThreads.Count > 0 || _state.Count > 0 || _starting)
 				{
 					try
 					{
@@ -34,9 +29,9 @@ namespace ScsContentMigrator
 								i--;
 							}
 						}
-						if (_runningThreads.Count < ContentMigrationHandler.remoteThreads)
+						if (_runningThreads.Count < ContentMigrationHandler.RemoteThreads)
 						{
-							Tuple<WaitCallback, object> stateTuple = null;
+							Tuple<WaitCallback, object> stateTuple;
 							if (_state.TryDequeue(out stateTuple))
 							{
 								_runningThreads.Add(stateTuple.Item1.BeginInvoke(stateTuple.Item2, null, null));
@@ -51,16 +46,16 @@ namespace ScsContentMigrator
 					{
 						Log.Error("problem initializing the content migration thread", e, this);
 					}
-					if (_runningThreads.Count == ContentMigrationHandler.writerThreads)
+					if (_runningThreads.Count == ContentMigrationHandler.WriterThreads)
 						await Task.Delay(10);
 				}
-				_status.EndOperation();
+				status.EndOperation();
 			});
 		}
 		public void Queue(WaitCallback f, object state = null)
 		{
 			_state.Enqueue(new Tuple<WaitCallback, object>(f, state));
-			starting = false;
+			_starting = false;
 		}
 	}
 }

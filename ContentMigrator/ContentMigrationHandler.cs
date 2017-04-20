@@ -163,7 +163,7 @@ namespace ScsContentMigrator
 		{
 			using (new SecurityDisabler())
 			{
-				return GetChecksum(HttpContext.Current.Request.QueryString["id"]);
+				return GetChecksum(context.Request.QueryString["id"]);
 			}
 		}
 

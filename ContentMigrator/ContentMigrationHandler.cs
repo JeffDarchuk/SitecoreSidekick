@@ -135,25 +135,25 @@ namespace ScsContentMigrator
 		public override void ProcessRequest(HttpContextBase context)
 		{
 			var file = GetFile(context);
-			if (file == "cmcontenttree.scsvc")
+			if (file.Equals("cmcontenttree.scsvc", StringComparison.Ordinal))
 				ReturnJson(context, GetContentTree(context));
-			else if (file == "cmcontenttreegetitem.scsvc")
+			else if (file.Equals("cmcontenttreegetitem.scsvc", StringComparison.Ordinal))
 				ReturnJson(context, GetItemYaml(context));
-			else if (file == "cmcontenttreepullitem.scsvc")
+			else if (file.Equals("cmcontenttreepullitem.scsvc", StringComparison.Ordinal))
 				ReturnJson(context, PullItem(context));
-			else if (file == "cmserverlist.scsvc")
+			else if (file.Equals("cmserverlist.scsvc", StringComparison.Ordinal))
 				ReturnJson(context, ServerList);
-			else if (file == "cmopeartionstatus.scsvc")
+			else if (file.Equals("cmopeartionstatus.scsvc", StringComparison.Ordinal))
 				ReturnJson(context, GetOperationStatus(context));
-			else if (file == "cmoperationlist.scsvc")
+			else if (file.Equals("cmoperationlist.scsvc", StringComparison.Ordinal))
 				ReturnJson(context, GetOperationList(context));
-			else if (file == "cmstopoperation.scsvc")
+			else if (file.Equals("cmstopoperation.scsvc", StringComparison.Ordinal))
 				ReturnJson(context, StopOperation(context));
-			else if (file == "cmapprovepreview.scsvc")
+			else if (file.Equals("cmapprovepreview.scsvc", StringComparison.Ordinal))
 				ReturnJson(context, StartPreviewAsPull(context));
-			else if (file == "cmqueuelength.scsvc")
+			else if (file.Equals("cmqueuelength.scsvc", StringComparison.Ordinal))
 				ReturnJson(context, OperationQueueLength(context));
-			else if (file == "cmchecksum.scsvc")
+			else if (file.Equals("cmchecksum.scsvc", StringComparison.Ordinal))
 				ReturnJson(context, GetChecksum(context));
 			else
 				ProcessResourceRequest(context);

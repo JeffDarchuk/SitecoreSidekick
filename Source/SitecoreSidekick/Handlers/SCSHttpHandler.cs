@@ -182,7 +182,7 @@ namespace SitecoreSidekick.Handlers
 			var buffer = GetImage(file, imageFormat);
 			if (buffer == null || !buffer.Any()) return;
 			context.Response.StatusCode = 200;
-			context.Response.ContentType = "image/png";
+			context.Response.ContentType = contentType;
 			context.Response.BinaryWrite(buffer);
 			context.Response.Flush();
 		}

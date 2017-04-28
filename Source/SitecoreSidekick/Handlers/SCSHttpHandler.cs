@@ -13,13 +13,8 @@ using System.Web;
 using System.Web.Routing;
 using System.Web.SessionState;
 using Newtonsoft.Json;
-using Sitecore.Diagnostics;
 using Sitecore.Mvc.Extensions;
 using Sitecore.Pipelines;
-using Sitecore.Shell.Framework;
-using Sitecore.Shell.Framework.Commands;
-using Sitecore.StringExtensions;
-using Sitecore.Web.UI.Sheer;
 using SitecoreSidekick.Core;
 using SitecoreSidekick.Pipelines.HttpRequestBegin;
 
@@ -187,7 +182,7 @@ namespace SitecoreSidekick.Handlers
 			var buffer = GetImage(file, imageFormat);
 			if (buffer == null || !buffer.Any()) return;
 			context.Response.StatusCode = 200;
-			context.Response.ContentType = "image/png";
+			context.Response.ContentType = contentType;
 			context.Response.BinaryWrite(buffer);
 			context.Response.Flush();
 		}

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Drawing.Imaging;
 using System.Dynamic;
 using System.Linq;
 using System.Net;
@@ -10,9 +9,7 @@ using System.Web;
 using System.Xml;
 using Microsoft.CSharp.RuntimeBinder;
 using Newtonsoft.Json;
-using Rainbow.Diff;
 using ScsContentMigrator.Args;
-using ScsContentMigrator.CMRainbow;
 using ScsContentMigrator.Data;
 using Sitecore.Configuration;
 using Sitecore.Data;
@@ -29,12 +26,12 @@ namespace ScsContentMigrator
 {
 	public class ContentMigrationHandler : ScsHttpHandler
 	{
-		private static ConcurrentDictionary<string, int> _checksum = new ConcurrentDictionary<string, int>();
+		private static readonly ConcurrentDictionary<string, int> Checksum = new ConcurrentDictionary<string, int>();
 		private static readonly RemoteContentPuller Puller = new RemoteContentPuller();
-		private static CompareContentTreeNode Root = new CompareContentTreeNode() { DatabaseName = "master", DisplayName = "Root", Icon = "/~/icon/Applications/32x32/media_stop.png", Open = true, Nodes = new List<ContentTreeNode>() };
-		private static List<string> ServerList = new List<string>();
-		internal static int remoteThreads = 1;
-		internal static int writerThreads = 1;
+		private static readonly CompareContentTreeNode Root = new CompareContentTreeNode() { DatabaseName = "master", DisplayName = "Root", Icon = "/~/icon/Applications/32x32/media_stop.png", Open = true, Nodes = new List<ContentTreeNode>() };
+		private static readonly List<string> ServerList = new List<string>();
+		internal static int RemoteThreads = 1;
+		internal static int WriterThreads = 1;
 		public override string Directive { get; set; } = "cmmasterdirective";
 		public override NameValueCollection DirectiveAttributes { get; set; }
 		public override string ResourcesPath { get; set; } = "ScsContentMigrator.Resources";
@@ -43,10 +40,10 @@ namespace ScsContentMigrator
 		public override string CssStyle => "width:800px";
 		public ContentMigrationHandler(string roles, string isAdmin, string users, string remotePullingThreads, string databaseWriterThreads) : base(roles, isAdmin, users)
 		{
-			if (remoteThreads == 1)
-				int.TryParse(remotePullingThreads, out remoteThreads);
-			if (writerThreads == 1)
-				int.TryParse(databaseWriterThreads, out writerThreads);
+			if (RemoteThreads == 1)
+				int.TryParse(remotePullingThreads, out RemoteThreads);
+			if (WriterThreads == 1)
+				int.TryParse(databaseWriterThreads, out WriterThreads);
 			Timer t = new Timer(60 * 1000);
 			t.Elapsed += async (sender, e) => await GenerateChecksum();
 			t.Start();
@@ -66,7 +63,7 @@ namespace ScsContentMigrator
 		}
 		public static int GetChecksum(string id, bool force = false, bool childrenOnly = true)
 		{
-			if (!_checksum.ContainsKey(id) || force)
+			if (!Checksum.ContainsKey(id) || force)
 			{
 				using (new SecurityDisabler())
 				{
@@ -87,29 +84,30 @@ namespace ScsContentMigrator
 						int checksum = 0;
 						foreach (Item child in cur.Children.OrderBy(x => x.ID.ToString()))
 						{
-							checksum = (checksum + (_checksum.ContainsKey(child.ID.ToString()) ? _checksum[child.ID.ToString()].ToString() : "-1")).GetHashCode();
+							checksum = (checksum + (Checksum.ContainsKey(child.ID.ToString()) ? Checksum[child.ID.ToString()].ToString() : "-1")).GetHashCode();
 						}
-						_checksum["children" + cur.ID.ToString()] = checksum;
-						checksum = (checksum.ToString() + cur.Statistics.Revision).GetHashCode();
-						_checksum[cur.ID.ToString()] = checksum;
+						Checksum["children" + cur.ID] = checksum;
+						checksum = (checksum + cur.Statistics.Revision).GetHashCode();
+						Checksum[cur.ID.ToString()] = checksum;
 					}
 					
 				}
 			}
 			if (childrenOnly)
 			{
-				if (!_checksum.ContainsKey("children" + id))
+				if (!Checksum.ContainsKey("children" + id))
 					return -1;
-				return _checksum["children" + id];
+				return Checksum["children" + id];
 			}
-			if (!_checksum.ContainsKey(id))
+			if (!Checksum.ContainsKey(id))
 				return -1;
-			return _checksum[id];
+			return Checksum[id];
 		}
 		public static void StartContentSync(RemoteContentPullArgs args)
 		{
 			Puller.PullContentItem(args);
 		}
+
 		public void BuildRoot(XmlNode node)
 		{
 			string dbName = "master";
@@ -122,8 +120,14 @@ namespace ScsContentMigrator
 			{
 				var item = db.GetItem(node.InnerText);
 				if (item != null)
+				{
 					Root.Nodes.Add(new CompareContentTreeNode(item, false));
-				GenerateChecksum(new List<CompareContentTreeNode>() { new CompareContentTreeNode(item) });
+				}
+
+#pragma warning disable 4014
+				// async method intentionally not awaited to allow processing in the background and this method returning
+				GenerateChecksum(new List<CompareContentTreeNode> { new CompareContentTreeNode(item) });
+#pragma warning restore 4014
 			}
 
 		}
@@ -131,25 +135,25 @@ namespace ScsContentMigrator
 		public override void ProcessRequest(HttpContextBase context)
 		{
 			var file = GetFile(context);
-			if (file == "cmcontenttree.scsvc")
+			if (file.Equals("cmcontenttree.scsvc", StringComparison.Ordinal))
 				ReturnJson(context, GetContentTree(context));
-			else if (file == "cmcontenttreegetitem.scsvc")
+			else if (file.Equals("cmcontenttreegetitem.scsvc", StringComparison.Ordinal))
 				ReturnJson(context, GetItemYaml(context));
-			else if (file == "cmcontenttreepullitem.scsvc")
+			else if (file.Equals("cmcontenttreepullitem.scsvc", StringComparison.Ordinal))
 				ReturnJson(context, PullItem(context));
-			else if (file == "cmserverlist.scsvc")
+			else if (file.Equals("cmserverlist.scsvc", StringComparison.Ordinal))
 				ReturnJson(context, ServerList);
-			else if (file == "cmopeartionstatus.scsvc")
+			else if (file.Equals("cmopeartionstatus.scsvc", StringComparison.Ordinal))
 				ReturnJson(context, GetOperationStatus(context));
-			else if (file == "cmoperationlist.scsvc")
+			else if (file.Equals("cmoperationlist.scsvc", StringComparison.Ordinal))
 				ReturnJson(context, GetOperationList(context));
-			else if (file == "cmstopoperation.scsvc")
+			else if (file.Equals("cmstopoperation.scsvc", StringComparison.Ordinal))
 				ReturnJson(context, StopOperation(context));
-			else if (file == "cmapprovepreview.scsvc")
+			else if (file.Equals("cmapprovepreview.scsvc", StringComparison.Ordinal))
 				ReturnJson(context, StartPreviewAsPull(context));
-			else if (file == "cmqueuelength.scsvc")
+			else if (file.Equals("cmqueuelength.scsvc", StringComparison.Ordinal))
 				ReturnJson(context, OperationQueueLength(context));
-			else if (file == "cmchecksum.scsvc")
+			else if (file.Equals("cmchecksum.scsvc", StringComparison.Ordinal))
 				ReturnJson(context, GetChecksum(context));
 			else
 				ProcessResourceRequest(context);
@@ -159,7 +163,7 @@ namespace ScsContentMigrator
 		{
 			using (new SecurityDisabler())
 			{
-				return GetChecksum(HttpContext.Current.Request.QueryString["id"]);
+				return GetChecksum(context.Request.QueryString["id"]);
 			}
 		}
 

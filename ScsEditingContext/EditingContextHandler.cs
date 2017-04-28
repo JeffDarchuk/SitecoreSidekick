@@ -1,19 +1,14 @@
-﻿using System;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Drawing.Imaging;
 using System.Dynamic;
 using System.Linq;
 using System.Web;
 using System.Web.Security;
 using System.Xml;
-using ScsEditingContext.Pipelines.HttpRequestBegin;
-using Sitecore;
 using Sitecore.Configuration;
 using Sitecore.Data;
 using Sitecore.Data.Managers;
-using Sitecore.Security.Accounts;
 using Sitecore.SecurityModel;
 using SitecoreSidekick.ContentTree;
 using SitecoreSidekick.Handlers;
@@ -35,8 +30,8 @@ namespace ScsEditingContext
 
 		public static Database Core = Factory.GetDatabase("core");
 		public static Database Master = Factory.GetDatabase("master");
-		internal static ConcurrentDictionary<string, List<TypeContentTreeNode>> Related { get; private set; }
-		internal static ConcurrentDictionary<string, List<TypeContentTreeNode>> Referrers { get; private set; }
+		internal static ConcurrentDictionary<string, List<TypeContentTreeNode>> Related { get; }
+		internal static ConcurrentDictionary<string, List<TypeContentTreeNode>> Referrers { get; }
 
 		static EditingContextHandler()
 		{
@@ -145,7 +140,7 @@ namespace ScsEditingContext
 
 		public dynamic GetLocationFromXml(XmlNode arg, Database db)
 		{
-			var node = new ContentTreeNode(db.DataManager.DataEngine.GetItem(new ID(arg.Attributes?["id"]?.InnerText), LanguageManager.DefaultLanguage, Sitecore.Data.Version.Latest));
+			var node = new ContentTreeNode(db.DataManager.DataEngine.GetItem(new ID(arg.Attributes?["id"]?.InnerText), LanguageManager.DefaultLanguage, Version.Latest));
 			dynamic location = new ExpandoObject();
 			location.item = node;
 			location.description = arg.Attributes?["description"]?.InnerText;

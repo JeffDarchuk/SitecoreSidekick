@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using Sitecore;
@@ -68,7 +66,7 @@ namespace ScsEditingContext.Pipelines.HttpRequestBegin
 			}
 			catch (Exception e)
 			{
-				Log.Warn("unable to register action for SCS Editing Context", this);
+				Log.Warn("unable to register action for SCS Editing Context", e, this);
 			}
 		}
 	}

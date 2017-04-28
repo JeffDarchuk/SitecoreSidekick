@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web;
 using Rainbow.Diff.Fields;
 using Rainbow.Model;
@@ -20,15 +18,15 @@ namespace ScsContentMigrator.Data
 {
 	public class CompareContentTreeNode : ContentTreeNode
 	{
-		private static List<IFieldComparer> _comparers = new List<IFieldComparer>();
+		private static readonly List<IFieldComparer> Comparers = new List<IFieldComparer>();
 
 		static CompareContentTreeNode()
 		{
-			_comparers.Add(new CheckboxComparison());
-			_comparers.Add(new MultiLineTextComparison());
-			_comparers.Add(new MultilistComparison());
-			_comparers.Add(new XmlComparison());
-			_comparers.Add(new DefaultComparison());
+			Comparers.Add(new CheckboxComparison());
+			Comparers.Add(new MultiLineTextComparison());
+			Comparers.Add(new MultilistComparison());
+			Comparers.Add(new XmlComparison());
+			Comparers.Add(new DefaultComparison());
 		}
 		public string Data;
 		public List<Tuple<string,string>> Status;
@@ -55,7 +53,7 @@ namespace ScsContentMigrator.Data
 		private bool AreFieldsEqual(Field local, IItemFieldValue remote)
 		{
 			var localField = new ItemFieldValue(local, local.Value);
-			foreach (IFieldComparer comparer in _comparers)
+			foreach (IFieldComparer comparer in Comparers)
 			{
 				if (!comparer.CanCompare(localField, remote)) continue;
 

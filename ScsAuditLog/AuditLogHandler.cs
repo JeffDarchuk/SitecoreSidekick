@@ -3,20 +3,15 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Web;
 using ScsAuditLog.Model;
 using SitecoreSidekick.Handlers;
 using System.Dynamic;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Xml;
-using Lucene.Net.Documents;
 using Lucene.Net.Search;
 using ScsAuditLog.Core;
 using ScsAuditLog.Model.Interface;
-using ScsAuditLog.Pipelines;
-using Sitecore.Shell.Framework.Commands.System;
 using SitecoreSidekick.ContentTree;
 using Sitecore.Configuration;
 using Sitecore.Data;
@@ -27,14 +22,14 @@ namespace ScsAuditLog
 {
 	public class AuditLogHandler : ScsHttpHandler
 	{
-		private static ContentTreeNode Root = new ContentTreeNode() { DatabaseName = "master", DisplayName = "Root", Icon = "/~/icon/Applications/32x32/media_stop.png", Open = true, Nodes = new List<ContentTreeNode>() };
+		private static readonly ContentTreeNode Root = new ContentTreeNode() { DatabaseName = "master", DisplayName = "Root", Icon = "/~/icon/Applications/32x32/media_stop.png", Open = true, Nodes = new List<ContentTreeNode>() };
 		public override string Directive { get; set; } = "aldirective";
 		public override NameValueCollection DirectiveAttributes { get; set; }
 		public override string ResourcesPath { get; set; } = "ScsAuditLog.Resources";
 		public override string Icon { get; } = "/scs/portfoliofolder.png";
 		public override string Name { get; } = "Audit Log";
 		public override string CssStyle { get; } = "width:1000px";
-		private List<string> _luceneSpecialChars = new List<string>() { "+", "-", "&&", "||", "!", "(", ")", "{", "}", "[", "]", "^", "\"", "~", "*", "?", ":", "\\" };
+		private readonly List<string> _luceneSpecialChars = new List<string>() { "+", "-", "&&", "||", "!", "(", ")", "{", "}", "[", "]", "^", "\"", "~", "*", "?", ":", "\\" };
 
 		public AuditLogHandler(string keepBackups, string keepRecords, string roles, string isAdmin, string users) : base(roles, isAdmin, users)
 		{
@@ -46,8 +41,8 @@ namespace ScsAuditLog
 					Root.Nodes.Add(new ContentTreeNode(child, false));
 				}
 			}
-			int backup = 0;
-			int duration = 0;
+			int backup;
+			int duration;
 			if (!int.TryParse(keepBackups, out backup))
 				backup = 0;
 			if (!int.TryParse(keepRecords, out duration))
@@ -78,7 +73,7 @@ namespace ScsAuditLog
 
 		private object RebuildLogStatus(HttpContextBase context)
 		{
-			return AuditLogger.Log.rebuilt;
+			return AuditLogger.Log.Rebuilt;
 		}
 
 		private object RebuildLog(HttpContextBase context)
@@ -105,7 +100,7 @@ namespace ScsAuditLog
 			sb.Append(BuildArrayQuery((List<object>)data.eventTypes, "event"));
 			if (sb.Length > 0)
 				sb.Append(" AND ");
-			sb.Append($"date:[{start.ToString("yyyyMMdd")} TO {end.ToString("yyyyMMdd")}]");
+			sb.Append($"date:[{start:yyyyMMdd} TO {end:yyyyMMdd}]");
 			IndexSearcher searcher = AuditLogger.Current.GetSearcher();
 			TopDocs results = AuditLogger.Current.Query(sb.ToString(), searcher);
 			dynamic ret = new ExpandoObject();

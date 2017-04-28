@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SitecoreSidekick</RootNamespace>
     <AssemblyName>SitecoreSidekick</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -30,39 +31,45 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.4.5.9\lib\net40\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
     </Reference>
-    <Reference Include="Sitecore.Client">
-      <HintPath>..\..\Dependencies\Lib\Sitecore\Sitecore.Client.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="Sitecore.ContentSearch">
-      <HintPath>..\..\Dependencies\Lib\Sitecore\Sitecore.ContentSearch.dll</HintPath>
+    <Reference Include="Sitecore.Kernel, Version=10.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Sitecore.Kernel.NoReferences.8.2.170407\lib\NET452\Sitecore.Kernel.dll</HintPath>
     </Reference>
-    <Reference Include="Sitecore.ContentSearch.Linq">
-      <HintPath>..\..\Dependencies\Lib\Sitecore\Sitecore.ContentSearch.Linq.dll</HintPath>
+    <Reference Include="Sitecore.Mvc, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Sitecore.Mvc.NoReferences.8.2.170407\lib\NET452\Sitecore.Mvc.dll</HintPath>
     </Reference>
-    <Reference Include="Sitecore.Kernel">
-      <HintPath>..\..\Dependencies\Lib\Sitecore\Sitecore.Kernel.dll</HintPath>
-    </Reference>
-    <Reference Include="Sitecore.Mvc">
-      <HintPath>..\..\Dependencies\Lib\Sitecore\Sitecore.Mvc.dll</HintPath>
-    </Reference>
-    <Reference Include="Sitecore.Mvc.ExperienceEditor">
-      <HintPath>..\..\Dependencies\Lib\Sitecore\Sitecore.Mvc.ExperienceEditor.dll</HintPath>
+    <Reference Include="Sitecore.Mvc.ExperienceEditor, Version=2.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Sitecore.Mvc.ExperienceEditor.NoReferences.8.2.170407\lib\NET452\Sitecore.Mvc.ExperienceEditor.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web" />
-    <Reference Include="System.Web.Mvc, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Dependencies\Lib\Sitecore\System.Web.Mvc.dll</HintPath>
+    <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.Helpers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.AspNet.Mvc.5.2.3\lib\net45\System.Web.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.AspNet.Razor.3.2.3\lib\net45\System.Web.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Deployment, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Deployment.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -91,9 +98,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="packages.config">
-      <SubType>Designer</SubType>
-    </None>
+    <None Include="packages.config" />
     <None Include="zSCS.config">
       <SubType>Designer</SubType>
     </None>
@@ -120,16 +125,8 @@
     <EmbeddedResource Include="Resources\scsfactory.js" />
   </ItemGroup>
   <ItemGroup>
-	<Compile Include="..\..\SharedAssemblyInfo.cs">
+    <Compile Include="..\..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
   </ItemGroup>
-  <Target Name="AfterBuild">
-    <Copy SourceFiles="$(TargetPath)" DestinationFolder="C:\inetpub\wwwroot\Spectrum\Source\Spectrum.Web\bin" />
-    <Copy SourceFiles="C:\Development\Sitecore Sidekick\Source\SitecoreSidekick\zSCS.config" DestinationFolder="C:\inetpub\wwwroot\Spectrum\Source\Spectrum.Web\App_Config\Include" />
-    <Copy SourceFiles="$(TargetPath)" DestinationFolder="C:\inetpub\wwwroot\Debut\Source\Debut.Web\bin" />
-    <Copy SourceFiles="C:\Development\Sitecore Sidekick\Source\SitecoreSidekick\zSCS.config" DestinationFolder="C:\inetpub\wwwroot\Debut\Source\Debut.Web\App_Config\Include" />
-    <Copy SourceFiles="$(TargetPath)" DestinationFolder="C:\inetpub\wwwroot\APGit\Source\AirProducts.Web\bin" />
-    <Copy SourceFiles="C:\Development\Sitecore Sidekick\Source\SitecoreSidekick\zSCS.config" DestinationFolder="C:\inetpub\wwwroot\APGit\Source\AirProducts.Web\App_Config\Include" />
-  </Target>
 </Project>

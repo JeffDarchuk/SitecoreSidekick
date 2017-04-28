@@ -8,7 +8,7 @@
 }
 
 .cmresults {
-	padding: 0px;
+	padding: 0;
 }
 
 .cmspinner {
@@ -24,8 +24,8 @@
 }
 
 .cmtab {
-	border-bottom-right-radius: 0px;
-	border-bottom-left-radius: 0px;
+	border-bottom-right-radius: 0;
+	border-bottom-left-radius: 0;
 	background-color: darkgray;
 }
 
@@ -119,7 +119,7 @@ td.cmresultslabel {
     border: thin solid black;
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
-    padding: 3px 6px 0px 6px;
+    padding: 3px 6px 0 6px;
     background-color: darkgrey;
     color: white;
     cursor: pointer;
@@ -136,7 +136,7 @@ td.cmresultslabel {
 	color: black;
 	border-bottom: none;
 	padding-bottom: 2px;
-	top:0px;
+	top:0;
 }
 .cmchildchanged {
 	width: 2px;
@@ -151,7 +151,7 @@ td.cmresultslabel {
 .cmviewresult {
 	margin-left: -5px;
 	padding-right: 15px;
-	border-radius: 0px;
+	border-radius: 0;
 }
 .cmlocalonly {
 	opacity: .5;

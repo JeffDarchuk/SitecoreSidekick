@@ -1,37 +1,14 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Dynamic;
-using System.IO;
 using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Rainbow.Model;
-using Rainbow.Storage.Sc;
-using Rainbow.Storage.Sc.Deserialization;
-using Rainbow.Storage.Yaml;
 using ScsContentMigrator.Args;
-using ScsContentMigrator.CMRainbow;
-using Sitecore.Configuration;
-using Sitecore.Data;
-using Sitecore.Data.Events;
-using Sitecore.Data.Items;
-using Sitecore.Data.Query;
-using Sitecore.Diagnostics;
-using Sitecore.SecurityModel;
-using Sitecore.StringExtensions;
-using SitecoreSidekick.ContentTree;
 
 namespace ScsContentMigrator
 {
 	public class RemoteContentPuller
 	{
-		DefaultDeserializer deserializer = new DefaultDeserializer(new DefaultLogger(), new DefaultFieldFilter());
-		private static ConcurrentDictionary<string, OperationStatus> _operation = new ConcurrentDictionary<string, OperationStatus>();
+		private static readonly ConcurrentDictionary<string, OperationStatus> Operation = new ConcurrentDictionary<string, OperationStatus>();
 
 		public dynamic PullContentItem(RemoteContentPullArgs args)
 		{
@@ -41,9 +18,9 @@ namespace ScsContentMigrator
 
 		public static bool StopOperation(string operationId)
 		{
-			if (_operation.ContainsKey(operationId))
+			if (Operation.ContainsKey(operationId))
 			{
-				_operation[operationId].CancelOperation();
+				Operation[operationId].CancelOperation();
 				return true;
 			}
 			return false;
@@ -51,29 +28,29 @@ namespace ScsContentMigrator
 		internal static OperationStatus RegisterEvent(RemoteContentPullArgs args)
 		{
 			var ret = Guid.NewGuid().ToString();
-			_operation[ret] = new OperationStatus(args, ret);
-			return _operation[ret];
+			Operation[ret] = new OperationStatus(args, ret);
+			return Operation[ret];
 		}
 
 		public static IEnumerable<dynamic> GetRunningOperations()
 		{
-			return _operation.Values.Select(x => new {x.Completed, x.RootNodes, x.OperationId, x.IsPreview, x.Cancelled, x.StartedTime, x.FinishedTime});
+			return Operation.Values.Select(x => new {x.Completed, x.RootNodes, x.OperationId, x.IsPreview, x.Cancelled, x.StartedTime, x.FinishedTime});
 		}
 
 		public static OperationStatus GetOperation(string id)
 		{
-			if (_operation.ContainsKey(id))
-				return _operation[id];
+			if (Operation.ContainsKey(id))
+				return Operation[id];
 			return null;
 		}
 
 		public static IEnumerable<dynamic> OperationStatus(string operationId, int lineNumber)
 		{
-			if (_operation == null || string.IsNullOrWhiteSpace(operationId))
+			if (Operation == null || string.IsNullOrWhiteSpace(operationId))
 				yield break;
-			if (_operation.ContainsKey(operationId))
-				for (int i = lineNumber; i < _operation[operationId].Lines.Count; i++)
-					yield return _operation[operationId].Lines[i];
+			if (Operation.ContainsKey(operationId))
+				for (int i = lineNumber; i < Operation[operationId].Lines.Count; i++)
+					yield return Operation[operationId].Lines[i];
 		}
 	}
 }

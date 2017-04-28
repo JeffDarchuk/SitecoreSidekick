@@ -3,26 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Security.Authentication.ExtendedProtection;
 using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
-using Rainbow.Diff;
 using Rainbow.Model;
-using Rainbow.Storage.Sc;
 using Rainbow.Storage.Yaml;
 using ScsContentMigrator.Args;
-using ScsContentMigrator.CMRainbow;
 using ScsContentMigrator.Data;
-using Sitecore.Configuration;
 using Sitecore.Diagnostics;
-using SitecoreSidekick.ContentTree;
-using Sitecore.Data;
-using Sitecore.Data.Managers;
-using Sitecore.Data.Items;
-using System.Web;
-using Rainbow.Diff.Fields;
-using Sitecore.SecurityModel;
 
 namespace ScsContentMigrator
 {

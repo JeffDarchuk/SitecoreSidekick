@@ -1,6 +1,4 @@
-﻿using ScsAuditLog.Model.Interface;
-
-namespace ScsAuditLog.Model
+﻿namespace ScsAuditLog.Model
 {
 	public class AuditSourceRecord
 	{

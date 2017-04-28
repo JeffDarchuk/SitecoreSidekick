@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ScsContentMigrator.Args;
-using Sitecore.Data.Events;
+﻿using ScsContentMigrator.Args;
 
 namespace ScsContentMigrator
 {
 	public class ContentAgent
 	{
-		private RemoteContentPullArgs _args;
+		private readonly RemoteContentPullArgs _args;
 
 		public ContentAgent(string remoteServer, string rootIds, string database, string bulkUpdate, string children, string overwrite, string eventDisabler, string pullParent, string mirror)
 		{

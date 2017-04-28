@@ -2,11 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
+
 // FROM http://stackoverflow.com/questions/18922985/concurrent-hashsett-in-net-framework
 namespace ScsAuditLog
 {
@@ -290,9 +287,6 @@ namespace ScsAuditLog
 			}
 		}
 
-		public bool IsReadOnly
-		{
-			get { return false; }
-		}
+		public bool IsReadOnly => false;
 	}
 }

@@ -2,31 +2,23 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Sitecore.Pipelines.GetVisitorEmailAddress;
 
 namespace ScsAuditLog.Core
 {
 	public class AuditTrie<T>
 	{
-		private ConcurrentDictionary<char, AuditTrie<T>> Level = new ConcurrentDictionary<char, AuditTrie<T>>();
-		private T Value = default(T);
-		private AuditTrie<T> _parent;
-
-		public AuditTrie(AuditTrie<T> parent)
-		{
-			this._parent = parent;
-		}
+		private readonly ConcurrentDictionary<char, AuditTrie<T>> _level = new ConcurrentDictionary<char, AuditTrie<T>>();
+		private T _value;
 
 		public T this[string text]
 		{
-			get { return Query(text, 0).Value; }
-			set { Query(text, 0).Value = value; }
+			get => Query(text, 0)._value;
+			set => Query(text, 0)._value = value;
 		} 
 
 		public T Query(string text)
 		{
-			return Query(text, 0).Value;
+			return Query(text, 0)._value;
 		}
 
 		private AuditTrie<T> Query(string text, int index)
@@ -34,14 +26,14 @@ namespace ScsAuditLog.Core
 			if (text.Length == index)
 				return this;
 			char levelIndex = text[index];
-			if (!Level.ContainsKey(levelIndex))
-				Level[levelIndex] = new AuditTrie<T>(this);
-			return Level[levelIndex].Query(text, index + 1);
+			if (!_level.ContainsKey(levelIndex))
+				_level[levelIndex] = new AuditTrie<T>();
+			return _level[levelIndex].Query(text, index + 1);
 		}
 
 		public void Set(string text, T value)
 		{
-			Query(text, 0).Value = value;
+			Query(text, 0)._value = value;
 		}
 		public Dictionary<string, int> Autocomplete(string text, Func<T, int> getCount, int maxResults)
 		{
@@ -55,8 +47,8 @@ namespace ScsAuditLog.Core
 				return FindKeys(text, getCount).Take(maxResults).ToDictionary(x => x.Value, x => x.Key);
 			}
 			char levelIndex = text[index];
-			if (Level.ContainsKey(levelIndex))
-				return Level[levelIndex].Autocomplete(text, index + 1, getCount, maxResults);
+			if (_level.ContainsKey(levelIndex))
+				return _level[levelIndex].Autocomplete(text, index + 1, getCount, maxResults);
 			return new Dictionary<string, int>();
 		}
 
@@ -67,12 +59,12 @@ namespace ScsAuditLog.Core
 			while (q.Any())
 			{
 				var cur = q.Dequeue();
-				int count = getCount(cur.Item2.Value);
+				int count = getCount(cur.Item2._value);
 				if (count > 0)
 					yield return new KeyValuePair<int, string>(count, cur.Item1);
-				foreach (char key in cur.Item2.Level.Keys)
+				foreach (char key in cur.Item2._level.Keys)
 				{
-					q.Enqueue(new Tuple<string, AuditTrie<T>>(cur.Item1+key, cur.Item2.Level[key]));
+					q.Enqueue(new Tuple<string, AuditTrie<T>>(cur.Item1+key, cur.Item2._level[key]));
 				}
 			}
 		}

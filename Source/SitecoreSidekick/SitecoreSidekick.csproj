@@ -71,8 +71,8 @@
     <Compile Include="Commands\OpenScs.cs" />
     <Compile Include="ContentTree\ContentTreeNode.cs" />
     <Compile Include="Core\ISidekick.cs" />
-    <Compile Include="Handlers\SCSHttpHandler.cs" />
-    <Compile Include="Handlers\SCSHandler.cs" />
+    <Compile Include="Handlers\ScsHandler.cs" />
+    <Compile Include="Handlers\ScsMainHandlerController.cs" />
     <Compile Include="Pipelines\ExperienceEditor\RegisterSidekickForEE.cs" />
     <Compile Include="Pipelines\HttpRequestBegin\IsAdmin.cs" />
     <Compile Include="Pipelines\Initialize\InitializeSidekick.cs" />
@@ -120,7 +120,7 @@
     <EmbeddedResource Include="Resources\scsfactory.js" />
   </ItemGroup>
   <ItemGroup>
-	<Compile Include="..\..\SharedAssemblyInfo.cs">
+    <Compile Include="..\..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
   </ItemGroup>

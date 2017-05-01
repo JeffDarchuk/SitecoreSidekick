@@ -25,7 +25,7 @@ using Sitecore.Events;
 
 namespace ScsAuditLog
 {
-	public class AuditLogHandler : ScsHttpHandler
+	public class AuditLogHandler : ScsHandler
 	{
 		private static ContentTreeNode Root = new ContentTreeNode() { DatabaseName = "master", DisplayName = "Root", Icon = "/~/icon/Applications/32x32/media_stop.png", Open = true, Nodes = new List<ContentTreeNode>() };
 		public override string Directive { get; set; } = "aldirective";

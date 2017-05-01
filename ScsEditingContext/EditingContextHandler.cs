@@ -21,7 +21,7 @@ using SitecoreSidekick.Pipelines.HttpRequestBegin;
 
 namespace ScsEditingContext
 {
-	public class EditingContextHandler : ScsHttpHandler
+	public class EditingContextHandler : ScsHandler
 	{
 		public List<dynamic> CoreLocations = new List<dynamic>();
 		public List<dynamic> MasterLocations = new List<dynamic>();
@@ -64,7 +64,7 @@ namespace ScsEditingContext
 
 		private object GetReferrers()
 		{
-			string key = HttpContext.Current.Request.Cookies["ASP.NET_SessionId"]?.Value ?? "";
+			string key = HttpContext.Request.Cookies["ASP.NET_SessionId"]?.Value ?? "";
 			if (Referrers.ContainsKey(key))
 				return Referrers[key];
 			return new List<TypeContentTreeNode>();
@@ -72,7 +72,7 @@ namespace ScsEditingContext
 
 		private object GetReferences()
 		{
-			string key = HttpContext.Current.Request.Cookies["ASP.NET_SessionId"]?.Value ?? "";
+			string key = HttpContext.Request.Cookies["ASP.NET_SessionId"]?.Value ?? "";
 			if (Related.ContainsKey(key))
 				return Related[key];
 			return new List<TypeContentTreeNode>();
@@ -81,14 +81,14 @@ namespace ScsEditingContext
 		private dynamic GetItemHistory()
 		{
 			dynamic ret = new ExpandoObject();
-			HttpCookie authCookie = HttpContext.Current.Request.Cookies[FormsAuthentication.FormsCookieName];
+			HttpCookie authCookie = HttpContext.Request.Cookies[FormsAuthentication.FormsCookieName];
 			if (authCookie != null)
 			{
 				FormsAuthenticationTicket ticket = FormsAuthentication.Decrypt(authCookie.Value);
 				if (ticket != null)
 				{
 					string u = ticket.Name;
-					var httpCookie = HttpContext.Current.Request.Cookies["scseditorcontext"+u];
+					var httpCookie = HttpContext.Request.Cookies["scseditorcontext"+u];
 					if (httpCookie?.Value != null)
 						using (new SecurityDisabler())
 						{

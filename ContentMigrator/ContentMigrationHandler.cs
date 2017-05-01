@@ -27,7 +27,7 @@ using System.Collections.Concurrent;
 
 namespace ScsContentMigrator
 {
-	public class ContentMigrationHandler : ScsHttpHandler
+	public class ContentMigrationHandler : ScsHandler
 	{
 		private static ConcurrentDictionary<string, int> _checksum = new ConcurrentDictionary<string, int>();
 		private static readonly RemoteContentPuller Puller = new RemoteContentPuller();
@@ -159,7 +159,7 @@ namespace ScsContentMigrator
 		{
 			using (new SecurityDisabler())
 			{
-				return GetChecksum(HttpContext.Current.Request.QueryString["id"]);
+				return GetChecksum(context.Request.QueryString["id"]);
 			}
 		}
 

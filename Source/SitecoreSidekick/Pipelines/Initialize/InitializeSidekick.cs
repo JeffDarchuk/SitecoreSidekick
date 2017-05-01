@@ -1,4 +1,5 @@
 ﻿using System.Web;
+using System.Web.Mvc;
 using System.Web.Routing;
 using System.Xml;
 using Sitecore.Configuration;
@@ -75,15 +76,21 @@ namespace SitecoreSidekick.Pipelines.Initialize
 		public static void RegisterRoutes(string route)
 		{
 			var routes = RouteTable.Routes;
-			var handler = new ScsHandler("", "", "");
 			using (routes.GetWriteLock())
 			{
-				var filenameRoute = new Route(route + "/{filename}", handler)
-				{
-					Defaults = new RouteValueDictionary(new { controller = "SCSHandler", action = "ProcessRequest" }),
-					Constraints = new RouteValueDictionary(new { controller = "SCSHandler", action = "ProcessRequest" })
-				};
-				routes.Insert(0, filenameRoute);
+				var newRoute = routes.MapRoute(
+					"SCSHandler",
+					$"{route}/{{action}}",
+					new {controller = "SitecoreSidekick.Handlers.ScsMainHandlerController, SitecoreSidekick", action = "pie", id = UrlParameter.Optional},
+					new[] {typeof(ScsMainHandlerController).Namespace});
+
+
+				//var filenameRoute = new Route(route + "/{filename}", handler)
+				//{
+				//	Defaults = new RouteValueDictionary(new { controller = "SCSHandler", action = "ProcessRequest" }),
+				//	Constraints = new RouteValueDictionary(new { controller = "SCSHandler", action = "ProcessRequest" })
+				//};
+				//routes.Insert(0, newRoute);
 			}
 		}
 	}

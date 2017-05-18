@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Drawing.Imaging;
 using System.Dynamic;
 using System.Linq;
 using System.Net;
@@ -9,10 +8,7 @@ using System.Text;
 using System.Web;
 using System.Xml;
 using Microsoft.CSharp.RuntimeBinder;
-using Newtonsoft.Json;
-using Rainbow.Diff;
 using ScsContentMigrator.Args;
-using ScsContentMigrator.CMRainbow;
 using ScsContentMigrator.Data;
 using Sitecore.Configuration;
 using Sitecore.Data;
@@ -24,29 +20,37 @@ using SitecoreSidekick.Handlers;
 using System.Timers;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
+using System.Web.Mvc;
+using MicroCHAP;
+using MicroCHAP.Server;
+using ScsContentMigrator.Security;
+using SitecoreSidekick;
 
 namespace ScsContentMigrator
 {
 	public class ContentMigrationHandler : ScsHandler
 	{
-		private static ConcurrentDictionary<string, int> _checksum = new ConcurrentDictionary<string, int>();
+		private static readonly ConcurrentDictionary<string, int> Checksum = new ConcurrentDictionary<string, int>();
 		private static readonly RemoteContentPuller Puller = new RemoteContentPuller();
-		private static CompareContentTreeNode Root = new CompareContentTreeNode() { DatabaseName = "master", DisplayName = "Root", Icon = "/~/icon/Applications/32x32/media_stop.png", Open = true, Nodes = new List<ContentTreeNode>() };
-		private static List<string> ServerList = new List<string>();
-		internal static int remoteThreads = 1;
-		internal static int writerThreads = 1;
+		private static readonly CompareContentTreeNode Root = new CompareContentTreeNode() { DatabaseName = "master", DisplayName = "Root", Icon = "/~/icon/Applications/32x32/media_stop.png", Open = true, Nodes = new List<ContentTreeNode>() };
+		private static readonly List<string> ServerList = new List<string>();
+		internal static int RemoteThreads = 1;
+		internal static int WriterThreads = 1;
+		internal static TestChap cs;
 		public override string Directive { get; set; } = "cmmasterdirective";
 		public override NameValueCollection DirectiveAttributes { get; set; }
 		public override string ResourcesPath { get; set; } = "ScsContentMigrator.Resources";
 		public override string Icon => "/scs/cm.png";
 		public override string Name => "Content Migrator";
 		public override string CssStyle => "width:800px";
-		public ContentMigrationHandler(string roles, string isAdmin, string users, string remotePullingThreads, string databaseWriterThreads) : base(roles, isAdmin, users)
+		public ContentMigrationHandler(string roles, string isAdmin, string users, string remotePullingThreads, string databaseWriterThreads, string authenticationSecret) : base(roles, isAdmin, users)
 		{
-			if (remoteThreads == 1)
-				int.TryParse(remotePullingThreads, out remoteThreads);
-			if (writerThreads == 1)
-				int.TryParse(databaseWriterThreads, out writerThreads);
+			GetResources.ss = new SignatureService(authenticationSecret);
+			cs = new TestChap(GetResources.ss, new UniqueChallengeStore());
+			if (RemoteThreads == 1)
+				int.TryParse(remotePullingThreads, out RemoteThreads);
+			if (WriterThreads == 1)
+				int.TryParse(databaseWriterThreads, out WriterThreads);
 			Timer t = new Timer(60 * 1000);
 			t.Elapsed += async (sender, e) => await GenerateChecksum();
 			t.Start();
@@ -66,7 +70,7 @@ namespace ScsContentMigrator
 		}
 		public static int GetChecksum(string id, bool force = false, bool childrenOnly = true)
 		{
-			if (!_checksum.ContainsKey(id) || force)
+			if (!Checksum.ContainsKey(id) || force)
 			{
 				using (new SecurityDisabler())
 				{
@@ -87,29 +91,30 @@ namespace ScsContentMigrator
 						int checksum = 0;
 						foreach (Item child in cur.Children.OrderBy(x => x.ID.ToString()))
 						{
-							checksum = (checksum + (_checksum.ContainsKey(child.ID.ToString()) ? _checksum[child.ID.ToString()].ToString() : "-1")).GetHashCode();
+							checksum = (checksum + (Checksum.ContainsKey(child.ID.ToString()) ? Checksum[child.ID.ToString()].ToString() : "-1")).GetHashCode();
 						}
-						_checksum["children" + cur.ID.ToString()] = checksum;
-						checksum = (checksum.ToString() + cur.Statistics.Revision).GetHashCode();
-						_checksum[cur.ID.ToString()] = checksum;
+						Checksum["children" + cur.ID] = checksum;
+						checksum = (checksum + cur.Statistics.Revision).GetHashCode();
+						Checksum[cur.ID.ToString()] = checksum;
 					}
 					
 				}
 			}
 			if (childrenOnly)
 			{
-				if (!_checksum.ContainsKey("children" + id))
+				if (!Checksum.ContainsKey("children" + id))
 					return -1;
-				return _checksum["children" + id];
+				return Checksum["children" + id];
 			}
-			if (!_checksum.ContainsKey(id))
+			if (!Checksum.ContainsKey(id))
 				return -1;
-			return _checksum[id];
+			return Checksum[id];
 		}
 		public static void StartContentSync(RemoteContentPullArgs args)
 		{
 			Puller.PullContentItem(args);
 		}
+
 		public void BuildRoot(XmlNode node)
 		{
 			string dbName = "master";
@@ -122,67 +127,73 @@ namespace ScsContentMigrator
 			{
 				var item = db.GetItem(node.InnerText);
 				if (item != null)
+				{
 					Root.Nodes.Add(new CompareContentTreeNode(item, false));
-				GenerateChecksum(new List<CompareContentTreeNode>() { new CompareContentTreeNode(item) });
+				}
+
+#pragma warning disable 4014
+				// async method intentionally not awaited to allow processing in the background and this method returning
+				GenerateChecksum(new List<CompareContentTreeNode> { new CompareContentTreeNode(item) });
+#pragma warning restore 4014
 			}
 
 		}
 
-		public override void ProcessRequest(HttpContextBase context)
+		public override bool RequestValid(HttpContextBase context, string filename, dynamic data)
 		{
-			var file = GetFile(context);
-			if (file == "cmcontenttree.scsvc")
-				ReturnJson(context, GetContentTree(context));
-			else if (file == "cmcontenttreegetitem.scsvc")
-				ReturnJson(context, GetItemYaml(context));
-			else if (file == "cmcontenttreepullitem.scsvc")
-				ReturnJson(context, PullItem(context));
-			else if (file == "cmserverlist.scsvc")
+			if (!string.IsNullOrWhiteSpace(context.Request.Headers["X-MC-MAC"]) &&
+			    (filename == "cmcontenttreegetitem.scsvc" || filename == "cmcontenttree.scsvc"))
+				return true;
+			var user = Sitecore.Context.User;
+			if (!user.IsAuthenticated)
+				return false;
+			return true;
+		}
+
+		public override ActionResult ProcessRequest(HttpContextBase context, string filename, dynamic data)
+		{
+			if (filename.Equals("cmcontenttree.scsvc", StringComparison.Ordinal))
+				ReturnJson(context, GetContentTree(data));
+			else if (filename.Equals("cmcontenttreegetitem.scsvc", StringComparison.Ordinal))
+				ReturnJson(context, GetItemYaml(data));
+			else if (filename.Equals("cmcontenttreepullitem.scsvc", StringComparison.Ordinal))
+				ReturnJson(context, PullItem(data));
+			else if (filename.Equals("cmserverlist.scsvc", StringComparison.Ordinal))
 				ReturnJson(context, ServerList);
-			else if (file == "cmopeartionstatus.scsvc")
-				ReturnJson(context, GetOperationStatus(context));
-			else if (file == "cmoperationlist.scsvc")
-				ReturnJson(context, GetOperationList(context));
-			else if (file == "cmstopoperation.scsvc")
-				ReturnJson(context, StopOperation(context));
-			else if (file == "cmapprovepreview.scsvc")
-				ReturnJson(context, StartPreviewAsPull(context));
-			else if (file == "cmqueuelength.scsvc")
-				ReturnJson(context, OperationQueueLength(context));
-			else if (file == "cmchecksum.scsvc")
-				ReturnJson(context, GetChecksum(context));
+			else if (filename.Equals("cmopeartionstatus.scsvc", StringComparison.Ordinal))
+				ReturnJson(context, GetOperationStatus(data));
+			else if (filename.Equals("cmoperationlist.scsvc", StringComparison.Ordinal))
+				ReturnJson(context, GetOperationList());
+			else if (filename.Equals("cmstopoperation.scsvc", StringComparison.Ordinal))
+				ReturnJson(context, StopOperation(data));
+			else if (filename.Equals("cmapprovepreview.scsvc", StringComparison.Ordinal))
+				ReturnJson(context, StartPreviewAsPull(data));
+			else if (filename.Equals("cmqueuelength.scsvc", StringComparison.Ordinal))
+				ReturnJson(context, OperationQueueLength(data));
+			else if (filename.Equals("cmchecksum.scsvc", StringComparison.Ordinal))
+				ReturnJson(context, GetChecksum(context.Request.QueryString["id"]));
 			else
-				ProcessResourceRequest(context);
+				ProcessResourceRequest(context, filename, data);
+			return null;
 		}
 
-		private object GetChecksum(HttpContextBase context)
+		private object OperationQueueLength(dynamic data)
 		{
-			using (new SecurityDisabler())
-			{
-				return GetChecksum(context.Request.QueryString["id"]);
-			}
-		}
-
-		private object OperationQueueLength(HttpContextBase context)
-		{
-			var data = GetPostData(context);
 			return RemoteContentPuller.GetOperation(data.operationId).QueuedItems();
 		}
 
-		private object StartPreviewAsPull(HttpContextBase context)
+		private object StartPreviewAsPull(dynamic data)
 		{
-			var data = GetPostData(context);
 			RemoteContentPuller.GetOperation(data.operationId).RunPreviewAsFullOperation();
 			return true;
 		}
 
-		private object StopOperation(HttpContextBase context)
+		private object StopOperation(dynamic data)
 		{
-			var data = GetPostData(context);
 			return RemoteContentPuller.StopOperation(data.operationId);
 		}
 
-		private object GetOperationList(HttpContextBase context)
+		private object GetOperationList()
 		{
 			return RemoteContentPuller.GetRunningOperations().OrderBy(x =>
 			{
@@ -195,9 +206,8 @@ namespace ScsContentMigrator
 			}).ToList();
 		}
 
-		private object GetOperationStatus(HttpContextBase context)
+		private object GetOperationStatus(dynamic data)
 		{
-			var data = GetPostData(context);
 			return ((IEnumerable<object>)RemoteContentPuller.OperationStatus(data.operationId, (int)data.lineNumber)).ToList();
 		}
 
@@ -206,9 +216,8 @@ namespace ScsContentMigrator
 			ServerList.Add(node.InnerText);
 		}
 
-		private dynamic PullItem(HttpContextBase context)
+		private dynamic PullItem(dynamic data)
 		{
-			var data = GetPostData(context);
 			try
 			{
 				var args = new RemoteContentPullArgs(data);
@@ -226,9 +235,8 @@ namespace ScsContentMigrator
 			return true;
 		}
 
-		private List<string> GetItemYaml(HttpContextBase context)
+		private List<string> GetItemYaml(dynamic data)
 		{
-			var data = GetPostData(context);
 			try
 			{
 				var server = data.server;
@@ -238,12 +246,19 @@ namespace ScsContentMigrator
 					data.server = null;
 					return
 						wc.UploadString($"{server}/scs/cmcontenttreegetitem.scsvc", "POST",
-							JsonConvert.DeserializeObject<ExpandoObject>(data));
+							JsonNetWrapper.DeserializeObject<ExpandoObject>(data));
 				}
 			}
 			catch (RuntimeBinderException)
 			{
 
+			}
+			string payload = data.payload;
+			if (!cs.ValidateRequest(new HttpRequestWrapper(System.Web.HttpContext.Current.Request),
+				x => new[] {new SignatureFactor("payload", payload)}))
+			{
+				System.Web.HttpContext.Current.Response.StatusCode = 403;
+				return null;
 			}
 			var db = Factory.GetDatabase(data.database);
 			using (new SecurityDisabler())
@@ -260,9 +275,8 @@ namespace ScsContentMigrator
 		/// </summary>
 		/// <param name="context"></param>
 		/// <returns></returns>
-		private static object GetContentTree(HttpContextBase context)
+		private static object GetContentTree(dynamic data)
 		{
-			var data = GetPostData(context);
 			try
 			{
 				var args = new RemoteContentTreeArgs(data);
@@ -274,6 +288,13 @@ namespace ScsContentMigrator
 			catch (RuntimeBinderException)
 			{
 
+			}
+			string payload = data.payload;
+			if (!cs.ValidateRequest(new HttpRequestWrapper(System.Web.HttpContext.Current.Request),
+				x => new[] {new SignatureFactor("payload", payload)}))
+			{
+				System.Web.HttpContext.Current.Response.StatusCode = 403;
+				return null;
 			}
 			using (new SecurityDisabler())
 				return string.IsNullOrWhiteSpace(data.id.ToString()) ? Root : new CompareContentTreeNode(Factory.GetDatabase(data.database.ToString()).GetItem(new ID(data.id)));

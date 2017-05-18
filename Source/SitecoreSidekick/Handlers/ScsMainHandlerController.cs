@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Drawing.Imaging;
+using System.Dynamic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using Microsoft.CSharp.RuntimeBinder;
-using Newtonsoft.Json;
 using Sitecore.Configuration;
 using Sitecore.Data.Items;
 using Sitecore.Diagnostics;
@@ -26,6 +27,8 @@ namespace SitecoreSidekick.Handlers
 		private static List<ISidekick> Sidekicks { get; set; } = new List<ISidekick>();
 		private static StringBuilder js = new StringBuilder();
 		private static StringBuilder css = new StringBuilder();
+		private static bool addedSelf = false;
+		private static object locker = new object();
 
 		public override string Directive { get; set; }
 		public override NameValueCollection DirectiveAttributes { get; set; }
@@ -36,72 +39,101 @@ namespace SitecoreSidekick.Handlers
 
 		public ScsMainHandlerController()
 		{
-			
+			lock (locker)
+			{
+				if (!addedSelf)
+				{
+					addedSelf = true;
+					js.Insert(0, CompileEmbeddedResource(".js"));
+					css.Insert(0, CompileEmbeddedResource(".css"));
+				}
+			}
 		}
 		public ScsMainHandlerController(string roles, string isAdmin, string users) : base(roles, isAdmin, users)
 		{
-			js.Append(CompileEmbeddedResource(".js"));
-			css.Append(CompileEmbeddedResource(".css"));
+			lock (locker)
+			{
+				if (!addedSelf)
+				{
+					addedSelf = true;
+					js.Insert(0, CompileEmbeddedResource(".js"));
+					css.Insert(0, CompileEmbeddedResource(".css"));
+				}
+			}
 		}
-		public static void RegisterSideKick(ISidekick sk)
+		public static void RegisterSideKick(ISidekick sk, bool addSidekick = true)
 		{
 			Sidekicks.Add(sk);
-			js.Append(sk.CompileEmbeddedResource(".js"));
-			css.Append(sk.CompileEmbeddedResource(".css"));
+			js.Insert(0, sk.CompileEmbeddedResource(".js"));
+			css.Insert(0, sk.CompileEmbeddedResource(".css"));
 		}
-		[ActionName("scs.scs")]
+		[Route("scs/{filename}")]
+		[ActionName("scs")]
 		public ActionResult ScsEntry(string filename)
 		{
-			var html = GetResource("scsindex.scs").Replace("[[sidekicks]]", GetAllSidekickDirectives());
-			if (Request.QueryString["desktop"] == "true")
-				html = html.Replace("</head>", $"<style>{GenerateDesktopStyle()}</style></head>");
-			return Content(html, "text/html");
+			string ticket = Sitecore.Web.Authentication.TicketManager.GetCurrentTicketId();
+			if (!string.IsNullOrWhiteSpace(ticket))
+				Sitecore.Web.Authentication.TicketManager.Relogin(ticket);
+			var data = GetPostData(Request.InputStream);
+			var result = ProcessRequest(Request.RequestContext.HttpContext, filename, data);
+			if (result == null)
+				return Content("", Response.ContentType);
+			return result;
 		}
-		[ActionName("main.css")]
-		public ActionResult ScsCss(string filename)
-		{
-			ProcessRequest(HttpContext);
-			return Content("pie");
-		}
+
 		/// <summary>
 		/// base HTTP request
 		/// </summary>
 		/// <param name="context"></param>
-		public override void ProcessRequest(HttpContextBase context)
+		public override ActionResult ProcessRequest(HttpContextBase context, string filename, dynamic data)
 		{
 			try
 			{
 				context.Response.StatusCode = 404;
-				string file = GetFile(context);
 				foreach (ISidekick sk in Sidekicks)
 				{
+					if (!sk.RequestValid(context, filename, data))
+						continue;
 					if (context.Response.StatusCode != 404)
-						return;
-					sk.ProcessRequest(context);
+						return null;
+					sk.ProcessRequest(context, filename, data);
 					if (context.Response.StatusCode != 404)
-						return;
-					sk.ProcessResourceRequest(context);
+						return null;
+					sk.ProcessResourceRequest(context, filename, data);
 				}
-				ProcessResourceRequest(context);
+				if (!RequestValid(context, filename, data))
+				{
+					if (filename == "scsvalid.scsvc")
+					{
+						ReturnJson(context, false);
+						return null;
+					}
+					return new HttpUnauthorizedResult("Not logged in.");
+				}
+				ProcessResourceRequest(context, filename, data);
 				if (context.Response.StatusCode == 404)
 				{
-					if (file == "scs.scs")
+					if (filename == "scs.scs")
 					{
 						var html = GetResource("scsindex.scs").Replace("[[sidekicks]]", GetAllSidekickDirectives());
 						if (context.Request.QueryString["desktop"] == "true")
 							html = html.Replace("</head>", $"<style>{GenerateDesktopStyle()}</style></head>");
 						ReturnResponse(context, html, "text/html");
 					}
-					else if (file.Equals("scscommand.js"))
-						ReturnResource(context, file, "application/javascript");
-					else if (file.EndsWith(".js"))
+					else if (filename.Equals("scscommand.js"))
+						ReturnResource(context, filename, "application/javascript");
+					else if (filename.EndsWith(".js"))
 						ReturnResponse(context, js.ToString(), "application/javascript");
-					else if (file.EndsWith(".css"))
+					else if (filename.EndsWith(".css"))
 						ReturnResponse(context, css.ToString(), "text/css");
-					else if (file == "contenttreeselectedrelated.scsvc")
-						ReturnJson(context, GetContentSelectedRelated(context));
-					else
-						NotFound(context);
+					else if (filename == "contenttreeselectedrelated.scsvc")
+						ReturnJson(context, GetContentSelectedRelated(data));
+					else if (filename == "scsvalid.scsvc")
+						ReturnJson(context, true);
+					else if (Response.StatusCode == 404)
+						NotFound(context, "Requested resource was not found.");
+					else if (Response.StatusCode == 403)
+						ReturnResponse(context, "Unauthorized to perform this action", "text/plain", HttpStatusCode.Forbidden);
 				}
 			}
 			catch (Exception e)
@@ -109,18 +141,18 @@ namespace SitecoreSidekick.Handlers
 				Log.Error("Sitecore sidekick failed to return the proper resource", e, this);
 				Error(context, e);
 			}
+			return null;
 		}
 
-		private object GetContentSelectedRelated(HttpContextBase context)
+		private object GetContentSelectedRelated(dynamic data)
 		{
-			var data = GetPostData(context);
 			try
 			{
 				if (data.server != null)
 				{
 					WebClient wc = new WebClient { Encoding = Encoding.UTF8 };
-					bool node = JsonConvert.DeserializeObject<bool>(wc.UploadString($"{data.server}/scs/contenttreeselectedrelated.scsvc", "POST",
-									$@"{{ ""currentId"": ""{data.currentId}"", ""selectedId"": {JsonConvert.SerializeObject(data.selectedId.Count == 1 ? data.selectedId.FirstOrDefault() : data.selectedId)}}}"));
+					bool node = JsonNetWrapper.DeserializeObject<bool>(wc.UploadString($"{data.server}/scs/contenttreeselectedrelated.scsvc", "POST",
+									$@"{{ ""currentId"": ""{data.currentId}"", ""selectedId"": {JsonNetWrapper.SerializeObject(data.selectedId.Count == 1 ? data.selectedId.FirstOrDefault() : data.selectedId)}}}"));
 				
 					return node;
 				}

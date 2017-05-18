@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Web;
+using System.Web.Mvc;
 
 namespace SitecoreSidekick.Core
 {
@@ -16,9 +17,10 @@ namespace SitecoreSidekick.Core
 		List<string> Roles { get; }
 		List<string> Users { get; } 
 		string CompileEmbeddedResource(string fileExtension);
-		void ProcessRequest(HttpContextBase context);
-		void ProcessResourceRequest(HttpContextBase context);
+		ActionResult ProcessRequest(HttpContextBase context, string filename, dynamic data);
+		void ProcessResourceRequest(HttpContextBase context, string filename, dynamic data);
 		bool ApplicableSidekick();
+		bool RequestValid(HttpContextBase context, string filename, dynamic data);
 
 	}
 }

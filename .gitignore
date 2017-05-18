@@ -26,3 +26,5 @@ packages/*
 
 # Any Sitecore assemblies copied local
 Dependencies/Libraries/Sitecore/*
+
+build/*.nupkg

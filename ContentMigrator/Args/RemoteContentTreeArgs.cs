@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Microsoft.CSharp.RuntimeBinder;
+﻿using Microsoft.CSharp.RuntimeBinder;
 
 namespace ScsContentMigrator.Args
 {

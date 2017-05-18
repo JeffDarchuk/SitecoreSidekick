@@ -17,7 +17,7 @@
 				<img ng-if="server.MissingRemote" ng-src="{{vm.data.Icon}}" width="16" height="16" class="scContentTreeNodeIcon" alt="" border="0" />
 				{{vm.data.DisplayName}}
 			</span>
-			<span ng-hide="vm.data.Icon">
+			<span ng-if="!vm.error" ng-hide="vm.data.Icon">
 				<img src="/scs/cmspinner.gif" />
 			</span>
 			<div class="cmdifftableroot cmdifftabletree" ng-if="events.diff && events.diff === vm.data.Id">

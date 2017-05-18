@@ -5,10 +5,11 @@
 	angular
         .module('app')
         .controller('master', master);
-	master.$inject = ['$cookies'];
+	master.$inject = ['$cookies', '$interval', 'ScsFactory'];
 
-	function master($cookies) {
+	function master($cookies, $interval, ScsFactory) {
 		var vm = this;
+		vm.valid = true;
 		vm.selectSidekick = function (sk) {
 			vm.sidekick = sk;
 			setTimeout(function () {
@@ -23,6 +24,11 @@
 			$cookies.put("sidekick", sk);
 			scsActiveModule = sk;
 		}
+		$interval(function () {
+			ScsFactory.valid().then(function(result) {
+				vm.valid = result.data === true;
+			});
+		}, 3000);
 		vm.goHome = function () {
 			$(".scs-form").css("max-height", window.top.screen.height + "px");
 			var active = $("#" + vm.sidekick.replace(" ", "").toLowerCase());

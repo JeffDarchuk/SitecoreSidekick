@@ -1,19 +1,15 @@
-﻿using System;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Drawing.Imaging;
 using System.Dynamic;
 using System.Linq;
 using System.Web;
+using System.Web.Mvc;
 using System.Web.Security;
 using System.Xml;
-using ScsEditingContext.Pipelines.HttpRequestBegin;
-using Sitecore;
 using Sitecore.Configuration;
 using Sitecore.Data;
 using Sitecore.Data.Managers;
-using Sitecore.Security.Accounts;
 using Sitecore.SecurityModel;
 using SitecoreSidekick.ContentTree;
 using SitecoreSidekick.Handlers;
@@ -35,8 +31,8 @@ namespace ScsEditingContext
 
 		public static Database Core = Factory.GetDatabase("core");
 		public static Database Master = Factory.GetDatabase("master");
-		internal static ConcurrentDictionary<string, List<TypeContentTreeNode>> Related { get; private set; }
-		internal static ConcurrentDictionary<string, List<TypeContentTreeNode>> Referrers { get; private set; }
+		internal static ConcurrentDictionary<string, List<TypeContentTreeNode>> Related { get; }
+		internal static ConcurrentDictionary<string, List<TypeContentTreeNode>> Referrers { get; }
 
 		static EditingContextHandler()
 		{
@@ -46,49 +42,48 @@ namespace ScsEditingContext
 		public EditingContextHandler(string roles, string isAdmin, string users) : base(roles, isAdmin, users)
 		{
 		}
-		public override void ProcessRequest(HttpContextBase context)
+		public override ActionResult ProcessRequest(HttpContextBase context, string filename, dynamic data)
 		{
-			string file = GetFile(context);
-
-			if (file == "ecgetcommonlocations.json")
+			if (filename == "ecgetcommonlocations.json")
 				ReturnJson(context, GetCommonLocations());
-			else if (file == "ecgetitemhistory.json")
-				ReturnJson(context, GetItemHistory());
-			else if (file == "ecgetrelated.json")
-				ReturnJson(context, GetReferences());
-			else if (file == "ecgetreferrers.json")
-				ReturnJson(context, GetReferrers());
+			else if (filename == "ecgetitemhistory.json")
+				ReturnJson(context, GetItemHistory(context));
+			else if (filename == "ecgetrelated.json")
+				ReturnJson(context, GetReferences(context));
+			else if (filename == "ecgetreferrers.json")
+				ReturnJson(context, GetReferrers(context));
 			else 
-				ProcessResourceRequest(context);
+				ProcessResourceRequest(context, filename, data);
+			return null;
 		}
 
-		private object GetReferrers()
+		private object GetReferrers(HttpContextBase context)
 		{
-			string key = HttpContext.Request.Cookies["ASP.NET_SessionId"]?.Value ?? "";
+			string key = context.Request.Cookies["ASP.NET_SessionId"]?.Value ?? "";
 			if (Referrers.ContainsKey(key))
 				return Referrers[key];
 			return new List<TypeContentTreeNode>();
 		}
 
-		private object GetReferences()
+		private object GetReferences(HttpContextBase context)
 		{
-			string key = HttpContext.Request.Cookies["ASP.NET_SessionId"]?.Value ?? "";
+			string key = context.Request.Cookies["ASP.NET_SessionId"]?.Value ?? "";
 			if (Related.ContainsKey(key))
 				return Related[key];
 			return new List<TypeContentTreeNode>();
 		}
 
-		private dynamic GetItemHistory()
+		private dynamic GetItemHistory(HttpContextBase context)
 		{
 			dynamic ret = new ExpandoObject();
-			HttpCookie authCookie = HttpContext.Request.Cookies[FormsAuthentication.FormsCookieName];
+			HttpCookie authCookie = context.Request.Cookies[FormsAuthentication.FormsCookieName];
 			if (authCookie != null)
 			{
 				FormsAuthenticationTicket ticket = FormsAuthentication.Decrypt(authCookie.Value);
 				if (ticket != null)
 				{
 					string u = ticket.Name;
-					var httpCookie = HttpContext.Request.Cookies["scseditorcontext"+u];
+					var httpCookie = context.Request.Cookies["scseditorcontext"+u];
 					if (httpCookie?.Value != null)
 						using (new SecurityDisabler())
 						{
@@ -145,7 +140,7 @@ namespace ScsEditingContext
 
 		public dynamic GetLocationFromXml(XmlNode arg, Database db)
 		{
-			var node = new ContentTreeNode(db.DataManager.DataEngine.GetItem(new ID(arg.Attributes?["id"]?.InnerText), LanguageManager.DefaultLanguage, Sitecore.Data.Version.Latest));
+			var node = new ContentTreeNode(db.DataManager.DataEngine.GetItem(new ID(arg.Attributes?["id"]?.InnerText), LanguageManager.DefaultLanguage, Version.Latest));
 			dynamic location = new ExpandoObject();
 			location.item = node;
 			location.description = arg.Attributes?["description"]?.InnerText;

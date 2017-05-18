@@ -78,19 +78,13 @@ namespace SitecoreSidekick.Pipelines.Initialize
 			var routes = RouteTable.Routes;
 			using (routes.GetWriteLock())
 			{
-				var newRoute = routes.MapRoute(
-					"SCSHandler",
-					$"{route}/{{action}}",
-					new {controller = "SitecoreSidekick.Handlers.ScsMainHandlerController, SitecoreSidekick", action = "pie", id = UrlParameter.Optional},
-					new[] {typeof(ScsMainHandlerController).Namespace});
+				var rt = routes.MapRoute(
+					"Default", // Route name
+					"scs/{filename}", // URL with parameters
+					new { controller = "ScsMainHandler", action = "scs" } // Parameter defaults
+				);
+		
 
-
-				//var filenameRoute = new Route(route + "/{filename}", handler)
-				//{
-				//	Defaults = new RouteValueDictionary(new { controller = "SCSHandler", action = "ProcessRequest" }),
-				//	Constraints = new RouteValueDictionary(new { controller = "SCSHandler", action = "ProcessRequest" })
-				//};
-				//routes.Insert(0, newRoute);
 			}
 		}
 	}

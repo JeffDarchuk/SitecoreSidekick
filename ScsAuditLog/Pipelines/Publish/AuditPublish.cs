@@ -1,11 +1,7 @@
-﻿using ScsAuditLog;
-using ScsAuditLog.Model;
-using ScsAuditLog.Pipelines;
+﻿using ScsAuditLog.Model;
 using Sitecore.Diagnostics;
 using Sitecore.Publishing.Pipelines.Publish;
-using Sitecore.Security.Accounts;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Sitecore.Data;

@@ -13,12 +13,19 @@
 	</svg>
 	<div id="overlay" class="scsoverlay"></div>
 	<div class="scs-root-div full-height" ng-controller="master as vm">
-		[[sidekicks]]
+		<div ng-if="vm.valid">
+			[[sidekicks]]
+		</div>
+		<div ng-if="!vm.valid" style="min-width: 600px; background-color: white;">
+			<h2>Not logged in.</h2>
+			<h4> Log into Sitecore to use Sidekick.</h4>
+		</div>
 	</div>
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+	<script src="/scs/scsangular.js"></script>
 	<script src="/scs/main.js"></script>
 </body>
 

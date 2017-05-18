@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,14 +14,12 @@ using Lucene.Net.Documents;
 using Lucene.Net.Index;
 using ScsAuditLog.Model;
 using ScsAuditLog.Model.Interface;
-using ScsAuditLog.Pipelines;
 using Sitecore.Configuration;
 using Sitecore.Data.Items;
-using Sitecore.Diagnostics;
 using Lucene.Net.QueryParsers;
 using Lucene.Net.Search;
 using Lucene.Net.Store;
-using Newtonsoft.Json;
+using SitecoreSidekick;
 using Directory = Lucene.Net.Store.Directory;
 using Version = Lucene.Net.Util.Version;
 
@@ -32,32 +27,33 @@ namespace ScsAuditLog.Core
 {
 	public class AuditLog
 	{
-		private Dictionary<string, AuditStorage> _storage = new Dictionary<string, AuditStorage>();
-		private Dictionary<string, IEventType> _types = new Dictionary<string, IEventType>();
-		AuditTrie<string> trie = new AuditTrie<string>(null);
-		private bool _updateLog = false;
-		private object locker = new object();
-		private HashSet<string> users = new HashSet<string>(); 
-		private static Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_29);
-		private static readonly MultiFieldQueryParser Parser = new MultiFieldQueryParser(Lucene.Net.Util.Version.LUCENE_29,
+		private readonly Dictionary<string, AuditStorage> _storage = new Dictionary<string, AuditStorage>();
+		private readonly Dictionary<string, IEventType> _types = new Dictionary<string, IEventType>();
+		readonly AuditTrie<string> _trie = new AuditTrie<string>();
+		private readonly object _locker = new object();
+		private readonly HashSet<string> _users = new HashSet<string>(); 
+		private static readonly Analyzer Analyzer = new StandardAnalyzer(Version.LUCENE_29);
+		private static readonly MultiFieldQueryParser Parser = new MultiFieldQueryParser(Version.LUCENE_29,
 				new[] { "content", "date" },
-				new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29));
+				new StandardAnalyzer(Version.LUCENE_29));
 		private int _optimizeTimer = 0;
-		ConcurrentQueue<Tuple<AuditSourceRecord, Document>> writeQueue = new ConcurrentQueue<Tuple<AuditSourceRecord, Document>>(); 
-		//private IndexWriter _writer;
+
+		readonly ConcurrentQueue<Tuple<AuditSourceRecord, Document>> _writeQueue = new ConcurrentQueue<Tuple<AuditSourceRecord, Document>>(); 
+
 		private Directory _dir;
-		private int _logDays;
-		private int _recordDays;
+		private readonly int _logDays;
+		private readonly int _recordDays;
 		private bool _clearOld = false;
-		private HashSet<string> _backupDays = new HashSet<string>();
+		private readonly HashSet<string> _backupDays = new HashSet<string>();
 		private static string _dataDirectory = "";
-		internal bool rebuilding = false;
-		internal int rebuilt = -1;
-		public AuditLog(int DaysToKeepLog, int DaysToKeepRecords)
+		internal bool Rebuilding = false;
+		internal int Rebuilt = -1;
+
+		public AuditLog(int daysToKeepLog, int daysToKeepRecords)
 		{
 			string dir = GetDataDirectory();
-			_logDays = DaysToKeepLog;
-			_recordDays = DaysToKeepRecords;
+			_logDays = daysToKeepLog;
+			_recordDays = daysToKeepRecords;
 			Task.Run(() =>
 			{
 				while (IsFileLocked(new FileInfo($"{dir}/write.lock")))
@@ -73,9 +69,9 @@ namespace ScsAuditLog.Core
 				while (terms.Next())
 				{
 					if (terms.Term.Field == "content")
-						trie[terms.Term.Text] = terms.Term.Text;
+						_trie[terms.Term.Text] = terms.Term.Text;
 					if (terms.Term.Field == "user")
-						users.Add(terms.Term.Text);
+						_users.Add(terms.Term.Text);
 				}
 				ValidateBackup();
 			});
@@ -119,7 +115,7 @@ namespace ScsAuditLog.Core
 
 		public HashSet<string> GetUsers()
 		{
-			return users;
+			return _users;
 		} 
 		public IDictionary<string, IEventType> GetAllEventTypes()
 		{
@@ -163,8 +159,8 @@ namespace ScsAuditLog.Core
 
 			Document doc = new Document();
 			AddField(doc, "user", entry.User.ToLower(), Field.Index.NOT_ANALYZED);
-			if (!users.Contains(entry.User.ToLower()))
-				users.Add(entry.User.ToLower());
+			if (!_users.Contains(entry.User.ToLower()))
+				_users.Add(entry.User.ToLower());
 			AddField(doc, "path", entry.Path, Field.Index.ANALYZED);
 			AddField(doc, "id", entry.Id.ToShortID().ToString().ToLower(), Field.Index.ANALYZED);
 			AddField(doc, "date", entry.TimeStamp.ToString("yyyyMMdd"), Field.Index.ANALYZED);
@@ -176,7 +172,7 @@ namespace ScsAuditLog.Core
 			AddField(doc, "event", entry.EventId, Field.Index.ANALYZED);
 			if (!string.IsNullOrWhiteSpace(content))
 				AddField(doc, "content", content, Field.Index.ANALYZED);
-			writeQueue.Enqueue(newRecord
+			_writeQueue.Enqueue(newRecord
 				? new Tuple<AuditSourceRecord, Document>(new AuditSourceRecord(entry as ItemAuditEntry, content), doc)
 				: new Tuple<AuditSourceRecord, Document>(null, doc));
 			KickOptimizeTimer();
@@ -185,22 +181,22 @@ namespace ScsAuditLog.Core
 		private void WriteSource(AuditSourceRecord record, StringBuilder sb)
 		{
 			if (record.Entry == null) return;
-			sb.Append("<|||>" + JsonConvert.SerializeObject(record) + "<|||>");
+			sb.Append("<|||>" + JsonNetWrapper.SerializeObject(record) + "<|||>");
 		}
 
 		public void Rebuild()
 		{
-			if (rebuilding) return;
-			rebuilt = 0;
+			if (Rebuilding) return;
+			Rebuilt = 0;
 			Task.Run(() =>
 			{
-				rebuilding = true;
-				lock (locker)
+				Rebuilding = true;
+				lock (_locker)
 				{
 					_dir.ClearLock("rebuilding");
-					using (var _writer = new IndexWriter(_dir, analyzer, IndexWriter.MaxFieldLength.UNLIMITED))
+					using (var writer = new IndexWriter(_dir, Analyzer, IndexWriter.MaxFieldLength.UNLIMITED))
 					{
-						_writer.DeleteAll();
+						writer.DeleteAll();
 					}
 				}
 				DateTime start = DateTime.Now.Subtract(TimeSpan.FromDays(_recordDays));
@@ -212,16 +208,16 @@ namespace ScsAuditLog.Core
 						byte[] txt = File.ReadAllBytes(file);
 						foreach (string entry in StringZipper.Unzip(txt).Split(new[] {"<|||>"}, StringSplitOptions.RemoveEmptyEntries))
 						{
-							AuditSourceRecord record = JsonConvert.DeserializeObject<AuditSourceRecord>(entry);
+							AuditSourceRecord record = JsonNetWrapper.DeserializeObject<AuditSourceRecord>(entry);
 							Task.Delay(1000).Wait();
 							Log(record.Entry, record.Content, false);
-							rebuilt++;
+							Rebuilt++;
 						}
 					}
 					start = start.AddDays(1);
 				}
-				rebuilt = -1;
-				rebuilding = false;
+				Rebuilt = -1;
+				Rebuilding = false;
 			});
 		}
 		private void KickOptimizeTimer()
@@ -234,25 +230,25 @@ namespace ScsAuditLog.Core
 					try
 					{
 						ValidateBackup();
-						lock (locker)
+						lock (_locker)
 						{
 							StringBuilder sb = new StringBuilder();
-							using (var _writer = new IndexWriter(_dir, analyzer, IndexWriter.MaxFieldLength.UNLIMITED))
+							using (var writer = new IndexWriter(_dir, Analyzer, IndexWriter.MaxFieldLength.UNLIMITED))
 							{
 								if (_recordDays > 0 && _clearOld)
 								{
-									var query = Parser.Parse($"date:[0 TO {DateTime.Now.AddDays(_recordDays*-1).ToString("yyyyMMdd")}]");
-									_writer.DeleteDocuments(query);
+									var query = Parser.Parse($"date:[0 TO {DateTime.Now.AddDays(_recordDays*-1):yyyyMMdd}]");
+									writer.DeleteDocuments(query);
 									_clearOld = false;
 								}
 								while (_optimizeTimer > 1)
 								{
-									while (writeQueue.Any())
+									while (_writeQueue.Any())
 									{
 										Tuple<AuditSourceRecord, Document> doc;
-										if (writeQueue.TryDequeue(out doc))
+										if (_writeQueue.TryDequeue(out doc))
 										{
-											_writer.AddDocument(doc.Item2);
+											writer.AddDocument(doc.Item2);
 											if (doc.Item1 != null)
 												WriteSource(doc.Item1, sb);
 										}
@@ -265,15 +261,15 @@ namespace ScsAuditLog.Core
 									string dir = _dataDirectory + "/source/" + DateTime.Now.ToString("yyyy-MMM-dd");
 									if (!System.IO.Directory.Exists(dir))
 										System.IO.Directory.CreateDirectory(dir);
-									if (!System.IO.File.Exists(dir + "/source.src"))
-										System.IO.File.Create(dir + "/source.src");
-									byte[] bytes = File.ReadAllBytes(dir + "/source.src");
+									if (!File.Exists(dir + "/source.src"))
+										File.Create(dir + "/source.src");
 									int count = 1;
 									while (count < 100 && IsFileLocked(new FileInfo(dir + "/source.src")))
 									{
 										Task.Delay(100).Wait();
 										count++;
 									}
+									byte[] bytes = File.ReadAllBytes(dir + "/source.src");
 									File.WriteAllBytes(dir + "/source.src",
 										bytes.Length != 0 ? StringZipper.Zip(StringZipper.Unzip(bytes) + sb) : StringZipper.Zip(sb.ToString()));
 								}
@@ -281,8 +277,8 @@ namespace ScsAuditLog.Core
 								{
 									Sitecore.Diagnostics.Log.Error("Unable to write the audit logger source", e, this);
 								}
-								_writer.Commit();
-								_writer.Optimize();
+								writer.Commit();
+								writer.Optimize();
 								_optimizeTimer = 0;
 							}
 						}
@@ -308,7 +304,7 @@ namespace ScsAuditLog.Core
 
 		public static string GetDataDirectory()
 		{
-			string filepath = "";
+			string filepath;
 			if (System.Text.RegularExpressions.Regex.IsMatch(Settings.DataFolder, @"^(([a-zA-Z]:\\)|(//)).*")) //if we have an absolute path, rather than relative to the site root
 				filepath = Settings.DataFolder +
 						   @"\AuditLog";
@@ -350,7 +346,7 @@ namespace ScsAuditLog.Core
 				searcher = GetSearcher();
 			try
 			{
-				var lq = Parser.Parse(query + $" AND date:[{start.ToString("yyyyMMdd")} TO {end.ToString("yyyyMMdd")}]");
+				var lq = Parser.Parse(query + $" AND date:[{start:yyyyMMdd} TO {end:yyyyMMdd}]");
 				return searcher.Search(lq, int.MaxValue);
 			}
 			catch (Exception e)
@@ -371,7 +367,7 @@ namespace ScsAuditLog.Core
 			}
 			if (types.Length > 4)
 				types.Remove(types.Length - 4, 4);
-			return trie.Autocomplete(text,
+			return _trie.Autocomplete(text,
 				x => x == null ? 0 : QueryIds(DateTime.Parse(start), DateTime.Parse(end), "(content:" + x + " OR user:" + x + ")" + (types.Length > 0 ? " AND ("+types.ToString()+")" : "")).TotalHits, 10);
 			//return new KeyValuePair<string, int>[0];
 		}

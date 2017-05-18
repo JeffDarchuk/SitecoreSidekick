@@ -3,40 +3,35 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Security.Authentication.ExtendedProtection;
 using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Rainbow.Diff;
+using MicroCHAP;
 using Rainbow.Model;
-using Rainbow.Storage.Sc;
 using Rainbow.Storage.Yaml;
 using ScsContentMigrator.Args;
-using ScsContentMigrator.CMRainbow;
 using ScsContentMigrator.Data;
-using Sitecore.Configuration;
 using Sitecore.Diagnostics;
-using SitecoreSidekick.ContentTree;
-using Sitecore.Data;
-using Sitecore.Data.Managers;
-using Sitecore.Data.Items;
-using System.Web;
-using Rainbow.Diff.Fields;
-using Sitecore.SecurityModel;
+using SitecoreSidekick;
 
 namespace ScsContentMigrator
 {
 	public class GetResources
 	{
-
+		internal static SignatureService ss;
 		public static IItemData GetRemoteItemData(RemoteContentPullArgs args, string itemId)
 		{
 			try
 			{
+				string url = $"{args.server}/scs/cmcontenttreegetitem.scsvc";
+				string parameters = args.GetSerializedData(itemId, false);
+				string nonce = Guid.NewGuid().ToString();
+				var sig = ss.CreateSignature(nonce, url,
+					new[] { new SignatureFactor("payload", parameters), });
 				WebClient wc = new WebClient { Encoding = Encoding.UTF8 };
-				string yamlList = wc.UploadString($"{args.server}/scs/cmcontenttreegetitem.scsvc", "POST",
-					args.GetSerializedData(itemId, false));
-				string yaml = JsonConvert.DeserializeObject<List<string>>(yamlList).FirstOrDefault();
+				wc.Headers["X-MC-MAC"] = sig.SignatureHash;
+				wc.Headers["X-MC-Nonce"] = nonce;
+				string yamlList = wc.UploadString(url, "POST",
+					parameters);
+				string yaml = JsonNetWrapper.DeserializeObject<List<string>>(yamlList).FirstOrDefault();
 				var ret = DeserializeYaml(yaml, itemId);
 				if (ret == null)
 					return null;
@@ -82,9 +77,17 @@ namespace ScsContentMigrator
 		{
 			try
 			{
+				string url = $"{args.server}/scs/cmcontenttree.scsvc";
+				string parameters = $@"{{ ""id"": ""{itemId}"", ""database"": ""{args.database}""}}";
+				string nonce = Guid.NewGuid().ToString();
+				var sig = ss.CreateSignature(nonce, url,
+					new[] {new SignatureFactor("payload", parameters),});
 				WebClient wc = new WebClient { Encoding = Encoding.UTF8 };
-				var node = JsonConvert.DeserializeObject<CompareContentTreeNode>(wc.UploadString($"{args.server}/scs/cmcontenttree.scsvc", "POST",
-								$@"{{ ""id"": ""{itemId}"", ""database"": ""{args.database}""}}"));
+				wc.Headers["X-MC-MAC"] = sig.SignatureHash;
+				wc.Headers["X-MC-Nonce"] = nonce;
+				string response = wc.UploadString($"{args.server}/scs/cmcontenttree.scsvc", "POST",
+					$@"{{ ""id"": ""{itemId}"", ""database"": ""{args.database}""}}");
+				var node = JsonNetWrapper.DeserializeObject<CompareContentTreeNode>(response);
 				if (!diff)
 					return node;
 				else

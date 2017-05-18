@@ -11,16 +11,8 @@ using System.Net;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
-using System.Web.Routing;
-using System.Web.SessionState;
-using Newtonsoft.Json;
-using Sitecore.Diagnostics;
 using Sitecore.Mvc.Extensions;
 using Sitecore.Pipelines;
-using Sitecore.Shell.Framework;
-using Sitecore.Shell.Framework.Commands;
-using Sitecore.StringExtensions;
-using Sitecore.Web.UI.Sheer;
 using SitecoreSidekick.Core;
 using SitecoreSidekick.Pipelines.HttpRequestBegin;
 
@@ -52,48 +44,41 @@ namespace SitecoreSidekick.Handlers
 			ScsMainHandlerController.RegisterSideKick(this);
 		}
 
-		public virtual string GetFile(HttpContextBase context)
-		{
-			var path = context.Request.AppRelativeCurrentExecutionFilePath;
-			var fileName = Path.GetFileName(path);
-			return fileName?.ToLowerInvariant() ?? "";
-		}
-
 		public string CompileEmbeddedResource(string fileExtension)
 		{
 			StringBuilder sb = new StringBuilder();
 			foreach (var resource in GetType().Assembly.GetManifestResourceNames().Where(x => x.EndsWith(fileExtension) && x.StartsWith(ResourcesPath)).Select(x => x.Substring(ResourcesPath.Length + 1)))
-				sb.Append(GetResource(resource));
+				if (!resource.Equals("scsangular.js"))
+					sb.Append(GetResource(resource));
 			return sb.ToString();
 		}
 
-		public void ProcessResourceRequest(HttpContextBase context)
+		public void ProcessResourceRequest(HttpContextBase context, string filename, dynamic data)
 		{
-			string file = GetFile(context);
-			if (file.EndsWith(".scs"))
-				ReturnResource(context, file, "text/html");
-			else if (file.EndsWith(".html"))
-				ReturnResource(context, file, "text/html");
-			else if (file.EndsWith(".gif"))
-				ReturnImage(context, file, ImageFormat.Gif, "image/gif");
-			else if (file.EndsWith(".png"))
-				ReturnImage(context, file, ImageFormat.Png, "image/png");
-			else if (file.EndsWith(".jpg"))
-				ReturnImage(context, file, ImageFormat.Jpeg, "image/jpg");
-			else if (file.EndsWith(".bmp"))
-				ReturnImage(context, file, ImageFormat.Bmp, "image/bmp");
-			else if (file.EndsWith(".emf"))
-				ReturnImage(context, file, ImageFormat.Emf, "image/emf");
-			else if (file.EndsWith(".ico"))
-				ReturnImage(context, file, ImageFormat.Icon, "image/icon");
-			else if (file.EndsWith(".tiff"))
-				ReturnImage(context, file, ImageFormat.Tiff, "image/tiff");
-			else if (file.EndsWith(".wmf"))
-				ReturnImage(context, file, ImageFormat.Wmf, "image/wmf");
-			else if (file.EndsWith(".svg"))
-				ReturnResource(context, file, "image/svg+xml");
-			else if (file.EndsWith(".js"))
-				ReturnResource(context, file, "text/javascript");
+			if (filename.EndsWith(".scs"))
+				ReturnResource(context, filename, "text/html");
+			else if (filename.EndsWith(".html"))
+				ReturnResource(context, filename, "text/html");
+			else if (filename.EndsWith(".gif"))
+				ReturnImage(context, filename, ImageFormat.Gif, "image/gif");
+			else if (filename.EndsWith(".png"))
+				ReturnImage(context, filename, ImageFormat.Png, "image/png");
+			else if (filename.EndsWith(".jpg"))
+				ReturnImage(context, filename, ImageFormat.Jpeg, "image/jpg");
+			else if (filename.EndsWith(".bmp"))
+				ReturnImage(context, filename, ImageFormat.Bmp, "image/bmp");
+			else if (filename.EndsWith(".emf"))
+				ReturnImage(context, filename, ImageFormat.Emf, "image/emf");
+			else if (filename.EndsWith(".ico"))
+				ReturnImage(context, filename, ImageFormat.Icon, "image/icon");
+			else if (filename.EndsWith(".tiff"))
+				ReturnImage(context, filename, ImageFormat.Tiff, "image/tiff");
+			else if (filename.EndsWith(".wmf"))
+				ReturnImage(context, filename, ImageFormat.Wmf, "image/wmf");
+			else if (filename.EndsWith(".svg"))
+				ReturnResource(context, filename, "image/svg+xml");
+			else if (filename.EndsWith(".js"))
+				ReturnResource(context, filename, "text/javascript");
 		}
 
 		public bool ApplicableSidekick()
@@ -111,22 +96,30 @@ namespace SitecoreSidekick.Handlers
 		/// <summary>
 		/// gets post data from post request
 		/// </summary>
-		/// <param name="context"></param>
+		/// <param name="instream"></param>
 		/// <returns>dynamic object containing post javascript object</returns>
-		public static dynamic GetPostData(HttpContextBase context)
+		public static dynamic GetPostData(Stream instream)
 		{
-			using (StreamReader sr = new StreamReader(context.Request.InputStream))
+			instream.Seek(0, SeekOrigin.Begin);
+			using (StreamReader sr = new StreamReader(instream))
 			{
-				return JsonConvert.DeserializeObject<ExpandoObject>(sr.ReadToEnd());
+				string payload = sr.ReadToEnd();
+				dynamic ret = null;
+				if (payload.StartsWith("{") || payload == "")
+					ret = JsonNetWrapper.DeserializeObject<ExpandoObject>(payload);
+				if (ret == null)
+					ret = new ExpandoObject();
+				ret.payload = payload;
+				return ret;
 			}
 		}
 		/// <summary>
 		/// processes http request
 		/// </summary>
 		/// <param name="context"></param>
-		public void ProcessRequest(HttpContext context)
+		public void ProcessRequest(HttpContext context, string filename, dynamic data)
 		{
-			ProcessRequest(new HttpContextWrapper(context));
+			ProcessRequest(new HttpContextWrapper(context), filename, data);
 		}
 
 		/// <summary>
@@ -206,7 +199,7 @@ namespace SitecoreSidekick.Handlers
 		{
 			if (o == null) return;
 			context.Response.StatusCode = 200;
-			var json = JsonConvert.SerializeObject(o);
+			var json = JsonNetWrapper.SerializeObject(o);
 			context.Response.AppendHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1.
 			context.Response.AppendHeader("Pragma", "no-cache"); // HTTP 1.0.
 			context.Response.AppendHeader("Expires", "0"); // Proxies.
@@ -272,6 +265,13 @@ namespace SitecoreSidekick.Handlers
 		public abstract string Icon { get; }
 		public abstract string Name { get; }
 		public abstract string CssStyle { get; }
-		public abstract void ProcessRequest(HttpContextBase context);
+		public abstract ActionResult ProcessRequest(HttpContextBase context, string filename, dynamic data);
+		public virtual bool RequestValid(HttpContextBase context, string filename, dynamic data)
+		{
+			var user = Sitecore.Context.User;
+			if (!user.IsAuthenticated)
+				return false;
+			return true;
+		}
 	}
 }

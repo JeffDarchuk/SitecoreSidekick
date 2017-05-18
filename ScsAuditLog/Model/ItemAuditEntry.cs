@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using ScsAuditLog.Model.Interface;
-using ScsAuditLog.Pipelines;
 using Sitecore;
 using Sitecore.Data;
 using Sitecore.Data.Items;
@@ -58,14 +56,14 @@ namespace ScsAuditLog.Model
 		{
 			try
 			{
-				string[] entries = line.Split(new string[] {"|"}, StringSplitOptions.None);
+				string[] entries = line.Split(new[] {"|"}, StringSplitOptions.None);
 				if (entries.Length > 0)
 					Uid = entries[0];
 				if (entries.Length > 1)
 					User = entries[1];
 				if (entries.Length > 2)
 					Role =
-						entries[2].Split(new string[] {","}, StringSplitOptions.None).Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
+						entries[2].Split(new[] {","}, StringSplitOptions.None).Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
 				if (entries.Length > 3)
 					TimeStamp = DateUtil.IsoDateToDateTime(entries[3]);
 				if (entries.Length > 4)

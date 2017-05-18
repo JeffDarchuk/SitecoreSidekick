@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Linq.Expressions;
 using System.Web;
 using Sitecore.Diagnostics;
-using Sitecore.Shell.Framework;
 using Sitecore.Shell.Framework.Commands;
 using Sitecore.Web.UI.Sheer;
 
@@ -12,7 +10,7 @@ namespace SitecoreSidekick.Commands
 	{
 		public override void Execute(CommandContext context)
 		{
-			Assert.ArgumentNotNull((object)context, "context");
+			Assert.ArgumentNotNull(context, "context");
 			try
 			{
 				typeof(Sitecore.Shell.Framework.Windows).GetMethod("RunUri", new [] {typeof(string), typeof(string), typeof(string), typeof(string), typeof(string) }).Invoke(null, new object[]
@@ -21,7 +19,7 @@ namespace SitecoreSidekick.Commands
 					"Sitecore Sidekick", "1000px", "600px"
 				});
 			}
-			catch (Exception e)
+			catch (Exception)
 			{
 					SheerResponse.Eval(
 						"var scs = window.top.document.getElementById(\"scs\");scs.innerHTML = \" <iframe id = 'scs-iframe' style = 'width:100%;height:100%;background-color: transparent;' src = '/scs/scs.scs' /> \";scs.style.display = \"block\";scs.style.position = \"absolute\";");

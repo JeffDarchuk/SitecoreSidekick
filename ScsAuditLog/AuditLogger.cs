@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ScsAuditLog.Core;
-using ScsAuditLog.Model;
-using Sitecore.Pipelines.GetAboutInformation;
+﻿using ScsAuditLog.Core;
 
 namespace ScsAuditLog
 {

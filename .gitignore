@@ -17,6 +17,8 @@ obj/
 *.user
 *.suo
 
+.vs/
+
 # Ignore generated Version.cs files
 /*/Properties/Version.cs
 

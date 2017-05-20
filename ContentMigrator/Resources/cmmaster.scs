@@ -11,7 +11,7 @@
 				<p>
 					<strong>Legend</strong><br/>
 					<span class="cmcompare cmequal"></span> Item is the same locally and remotely.<br />
-					<span class="cmcompare cmfieldchanged"></span> Item has field changes between local and remote. Click the red box to see differences.<br/>
+					<span class="cmcompare cmfieldchanged"></span> Item has field changes between local and remote. Click the <span class="cmcompare cmfieldchanged"></span> to see differences.<br/>
 					<span class="cmcompare cmchildchanged"></span> Children of this item have changes between local and remote.<br/>
 					<span class="cmcompare cmmissing"></span> Item is only present on the remote server.<br/>
 					<span class="cmcompare cmextra"></span> Item is only present on the local server.<br/>

@@ -47,9 +47,15 @@ namespace SitecoreSidekick.Handlers
 		public string CompileEmbeddedResource(string fileExtension)
 		{
 			StringBuilder sb = new StringBuilder();
+
 			foreach (var resource in GetType().Assembly.GetManifestResourceNames().Where(x => x.EndsWith(fileExtension) && x.StartsWith(ResourcesPath)).Select(x => x.Substring(ResourcesPath.Length + 1)))
+			{
 				if (!resource.Equals("scsangular.js"))
+				{
 					sb.Append(GetResource(resource));
+				}
+			}
+
 			return sb.ToString();
 		}
 
@@ -156,7 +162,7 @@ namespace SitecoreSidekick.Handlers
 		/// <param name="message"></param>
 		protected void Error(HttpContextBase context, Exception e, string message = null)
 		{
-			message = (string.IsNullOrWhiteSpace(message) ? e.ToString() : message + "\r\n" + e);
+			message = string.IsNullOrWhiteSpace(message) ? e.ToString() : message + "\r\n" + e;
 			ReturnResponse(context, message, status: HttpStatusCode.InternalServerError);
 		}
 
@@ -270,7 +276,10 @@ namespace SitecoreSidekick.Handlers
 		{
 			var user = Sitecore.Context.User;
 			if (!user.IsAuthenticated)
+			{
 				return false;
+			}
+
 			return true;
 		}
 	}

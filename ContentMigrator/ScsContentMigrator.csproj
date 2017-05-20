@@ -43,6 +43,7 @@
     </Reference>
     <Reference Include="MicroCHAP, Version=1.2.2.2, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MicroCHAP.1.2.2.2\lib\net45\MicroCHAP.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -51,15 +52,15 @@
     </Reference>
     <Reference Include="Rainbow, Version=1.4.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Rainbow.Core.1.4.2\lib\net452\Rainbow.dll</HintPath>
-      <Private>True</Private>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Rainbow.Storage.Sc, Version=1.4.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Rainbow.Storage.Sc.1.4.2\lib\net452\Rainbow.Storage.Sc.dll</HintPath>
-      <Private>True</Private>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Rainbow.Storage.Yaml, Version=1.4.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Rainbow.Storage.Yaml.1.4.2\lib\net452\Rainbow.Storage.Yaml.dll</HintPath>
-      <Private>True</Private>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Sitecore.Kernel, Version=10.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sitecore.Kernel.NoReferences.8.2.170407\lib\NET452\Sitecore.Kernel.dll</HintPath>
@@ -118,7 +119,7 @@
     <Compile Include="CMRainbow\DefaultFieldFilter.cs" />
     <Compile Include="CMRainbow\DefaultLogger.cs" />
     <Compile Include="RemoteContentPuller.cs" />
-    <Compile Include="Security\TestChap.cs" />
+    <Compile Include="Security\ScsHmacServer.cs" />
     <Compile Include="Security\UniqueChallengeStore.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -144,7 +145,10 @@
     <None Include="app.config" />
     <None Include="packages.config" />
     <EmbeddedResource Include="Resources\cm.css" />
-    <None Include="zSCSContentMigrator.config">
+    <None Include="Standard Config Files\zSCSContentMigrator.Local.config.example">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Standard Config Files\zSCSContentMigrator.config">
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>

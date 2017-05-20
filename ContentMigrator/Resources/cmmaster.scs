@@ -1,47 +1,65 @@
 ﻿<div ng-controller="cmmastercontroller as vm">
 	<div ng-if="!vm.operationId">
 		<fieldset>
-			<legend>Server to pull content from</legend>
+			<legend>Choose a Sitecore server to pull content from</legend>
 			<select ng-model="vm.server" ng-options="i for i in vm.serverList" ng-change="vm.serverSubmit()"> </select>
 		</fieldset>
-		<fieldset>
-			<legend>Diff Options</legend>
+		<fieldset ng-if="!vm.serverModified">
+			<legend>Select a content item to pull</legend>
 			<div>
-				<input type="checkbox" ng-model="vm.events.standardValues" /><span> Show standard values in diff </span>
-			</div>
-		</fieldset>
-		<fieldset>
-			<legend>Select content to pull</legend>
-			<div ng-if="!vm.serverModified">
 				<cmcontenttree parent="''" database="'master'" selected="vm.events.selectedIds" events="vm.events" server="vm.server" standardValues="vm.diffStandardValues"></cmcontenttree>
+				<p>
+					<strong>Legend</strong><br/>
+					<span class="cmcompare cmequal"></span> Item is the same locally and remotely.<br />
+					<span class="cmcompare cmfieldchanged"></span> Item has field changes between local and remote. Click the red box to see differences.<br/>
+					<span class="cmcompare cmchildchanged"></span> Children of this item have changes between local and remote.<br/>
+					<span class="cmcompare cmmissing"></span> Item is only present on the remote server.<br/>
+					<span class="cmcompare cmextra"></span> Item is only present on the local server.<br/>
+				</p>
 			</div>
 		</fieldset>
-		<fieldset>
+		<fieldset ng-if="!vm.serverModified">
 			<legend>Content migration options</legend>
 			<div>
-				<input type="checkbox" ng-model="vm.children" /><span> Migrate all childen of selected item. </span>
+				<input type="checkbox" id="stdVals" ng-model="vm.events.standardValues" />
+				<label for="stdVals"> Show system fields in diff view. </label>
 			</div>
 			<div>
-				<input type="checkbox" ng-model="vm.overwrite" /><span> Overwrite all existing content with new content from the server. </span>
+				<input type="checkbox" id="migrateChildren" ng-model="vm.children" />
+				<label for="migrateChildren"> Include subitems of selected item.</label>
 			</div>
 			<div>
-				<input type="checkbox" ng-model="vm.pullParent" /><span> If parent doesn't exist locally add that too. </span>
+				<input type="checkbox" id="migrateOverwrite" ng-model="vm.overwrite" />
+				<label for="migrateOverwrite"> Copy field changes for existing items (updates <span class="cmcompare cmfieldchanged"></span> items). </label>
 			</div>
 			<div>
-				<input type="checkbox" ng-model="vm.mirror" /><span> Make the local content tree mirror the remote content tree.</span>
+				<input type="checkbox" id="migrateMirror" ng-model="vm.mirror" />
+				<label for="migrateAddMirror"> Delete local items not in remote server (removes <span class="cmcompare cmextra"></span> items).</label>
 			</div>
+			<div>
+				<input type="checkbox" id="migrateAddParent" ng-model="vm.pullParent" />
+				<label for="migrateAddParent"> Add missing parent items if an item's parent(s) do not exist locally. </label>
+			</div>
+			
+			<p>If you wish to make local content exactly like remote, check all of these options.</p>
 		</fieldset>
-		<fieldset>
+		<fieldset ng-if="!vm.serverModified">
 			<legend>Sitecore advanced options</legend>
 			<div>
-				<input type="checkbox" ng-model="vm.eventDisabler" /><span> Run using the event disabler.</span>
+				<input type="checkbox" id="eventDisabler" ng-model="vm.eventDisabler" /><label for="eventDisabler"> Run using the event disabler.</label>
 			</div>
 			<div>
-				<input type="checkbox" ng-model="vm.bulkUpdate" /><span> Run using the bulk update context.</span>
+				<input type="checkbox" id="bulkUpdateContext" ng-model="vm.bulkUpdate" /><label for="bulkUpdateContext"> Run using bulk update context.</label>
 			</div>
+
+			<p>These options result in much faster processing speed, however the updated content will not be indexed or placed into the link database. Rebuilding the indexes and links may be required before updated items appear in searches or broken links reports.</p>
 		</fieldset>
 
-		<a class="btn" ng-click="vm.pull(false)">Pull</a><a class="btn cmpreviewbtn" ng-click="vm.pull(true)">Preview</a>
+		<div ng-if="!vm.serverModified">
+			<a class="btn" ng-click="vm.pull(false)">Pull</a>
+			<a class="btn cmpreviewbtn" ng-click="vm.pull(true)">Preview</a>
+		</div>
+		
 		<fieldset class="cmresults" ng-if="vm.runningOperations && vm.runningOperations.length > 0">
 			<legend>Currently Running Operations</legend>
 			<a class="btn cmresult" ng-click="vm.streamResults(item.operationId, item.rootNodes[0].Server, item.rootNodes, item.rootNodes, false)" ng-repeat="item in vm.runningOperations">

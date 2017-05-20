@@ -10,7 +10,7 @@
 	<projectUrl>https://github.com/JeffDarchuk/SitecoreSidekick</projectUrl>
 
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-	<description>An app to graphically log and search activity within sitecore.</description>
+	<description>An app to graphically log and search author activity within Sitecore.</description>
 	<copyright>Copyright 2017 Jeff Darchuk</copyright>
 	<tags>sitecore</tags>
 	<dependencies>
@@ -19,6 +19,6 @@
 	</dependencies>
   </metadata>
     <files>
-		<file src="..\ScsAuditLog\zSCSAuditLog.config" target="content\App_Config\Include" />
+		<file src="..\ScsAuditLog\zSCSAuditLog.config" target="content\App_Config\Include\Sidekick" />
 	</files>
 </package>

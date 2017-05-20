@@ -33,7 +33,7 @@
 				</div>
 				<table style="display:table;" class="cmdifftable" ng-if="events.difflang === 'none'">
 					<tr>
-						<td><h4>All differences can be found in standard values.  Click the option to include standard values in the comparison to see them.</h4></td>
+						<td><h4>All differences are in system fields.  Check the 'Show system fields in diff view.' option to see them.</h4></td>
 					</tr>
 				</table>
 			</div>

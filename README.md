@@ -26,7 +26,7 @@ It's very easy to use Sidekick. To open the Sidekick panel, you may choose betwe
 
 The main panel looks like this:
 
-![main menu](sidekickpanel.png)
+![main menu](doc/sidekickpanel.png)
 
 Once the Sidekick panel is open, choose a tool to use. Here are the standard tool modules that are available with Sidekick:
 
@@ -100,7 +100,7 @@ Backups and record duration can be configured in the `zSCSAuditLog.config` file.
 
 Additional events can be tracked using additional onSaved nodes.  Note that new registered events need to have a unique id assigned to it and while it’s not required a unique color would be preferable from a user experience standpoint.
 
-#### Adding Custom Audit Events
+### Adding Custom Audit Events
 
 If you’d like to track something that’s not a sitecore event, such as a pipeline processor.  You can invoke a logger singleton to perform the tracking of the event.
 

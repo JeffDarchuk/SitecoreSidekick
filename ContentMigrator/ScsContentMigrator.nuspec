@@ -10,7 +10,7 @@
 	<projectUrl>https://github.com/JeffDarchuk/SitecoreSidekick</projectUrl>
 
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-	<description>Sitecore Sidekick module to migrate content between sitecore installs using Kamsar's Rainbow serialization library.</description>
+	<description>Easily move production Sitecore content to pre-production environments with this Sidekick module.</description>
 	<copyright>Copyright 2017 Jeff Darchuk</copyright>
 	<tags>sitecore</tags>
 	<dependencies>
@@ -23,6 +23,7 @@
 	</dependencies>
   </metadata>
   <files>
-		<file src="..\ContentMigrator\zSCSContentMigrator.config" target="content\App_Config\Include" />
+		<file src="..\ContentMigrator\Standard Config Files\*.config" target="content\App_Config\Include\Sidekick" />
+		<file src="..\ContentMigrator\Standard Config Files\*.example" target="content\App_Config\Include\Sidekick" />
 	</files>
 </package>

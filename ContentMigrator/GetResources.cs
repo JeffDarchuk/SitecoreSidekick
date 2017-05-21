@@ -16,35 +16,38 @@ namespace ScsContentMigrator
 {
 	public class GetResources
 	{
-		internal static SignatureService ss;
+		// TODO: this is ugly AF. Fix this. This class should be named something more descriptive. It shouldn't be static. And it shouldn't have this property on it.
+		internal static SignatureService SignatureService;
+
 		public static IItemData GetRemoteItemData(RemoteContentPullArgs args, string itemId)
 		{
 			try
 			{
 				string url = $"{args.server}/scs/cmcontenttreegetitem.scsvc";
 				string parameters = args.GetSerializedData(itemId, false);
-				string nonce = Guid.NewGuid().ToString();
-				var sig = ss.CreateSignature(nonce, url,
-					new[] { new SignatureFactor("payload", parameters), });
-				WebClient wc = new WebClient { Encoding = Encoding.UTF8 };
-				wc.Headers["X-MC-MAC"] = sig.SignatureHash;
-				wc.Headers["X-MC-Nonce"] = nonce;
-				string yamlList = wc.UploadString(url, "POST",
-					parameters);
+
+				string yamlList = MakeRequest(url, parameters);
 				string yaml = JsonNetWrapper.DeserializeObject<List<string>>(yamlList).FirstOrDefault();
-				var ret = DeserializeYaml(yaml, itemId);
-				if (ret == null)
+
+				var resultItem = DeserializeYaml(yaml, itemId);
+				if (resultItem == null)
+				{
 					return null;
-				ret.DatabaseName = args.database;
-				return ret;
+				}
+
+				resultItem.DatabaseName = args.database;
+
+				return resultItem;
 			}
 			catch (Exception e)
 			{
 				Log.Error("Error getting remote item data for " + itemId, e, args);
 			}
+
 			return null;
 		}
 
+		// TODO: this looks awful similar to the method in ItemExtensions.cs
 		public static IItemData DeserializeYaml(string yaml, string itemId)
 		{
 			var formatter = new YamlSerializationFormatter(null, null);
@@ -73,39 +76,60 @@ namespace ScsContentMigrator
 			}
 			return null;
 		}
+
 		public static CompareContentTreeNode GetRemoteItem(RemoteContentTreeArgs args, string itemId, bool diff)
 		{
-			try
+			string url = $"{args.server}/scs/cmcontenttree.scsvc";
+			string parameters = $@"{{ ""id"": ""{itemId}"", ""database"": ""{args.database}""}}";
+
+			string response = MakeRequest(url, parameters);
+
+			var node = JsonNetWrapper.DeserializeObject<CompareContentTreeNode>(response);
+
+			if (!diff)
 			{
-				string url = $"{args.server}/scs/cmcontenttree.scsvc";
-				string parameters = $@"{{ ""id"": ""{itemId}"", ""database"": ""{args.database}""}}";
-				string nonce = Guid.NewGuid().ToString();
-				var sig = ss.CreateSignature(nonce, url,
-					new[] {new SignatureFactor("payload", parameters),});
-				WebClient wc = new WebClient { Encoding = Encoding.UTF8 };
-				wc.Headers["X-MC-MAC"] = sig.SignatureHash;
-				wc.Headers["X-MC-Nonce"] = nonce;
-				string response = wc.UploadString($"{args.server}/scs/cmcontenttree.scsvc", "POST",
-					$@"{{ ""id"": ""{itemId}"", ""database"": ""{args.database}""}}");
-				var node = JsonNetWrapper.DeserializeObject<CompareContentTreeNode>(response);
-				if (!diff)
-					return node;
-				else
-				{
-					node.BuildDiff(args.database, itemId);
-					return node;
-				}
+				return node;
 			}
-			catch (Exception e)
-			{
-				Log.Error("Problem getting children of node " + itemId, e, args);
-			}
-			return null;
+
+			node.BuildDiff(args.database, itemId);
+
+			return node;
 		}
 
 		public static IEnumerable<string> GetRemoteItemChildren(RemoteContentTreeArgs args, string itemId)
 		{
 			return GetRemoteItem(args, itemId, false).Nodes.Select(x => x.Id);
+		}
+
+		private static string MakeRequest(string url, string parameters)
+		{
+			string nonce = Guid.NewGuid().ToString();
+
+			WebClient wc = new WebClient { Encoding = Encoding.UTF8 };
+			var signature = SignatureService.CreateSignature(nonce, url, new[] { new SignatureFactor("payload", parameters) });
+
+			wc.Headers["X-MC-MAC"] = signature.SignatureHash;
+			wc.Headers["X-MC-Nonce"] = nonce;
+
+			try
+			{
+				return wc.UploadString(url, "POST", parameters);
+			}
+			catch (WebException ex)
+			{
+				if (ex.Status == WebExceptionStatus.ProtocolError)
+				{
+					var response = ex.Response as HttpWebResponse;
+					if (response?.StatusCode == HttpStatusCode.Forbidden)
+					{
+						throw new InvalidOperationException("Remote server returned Forbidden. Make sure your shared secrets match.");
+					}
+
+					throw;
+				}
+
+				throw;
+			}
 		}
 	}
 }

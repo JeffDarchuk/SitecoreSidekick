@@ -1,15 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using MicroCHAP.Server;
 
 namespace ScsContentMigrator.Security
 {
+	/// <summary>
+	/// Implements a reactive challenge store.
+	/// This enables HMAC authenticated requests that do not use a challenge issued by the server,
+	/// to increase performance.
+	/// </summary>
 	public class UniqueChallengeStore : IChallengeStore
 	{
-		HashSet<string> Challenges = new HashSet<string>();
+		readonly HashSet<string> _challenges = new HashSet<string>();
+
 		public void AddChallenge(string challenge, int expirationTimeInMsec)
 		{
 			
@@ -17,8 +19,10 @@ namespace ScsContentMigrator.Security
 
 		public bool ConsumeChallenge(string challenge)
 		{
-			bool valid = !Challenges.Contains(challenge);
-			Challenges.Add(challenge);
+			bool valid = !_challenges.Contains(challenge);
+
+			_challenges.Add(challenge);
+
 			return valid;
 		}
 	}

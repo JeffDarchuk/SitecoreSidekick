@@ -43,7 +43,7 @@ namespace ScsContentMigrator
 		public override string ResourcesPath { get; set; } = "ScsContentMigrator.Resources";
 		public override string Icon => "/scs/cm.png";
 		public override string Name => "Content Migrator";
-		public override string CssStyle => "width:800px";
+		public override string CssStyle => "width:100%;min-width:800px;";
 
 		public ContentMigrationHandler(string roles, string isAdmin, string users, string remotePullingThreads, string databaseWriterThreads, string authenticationSecret) : base(roles, isAdmin, users)
 		{

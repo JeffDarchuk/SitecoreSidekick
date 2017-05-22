@@ -29,7 +29,7 @@ namespace ScsAuditLog
 		public override string ResourcesPath { get; set; } = "ScsAuditLog.Resources";
 		public override string Icon { get; } = "/scs/alportfoliofolder.png";
 		public override string Name { get; } = "Audit Log";
-		public override string CssStyle { get; } = "width:1000px";
+		public override string CssStyle { get; } = "width:100%;min-width:900px";
 		private readonly List<string> _luceneSpecialChars = new List<string>() { "+", "-", "&&", "||", "!", "(", ")", "{", "}", "[", "]", "^", "\"", "~", "*", "?", ":", "\\" };
 
 		public AuditLogHandler(string keepBackups, string keepRecords, string roles, string isAdmin, string users) : base(roles, isAdmin, users)

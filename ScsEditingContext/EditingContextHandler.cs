@@ -27,7 +27,7 @@ namespace ScsEditingContext
 		public override string ResourcesPath { get; set; } = "ScsEditingContext.Resources";
 		public override string Icon => "/scs/ec.png";
 		public override string Name => "Editing Context";
-		public override string CssStyle => "width:600px";
+		public override string CssStyle => "width:100%;min-width:600px";
 
 		public static Database Core = Factory.GetDatabase("core");
 		public static Database Master = Factory.GetDatabase("master");

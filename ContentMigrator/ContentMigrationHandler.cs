@@ -57,8 +57,8 @@ namespace ScsContentMigrator
 				throw new InvalidOperationException("Sitecore Sidekick Content Migrator was initialized with an insecure shared secret. Please use a shared secret of 32 or more characters.");
 			}
 
-			GetResources.SignatureService = new SignatureService(authenticationSecret);
-			HmacServer = new ScsHmacServer(GetResources.SignatureService, new UniqueChallengeStore());
+			RemoteContentService.SignatureService = new SignatureService(authenticationSecret);
+			HmacServer = new ScsHmacServer(RemoteContentService.SignatureService, new UniqueChallengeStore());
 
 			if (RemoteThreads == 1)
 			{
@@ -209,6 +209,7 @@ namespace ScsContentMigrator
 				ReturnJson(context, GetChecksum(context.Request.QueryString["id"]));
 			else
 				ProcessResourceRequest(context, filename, data);
+
 			return null;
 		}
 
@@ -273,21 +274,6 @@ namespace ScsContentMigrator
 
 		private List<string> GetItemYaml(dynamic data)
 		{
-			try
-			{
-				var server = data.server;
-				if (server != null)
-				{
-					WebClient wc = new WebClient { Encoding = Encoding.UTF8 };
-					data.server = null;
-					return wc.UploadString($"{server}/scs/cmcontenttreegetitem.scsvc", "POST", JsonNetWrapper.DeserializeObject<ExpandoObject>(data));
-				}
-			}
-			catch (RuntimeBinderException)
-			{
-
-			}
-
 			string payload = data.payload;
 			if (!HmacServer.ValidateRequest(new HttpRequestWrapper(System.Web.HttpContext.Current.Request), x => new[] {new SignatureFactor("payload", payload)}))
 			{
@@ -318,7 +304,7 @@ namespace ScsContentMigrator
 				var args = new RemoteContentTreeArgs(data);
 				if (args.server != null)
 				{
-					return GetResources.GetRemoteItem(args, args.id, true);
+					return RemoteContentService.GetRemoteItem(args, args.id, true);
 				}
 			}
 			catch (RuntimeBinderException)

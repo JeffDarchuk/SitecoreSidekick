@@ -110,7 +110,7 @@ namespace ScsContentMigrator
 			{
 				foreach (string id in _args.ids)
 				{
-					IItemData idata = GetResources.GetRemoteItemData(_args, id);
+					IItemData idata = RemoteContentService.GetRemoteItemData(_args, id);
 
 					Item parent = _db.GetItem(new ID(idata.ParentId));
 					IItemData tmpData = idata;
@@ -141,7 +141,7 @@ namespace ScsContentMigrator
 						{
 							parent = _db.GetItem(new ID(tmpData.ParentId));
 							path.Push(tmpData);
-							tmpData = GetResources.GetRemoteItemData(_args, tmpData.ParentId.ToString());
+							tmpData = RemoteContentService.GetRemoteItemData(_args, tmpData.ParentId.ToString());
 						}
 
 						while (path.Any())
@@ -332,7 +332,7 @@ namespace ScsContentMigrator
 			}
 			else
 			{
-				IItemData idata = GetResources.GetRemoteItemData(_args, item);
+				IItemData idata = RemoteContentService.GetRemoteItemData(_args, item);
 				_installerQueue.Enqueue(idata);
 				if (_args.children)
 				{
@@ -343,7 +343,7 @@ namespace ScsContentMigrator
 
 		private void QueueChildren(object item)
 		{
-			var list = GetResources.GetRemoteItemChildren(_args, item.ToString()).ToList();
+			var list = RemoteContentService.GetRemoteItemChildren(_args, item.ToString()).ToList();
 			foreach (string id in list)
 			{
 				_tp.Queue(GetNextItem, id);

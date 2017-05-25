@@ -48,7 +48,7 @@ namespace ScsContentMigrator.Data
 
 		public IItemData ItemData()
 		{
-			return GetResources.DeserializeYaml(Data, Id);
+			return RemoteContentService.DeserializeYaml(Data, Id);
 		}
 
 		private bool AreFieldsEqual(Field local, IItemFieldValue remote)
@@ -71,7 +71,7 @@ namespace ScsContentMigrator.Data
 				{
 					if (Data != null)
 					{
-						var itemData = GetResources.DeserializeYaml(Data, itemId);
+						var itemData = RemoteContentService.DeserializeYaml(Data, itemId);
 						var localItem = Factory.GetDatabase(database, true).DataManager.DataEngine.GetItem(new ID(itemId), LanguageManager.DefaultLanguage, Sitecore.Data.Version.Latest);
 
 						Status = new List<Tuple<string, string>>();

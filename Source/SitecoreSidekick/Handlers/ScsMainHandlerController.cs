@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Drawing.Imaging;
-using System.Dynamic;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -13,9 +10,7 @@ using Microsoft.CSharp.RuntimeBinder;
 using Sitecore.Configuration;
 using Sitecore.Data.Items;
 using Sitecore.Diagnostics;
-using SitecoreSidekick.ContentTree;
 using SitecoreSidekick.Core;
-using SitecoreSidekick.Pipelines.HttpRequestBegin;
 
 namespace SitecoreSidekick.Handlers
 {
@@ -24,11 +19,11 @@ namespace SitecoreSidekick.Handlers
 	/// </summary>
 	public class ScsMainHandlerController : ScsHandler
 	{
-		private static List<ISidekick> Sidekicks { get; set; } = new List<ISidekick>();
-		private static StringBuilder js = new StringBuilder();
-		private static StringBuilder css = new StringBuilder();
-		private static bool addedSelf = false;
-		private static object locker = new object();
+		private static List<ISidekick> Sidekicks { get; } = new List<ISidekick>();
+		private static readonly StringBuilder Js = new StringBuilder();
+		private static readonly StringBuilder Css = new StringBuilder();
+		private static bool _addedSelf = false;
+		private static readonly object Locker = new object();
 
 		public override string Directive { get; set; }
 		public override NameValueCollection DirectiveAttributes { get; set; }
@@ -39,45 +34,54 @@ namespace SitecoreSidekick.Handlers
 
 		public ScsMainHandlerController()
 		{
-			lock (locker)
+			lock (Locker)
 			{
-				if (!addedSelf)
+				if (!_addedSelf)
 				{
-					addedSelf = true;
-					js.Insert(0, CompileEmbeddedResource(".js"));
-					css.Insert(0, CompileEmbeddedResource(".css"));
+					_addedSelf = true;
+					Js.Insert(0, CompileEmbeddedResource(".js"));
+					Css.Insert(0, CompileEmbeddedResource(".css"));
 				}
 			}
 		}
 		public ScsMainHandlerController(string roles, string isAdmin, string users) : base(roles, isAdmin, users)
 		{
-			lock (locker)
+			lock (Locker)
 			{
-				if (!addedSelf)
+				if (!_addedSelf)
 				{
-					addedSelf = true;
-					js.Insert(0, CompileEmbeddedResource(".js"));
-					css.Insert(0, CompileEmbeddedResource(".css"));
+					_addedSelf = true;
+					Js.Insert(0, CompileEmbeddedResource(".js"));
+					Css.Insert(0, CompileEmbeddedResource(".css"));
 				}
 			}
 		}
 		public static void RegisterSideKick(ISidekick sk, bool addSidekick = true)
 		{
 			Sidekicks.Add(sk);
-			js.Insert(0, sk.CompileEmbeddedResource(".js"));
-			css.Insert(0, sk.CompileEmbeddedResource(".css"));
+			Js.Insert(0, sk.CompileEmbeddedResource(".js"));
+			Css.Insert(0, sk.CompileEmbeddedResource(".css"));
 		}
+
 		[Route("scs/{filename}")]
 		[ActionName("scs")]
 		public ActionResult ScsEntry(string filename)
 		{
 			string ticket = Sitecore.Web.Authentication.TicketManager.GetCurrentTicketId();
+
 			if (!string.IsNullOrWhiteSpace(ticket))
+			{
 				Sitecore.Web.Authentication.TicketManager.Relogin(ticket);
+			}
+
 			var data = GetPostData(Request.InputStream);
 			var result = ProcessRequest(Request.RequestContext.HttpContext, filename, data);
+
 			if (result == null)
+			{
 				return Content("", Response.ContentType);
+			}
+
 			return result;
 		}
 
@@ -130,8 +134,8 @@ namespace SitecoreSidekick.Handlers
 						ReturnResponse(context, html, "text/html");
 					}
 					else if (filename.Equals("scscommand.js")) ReturnResource(context, filename, "application/javascript");
-					else if (filename.EndsWith(".js")) ReturnResponse(context, js.ToString(), "application/javascript");
-					else if (filename.EndsWith(".css")) ReturnResponse(context, css.ToString(), "text/css");
+					else if (filename.EndsWith(".js")) ReturnResponse(context, Js.ToString(), "application/javascript");
+					else if (filename.EndsWith(".css")) ReturnResponse(context, Css.ToString(), "text/css");
 					else if (filename == "contenttreeselectedrelated.scsvc") ReturnJson(context, GetContentSelectedRelated(data));
 					else if (filename == "scsvalid.scsvc") ReturnJson(context, true);
 					else if (Response.StatusCode == 404) NotFound(context, "Requested resource was not found.");
@@ -143,10 +147,11 @@ namespace SitecoreSidekick.Handlers
 				Log.Error("Sitecore sidekick failed to return the proper resource", e, this);
 				Error(context, e);
 			}
+
 			return null;
 		}
 
-		private object GetContentSelectedRelated(dynamic data)
+		private bool GetContentSelectedRelated(dynamic data)
 		{
 			try
 			{
@@ -163,35 +168,42 @@ namespace SitecoreSidekick.Handlers
 			{
 
 			}
+
 			if (data.selectedId is string)
+			{
 				return ContentSelectedRelated(data.currentId, data.selectedId);
+			}
+
 			foreach (object selectedId in data.selectedId)
 			{
 				if (selectedId != null && ContentSelectedRelated(data.currentId, selectedId.ToString()))
+				{
 					return true;
+				}
 			}
 			return false;
 		}
 
-		private static object ContentSelectedRelated(string currentId, string selectedId)
+		private static bool ContentSelectedRelated(string currentId, string selectedId)
 		{
 			var db = Factory.GetDatabase("master", false);
-			if (db == null)
-				return false;
-			if (currentId == "")
-				return true;
+			if (db == null) return false;
+			if (currentId == "") return true;
+
 			Item current = db.GetItem(currentId);
 			Item selected = db.GetItem(selectedId);
-			if (current == null || selected == null)
-				return false;
+
+			if (current == null || selected == null) return false;
+
 			var spath = selected.Paths.FullPath;
 			var cpath = current.Paths.FullPath;
-			if (spath == cpath)
-				return false;
+
+			if (spath == cpath) return false;
+
 			return spath.StartsWith(cpath);
 		}
 
-		private object GenerateDesktopStyle()
+		private string GenerateDesktopStyle()
 		{
 			return @"
 #sidekickHeader{
@@ -237,10 +249,9 @@ body{
 			var sb = new StringBuilder($"<div ng-style=\"({basicAngularIf}) && {{'width':'{CssStyle}', 'background-color':'white'}}\"><h3 id=\"sidekickHeader\" ng-if=\"{basicAngularIf}\">{Name}<span class='close' onclick='window.top.document.getElementById(\"scs\").style.display=\"none\";'></span></h3>");
 			foreach (var sk in Sidekicks.Where(x => x.ApplicableSidekick()))
 			{
-				sb.Append(
-					$"<div ng-if=\"{basicAngularIf}\" ng-click=\"vm.selectSidekick('{sk.Name}')\" class=\"btn scsbtn\"><img ng-src=\"{sk.Icon}\" width=\"32\" height=\"32\" class=\"scContentTreeNodeIcon\" border=\"0\"><div>{sk.Name}</div></div>");
+				sb.Append($"<div ng-if=\"{basicAngularIf}\" ng-click=\"vm.selectSidekick('{sk.Name}')\" class=\"btn scsbtn\"><img ng-src=\"{sk.Icon}\" width=\"32\" height=\"32\" class=\"scContentTreeNodeIcon\" border=\"0\"><div>{sk.Name}</div></div>");
 				sb.Append($"<div id=\"{sk.Name.Replace(" ", string.Empty).ToLower()}\" ng-if=\"vm.sidekick == '{sk.Name}'\" targetWidth=\"{sk.CssStyle}\"><div id=\"desktopSidekickHeader\"><span class=\"back\" ng-click=\"vm.goHome()\"><svg class=\"icon icon-arrow-left\"><use xlink:href=\"#icon-arrow-left\"></use></svg> Return Home</span><span class=\"subheader-logo\">{sk.Name}</span><span class='close' onclick='window.top.document.getElementById(\"scs\").style.display=\"none\";'></span></div><h3 id=\"sidekickHeader\">{sk.Name}<span class=\"back\" ng-click=\"vm.goHome()\">Return Home</span><span class='close' onclick='window.top.document.getElementById(\"scs\").style.display=\"none\";'></span></h3><div class=\"scs-form\"><{sk.Directive} ");
-                if (sk.DirectiveAttributes != null && sk.DirectiveAttributes.Count > 0)
+				if (sk.DirectiveAttributes != null && sk.DirectiveAttributes.Count > 0)
 					foreach (var key in sk.DirectiveAttributes.AllKeys)
 					{
 						sb.Append($"{key}=\"{sk.DirectiveAttributes[key]}\" ");

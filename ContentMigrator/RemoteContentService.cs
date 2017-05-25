@@ -14,7 +14,7 @@ using SitecoreSidekick;
 
 namespace ScsContentMigrator
 {
-	public class GetResources
+	public class RemoteContentService
 	{
 		// TODO: this is ugly AF. Fix this. This class should be named something more descriptive. It shouldn't be static. And it shouldn't have this property on it.
 		internal static SignatureService SignatureService;
@@ -66,7 +66,7 @@ namespace ScsContentMigrator
 					}
 					catch (Exception e)
 					{
-						Log.Error("Problem reading yaml from remote server", e);
+						Log.Error("Problem reading yaml from remote server", e, typeof(RemoteContentService));
 					}
 					if (itemData != null)
 					{
@@ -111,8 +111,13 @@ namespace ScsContentMigrator
 			wc.Headers["X-MC-MAC"] = signature.SignatureHash;
 			wc.Headers["X-MC-Nonce"] = nonce;
 
+			var currentPolicy = ServicePointManager.SecurityProtocol;
+
 			try
 			{
+				// .NET < 4.6.1 uses (insecure) SSL3 by default and does not enable TLS 1.2 for WebClient.
+				ServicePointManager.SecurityProtocol = SetSslCiphers();
+
 				return wc.UploadString(url, "POST", parameters);
 			}
 			catch (WebException ex)
@@ -130,6 +135,16 @@ namespace ScsContentMigrator
 
 				throw;
 			}
+			finally
+			{
+				ServicePointManager.SecurityProtocol = currentPolicy;
+			}
+		}
+
+		// TODO: in future, once this class isn't static any longer, this should be protected virtual
+		private static SecurityProtocolType SetSslCiphers()
+		{
+			return SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11;
 		}
 	}
 }

@@ -112,7 +112,7 @@
     <Compile Include="ContentMigrationHandler.cs" />
     <Compile Include="Data\CompareContentTreeNode.cs" />
     <Compile Include="ErrorItemData.cs" />
-    <Compile Include="GetResources.cs" />
+    <Compile Include="RemoteContentService.cs" />
     <Compile Include="ItemExtensions.cs" />
     <Compile Include="OperationStatus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

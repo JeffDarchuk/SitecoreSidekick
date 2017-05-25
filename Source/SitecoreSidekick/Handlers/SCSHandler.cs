@@ -112,13 +112,21 @@ namespace SitecoreSidekick.Handlers
 				string payload = sr.ReadToEnd();
 				dynamic ret = null;
 				if (payload.StartsWith("{") || payload == "")
+				{
 					ret = JsonNetWrapper.DeserializeObject<ExpandoObject>(payload);
+				}
+
 				if (ret == null)
+				{
 					ret = new ExpandoObject();
+				}
+
 				ret.payload = payload;
+
 				return ret;
 			}
 		}
+
 		/// <summary>
 		/// processes http request
 		/// </summary>

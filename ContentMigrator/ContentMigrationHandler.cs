@@ -45,6 +45,10 @@ namespace ScsContentMigrator
 		public override string Name => "Content Migrator";
 		public override string CssStyle => "width:100%;min-width:800px;";
 
+		public ContentMigrationHandler()
+		{
+		}
+
 		public ContentMigrationHandler(string roles, string isAdmin, string users, string remotePullingThreads, string databaseWriterThreads, string authenticationSecret) : base(roles, isAdmin, users)
 		{
 			if (string.IsNullOrWhiteSpace(authenticationSecret))
@@ -169,21 +173,6 @@ namespace ScsContentMigrator
 
 		}
 
-		public override bool RequestValid(HttpContextBase context, string filename, dynamic data)
-		{
-			if (!string.IsNullOrWhiteSpace(context.Request.Headers["X-MC-MAC"]) && (filename == "cmcontenttreegetitem.scsvc" || filename == "cmcontenttree.scsvc"))
-			{
-				return true;
-			}
-
-			var user = Sitecore.Context.User;
-			if (!user.IsAuthenticated)
-			{
-				return false;
-			}
-
-			return true;
-		}
 
 		public override ActionResult ProcessRequest(HttpContextBase context, string filename, dynamic data)
 		{

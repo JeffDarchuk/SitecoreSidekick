@@ -20,7 +20,6 @@ namespace SitecoreSidekick.Core
 		ActionResult ProcessRequest(HttpContextBase context, string filename, dynamic data);
 		void ProcessResourceRequest(HttpContextBase context, string filename, dynamic data);
 		bool ApplicableSidekick();
-		bool RequestValid(HttpContextBase context, string filename, dynamic data);
-
+		void RegisterRoutes();
 	}
 }

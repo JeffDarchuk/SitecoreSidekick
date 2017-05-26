@@ -19,11 +19,11 @@ namespace SitecoreSidekick.Handlers
 	/// </summary>
 	public class ScsMainHandlerController : ScsHandler
 	{
-		private static List<ISidekick> Sidekicks { get; } = new List<ISidekick>();
-		private static readonly StringBuilder Js = new StringBuilder();
-		private static readonly StringBuilder Css = new StringBuilder();
-		private static bool _addedSelf = false;
-		private static readonly object Locker = new object();
+		internal static List<ISidekick> Sidekicks { get; set; } = new List<ISidekick>();
+		private static StringBuilder js = new StringBuilder();
+		private static StringBuilder css = new StringBuilder();
+		private static bool addedSelf = false;
+		private static object locker = new object();
 
 		public override string Directive { get; set; }
 		public override NameValueCollection DirectiveAttributes { get; set; }
@@ -59,32 +59,37 @@ namespace SitecoreSidekick.Handlers
 		public static void RegisterSideKick(ISidekick sk, bool addSidekick = true)
 		{
 			Sidekicks.Add(sk);
-			Js.Insert(0, sk.CompileEmbeddedResource(".js"));
-			Css.Insert(0, sk.CompileEmbeddedResource(".css"));
+			js.Insert(0, sk.CompileEmbeddedResource(".js"));
+			css.Insert(0, sk.CompileEmbeddedResource(".css"));
 		}
+		//[Route("scs/{filename}")]
+		//[ActionName("scs")]
+		//public ActionResult ScsEntry(string filename)
+		//{
+		//	string ticket = Sitecore.Web.Authentication.TicketManager.GetCurrentTicketId();
+		//	if (!string.IsNullOrWhiteSpace(ticket))
+		//		Sitecore.Web.Authentication.TicketManager.Relogin(ticket);
+		//	var data = GetPostData(Request.InputStream);
+		//	var result = ProcessRequest(Request.RequestContext.HttpContext, filename, data);
+		//	if (result == null)
+		//		return Content("", Response.ContentType);
+		//	return result;
+		//}
 
-		[Route("scs/{filename}")]
-		[ActionName("scs")]
-		public ActionResult ScsEntry(string filename)
+
+		[ActionName("scsvalid.scsvc")]
+		public ActionResult Valid()
 		{
 			string ticket = Sitecore.Web.Authentication.TicketManager.GetCurrentTicketId();
-
 			if (!string.IsNullOrWhiteSpace(ticket))
-			{
 				Sitecore.Web.Authentication.TicketManager.Relogin(ticket);
-			}
-
-			var data = GetPostData(Request.InputStream);
-			var result = ProcessRequest(Request.RequestContext.HttpContext, filename, data);
-
-			if (result == null)
+			var user = Sitecore.Context.User;
+			if (!user.IsAuthenticated)
 			{
-				return Content("", Response.ContentType);
+				return ScsJson(false);
 			}
-
-			return result;
+			return ScsJson(true);
 		}
-
 		/// <summary>
 		/// base HTTP request
 		/// </summary>
@@ -94,30 +99,6 @@ namespace SitecoreSidekick.Handlers
 			try
 			{
 				context.Response.StatusCode = 404;
-
-				foreach (ISidekick sk in Sidekicks)
-				{
-					if (!sk.RequestValid(context, filename, data)) continue;
-
-					if (context.Response.StatusCode != 404) return null;
-
-					sk.ProcessRequest(context, filename, data);
-
-					if (context.Response.StatusCode != 404) return null;
-
-					sk.ProcessResourceRequest(context, filename, data);
-				}
-
-				if (!RequestValid(context, filename, data))
-				{
-					if (filename == "scsvalid.scsvc")
-					{
-						ReturnJson(context, false);
-						return null;
-					}
-
-					return new HttpUnauthorizedResult("Not logged in.");
-				}
 
 				ProcessResourceRequest(context, filename, data);
 
@@ -133,9 +114,8 @@ namespace SitecoreSidekick.Handlers
 
 						ReturnResponse(context, html, "text/html");
 					}
-					else if (filename.Equals("scscommand.js")) ReturnResource(context, filename, "application/javascript");
-					else if (filename.EndsWith(".js")) ReturnResponse(context, Js.ToString(), "application/javascript");
-					else if (filename.EndsWith(".css")) ReturnResponse(context, Css.ToString(), "text/css");
+					else if (filename.EndsWith(".js")) ReturnResponse(context, js.ToString(), "application/javascript");
+					else if (filename.EndsWith(".css")) ReturnResponse(context, css.ToString(), "text/css");
 					else if (filename == "contenttreeselectedrelated.scsvc") ReturnJson(context, GetContentSelectedRelated(data));
 					else if (filename == "scsvalid.scsvc") ReturnJson(context, true);
 					else if (Response.StatusCode == 404) NotFound(context, "Requested resource was not found.");

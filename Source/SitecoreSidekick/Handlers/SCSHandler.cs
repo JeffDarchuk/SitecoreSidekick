@@ -11,6 +11,7 @@ using System.Net;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Routing;
 using Sitecore.Mvc.Extensions;
 using Sitecore.Pipelines;
 using SitecoreSidekick.Core;
@@ -220,6 +221,10 @@ namespace SitecoreSidekick.Handlers
 			ReturnResponse(context, json, "application/json");
 		}
 
+		public virtual ActionResult ScsJson(object o)
+		{
+			return Content(JsonNetWrapper.SerializeObject(o), "application/json");
+		}
 		/// <summary>
 		/// extracts the resource out of the binary
 		/// </summary>
@@ -244,7 +249,36 @@ namespace SitecoreSidekick.Handlers
 			_resourceCache[filename] = result;
 			return result;
 		}
+		public virtual ActionResult Resources(string filename)
+		{
+			if (filename.EndsWith(".scs"))
+				return Content(GetResource(filename), "text/html");
+			if (filename.EndsWith(".html"))
+				return Content(GetResource(filename), "text/html");
+			if (filename.EndsWith(".gif"))
+				return File(GetImage(filename, ImageFormat.Gif), "image/gif");
+			if (filename.EndsWith(".png"))
+				return File(GetImage(filename, ImageFormat.Png), "image/png");
+			if (filename.EndsWith(".jpg"))
+				return File(GetImage(filename, ImageFormat.Jpeg), "image/jpg");
+			if (filename.EndsWith(".bmp"))
+				return File(GetImage(filename, ImageFormat.Bmp), "image/bmp");
+			if (filename.EndsWith(".emf"))
+				return File(GetImage(filename, ImageFormat.Emf), "image/emf");
+			if (filename.EndsWith(".ico"))
+				return File(GetImage(filename, ImageFormat.Icon), "image/icon");
+			if (filename.EndsWith(".tiff"))
+				return File(GetImage(filename, ImageFormat.Tiff), "image/tiff");
+			if (filename.EndsWith(".wmf"))
+				return File(GetImage(filename, ImageFormat.Wmf), "image/wmf");
+			if (filename.EndsWith(".svg"))
+				return Content(GetResource(filename), "image/svg+xml");
+			if (filename.EndsWith(".js"))
+				return Content(GetResource(filename), "text/javascript");
+			Response.StatusCode = 404;
+			return Content("Requested resource not found");
 
+		}
 		/// <summary>
 		/// returns image resource
 		/// </summary>
@@ -273,6 +307,17 @@ namespace SitecoreSidekick.Handlers
 			return result;
 		}
 
+		public virtual void RegisterRoutes()
+		{
+			var routes = RouteTable.Routes;
+			using (routes.GetWriteLock())
+			{
+				Type t = GetType();
+				routes.MapRoute(Name, "scs/"+Identifier+"/{action}", new { controller = $"{t.Namespace}.{t.Name}, {t.Assembly.GetName().Name}", action = Identifier });
+				routes.MapRoute(Name + "resources", "scs/" + Identifier + "/{action}/{filename}", new { controller = $"{t.Namespace}.{t.Name}, {t.Assembly.GetName().Name}", action = "resources" });
+			}
+		}
+		public abstract string Identifier { get; set; }
 		public abstract string Directive { get; set; }
 		public abstract NameValueCollection DirectiveAttributes { get; set; }
 		public abstract string ResourcesPath { get; set; }
@@ -280,15 +325,5 @@ namespace SitecoreSidekick.Handlers
 		public abstract string Name { get; }
 		public abstract string CssStyle { get; }
 		public abstract ActionResult ProcessRequest(HttpContextBase context, string filename, dynamic data);
-		public virtual bool RequestValid(HttpContextBase context, string filename, dynamic data)
-		{
-			var user = Sitecore.Context.User;
-			if (!user.IsAuthenticated)
-			{
-				return false;
-			}
-
-			return true;
-		}
 	}
 }

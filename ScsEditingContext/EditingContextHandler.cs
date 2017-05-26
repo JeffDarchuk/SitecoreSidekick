@@ -5,6 +5,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Routing;
 using System.Web.Security;
 using System.Xml;
 using Sitecore.Configuration;
@@ -33,14 +34,37 @@ namespace ScsEditingContext
 		public static Database Master = Factory.GetDatabase("master");
 		internal static ConcurrentDictionary<string, List<TypeContentTreeNode>> Related { get; }
 		internal static ConcurrentDictionary<string, List<TypeContentTreeNode>> Referrers { get; }
+		public override void RegisterRoutes()
+		{
+			var routes = RouteTable.Routes;
+			using (routes.GetWriteLock())
+			{
+				routes.MapRoute(Name, "scs/ec/{action}", new { controller = $"{GetType().Namespace}.{GetType().Name}, {GetType().Assembly.GetName().Name}", action = "ec" });
+				routes.MapRoute(Name + "resources", "scs/ec/{action}/{filename}", new {controller = $"{GetType().Namespace}.{GetType().Name}, {GetType().Assembly.GetName().Name}", action = "resources"});
+			}
+		}
 
 		static EditingContextHandler()
 		{
 			Related = new ConcurrentDictionary<string, List<TypeContentTreeNode>>();
 			Referrers = new ConcurrentDictionary<string, List<TypeContentTreeNode>>();
 		}
+
+		public EditingContextHandler()
+		{
+		}
+
 		public EditingContextHandler(string roles, string isAdmin, string users) : base(roles, isAdmin, users)
 		{
+		}
+		[ActionName("blaer.json")]
+		public ActionResult Blaer()
+		{
+			return Content("FLERFLER");
+		}
+		public ActionResult Resources(string filename)
+		{
+			return Content("RESOURCE "+filename);
 		}
 		public override ActionResult ProcessRequest(HttpContextBase context, string filename, dynamic data)
 		{

@@ -27,9 +27,9 @@ namespace SitecoreSidekick.Pipelines.Initialize
 			EnsureDesktopButton();
 			if (Factory.GetDatabase("master", false) != null)
 			{
-				RegisterRoutes("scs");
 				var pipeline = CorePipelineFactory.GetPipeline("scsRegister", string.Empty);
 				pipeline.Run(new PipelineArgs());
+				RegisterRoutes("scs");
 			}
 		}
 
@@ -78,14 +78,17 @@ namespace SitecoreSidekick.Pipelines.Initialize
 			var routes = RouteTable.Routes;
 			using (routes.GetWriteLock())
 			{
-				var rt = routes.MapRoute(
-					"Default", // Route name
+				routes.MapRoute(
+					"Scs", // Route name
 					"scs/{filename}", // URL with parameters
 					new { controller = "ScsMainHandler", action = "scs" } // Parameter defaults
 				);
-		
-
 			}
+			foreach (var sidekick in ScsMainHandlerController.Sidekicks)
+			{
+				sidekick.RegisterRoutes();
+			}
+
 		}
 	}
 }

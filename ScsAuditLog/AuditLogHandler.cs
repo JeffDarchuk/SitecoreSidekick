@@ -32,6 +32,10 @@ namespace ScsAuditLog
 		public override string CssStyle { get; } = "width:100%;min-width:900px";
 		private readonly List<string> _luceneSpecialChars = new List<string>() { "+", "-", "&&", "||", "!", "(", ")", "{", "}", "[", "]", "^", "\"", "~", "*", "?", ":", "\\" };
 
+		public AuditLogHandler()
+		{
+		}
+
 		public AuditLogHandler(string keepBackups, string keepRecords, string roles, string isAdmin, string users) : base(roles, isAdmin, users)
 		{
 			Database db = Factory.GetDatabase(Root.DatabaseName, false);

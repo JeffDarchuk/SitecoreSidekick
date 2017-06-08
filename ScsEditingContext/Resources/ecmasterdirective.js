@@ -8,7 +8,7 @@
 	function ecmasterdirective() {
 
 		var directive = {
-			templateUrl: "/scs/ecmaster.scs",
+			templateUrl: "/scs/ec/resources/ecmaster.scs",
 			restrict: 'EA'
 		};
 		return directive;

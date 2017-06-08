@@ -1,7 +1,7 @@
 <div ng-controller="alcontroller as vm" ng-click="vm.mainClick($event)">
 	<div>
 		<div>
-			<img class="algear" ng-click="vm.resetPanes('settings')" src="/scs/algear.png"></img>
+			<img class="algear" ng-click="vm.resetPanes('settings')" src="/scs/al/resources/algear.png"></img>
 			<a href="#" class="btn" ng-click="vm.resetPanes('viewQuery')">Filter</a>
 		</div>
 		<div ng-if="vm.panes.settings" class="alpane">

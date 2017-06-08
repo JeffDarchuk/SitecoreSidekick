@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace SitecoreSidekick.Models
 {
-	class ContentSelectedRelatedModel
+	public class ContentSelectedRelatedModel
 	{
+		public string Server { get; set; }
+		public List<string> SelectedIds { get; set; }
 	}
 }

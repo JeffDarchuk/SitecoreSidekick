@@ -24,7 +24,13 @@ namespace SitecoreSidekick
 		public static T DeserializeObject<T>(string str)
 		{
 			MethodInfo generic = Deserialize.MakeGenericMethod(new[] { typeof(T) });
-			return (T)generic.Invoke(null, new[] { str });
+			return (T)generic.Invoke(null, new object[] { str });
+		}
+
+		public static object DeserializeObject(string str, Type t)
+		{
+			MethodInfo generic = Deserialize.MakeGenericMethod(new[] { t });
+			return generic.Invoke(null, new object[]{str});
 		}
 
 		public static string SerializeObject(object o)

@@ -1,4 +1,5 @@
-﻿using ScsContentMigrator.Args;
+﻿using System.Collections.Generic;
+using ScsContentMigrator.Args;
 
 namespace ScsContentMigrator
 {
@@ -10,11 +11,11 @@ namespace ScsContentMigrator
 		{
 			_args = new RemoteContentPullArgs()
 			{
-				server = remoteServer,
-				ids = rootIds.Split(','),
-				database = database,
+				Server = remoteServer,
+				Ids = new List<string>(rootIds.Split(',')),
+				Database = database,
 				bulkUpdate = bulkUpdate.ToLower() == "true",
-				children = children.ToLower() == "true",
+				Children = children.ToLower() == "true",
 				overwrite = overwrite.ToLower() == "true",
 				eventDisabler = eventDisabler.ToLower() == "true",
 				pullParent = pullParent.ToLower() == "true",
@@ -25,7 +26,7 @@ namespace ScsContentMigrator
 
 		public void Run()
 		{
-			ContentMigrationHandler.StartContentSync(_args);
+			ContentMigrationRegistration.StartContentSync(_args);
 		}
 	}
 }

@@ -8,7 +8,7 @@
 	function aldirective() {
 
 		var directive = {
-			templateUrl: "/scs/almaster.scs",
+			templateUrl: "/scs/al/resources/almaster.scs",
 			restrict: 'EA'
 		};
 		return directive;

@@ -29,7 +29,7 @@ namespace ScsContentMigrator
 								i--;
 							}
 						}
-						if (_runningThreads.Count < ContentMigrationHandler.RemoteThreads)
+						if (_runningThreads.Count < ContentMigrationRegistration.RemoteThreads)
 						{
 							Tuple<WaitCallback, object> stateTuple;
 							if (_state.TryDequeue(out stateTuple))
@@ -46,7 +46,7 @@ namespace ScsContentMigrator
 					{
 						Log.Error("problem initializing the content migration thread", e, this);
 					}
-					if (_runningThreads.Count == ContentMigrationHandler.WriterThreads)
+					if (_runningThreads.Count == ContentMigrationRegistration.WriterThreads)
 						await Task.Delay(10);
 				}
 				status.EndOperation();

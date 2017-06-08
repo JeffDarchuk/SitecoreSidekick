@@ -11,16 +11,16 @@
 		var service = {
 
 			getLocations: function () {
-				return $http.get("/scs/ecgetcommonlocations.json");
+				return $http.get("/scs/ec/getcommonlocations.json");
 			},
 			getItemHistory: function () {
-				return $http.get("/scs/ecgetitemhistory.json");
+				return $http.get("/scs/ec/getitemhistory.json");
 			},
 			getRelatedItems: function () {
-				return $http.get("/scs/ecgetrelated.json");
+				return $http.get("/scs/ec/getrelated.json");
 			},
 			getReferrersItems: function () {
-				return $http.get("/scs/ecgetreferrers.json");
+				return $http.get("/scs/ec/getreferrers.json");
 			}
 		};
 

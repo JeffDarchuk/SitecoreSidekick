@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using MicroCHAP.Server;
 
 namespace ScsContentMigrator.Security
@@ -11,6 +12,7 @@ namespace ScsContentMigrator.Security
 	public class UniqueChallengeStore : IChallengeStore
 	{
 		readonly HashSet<string> _challenges = new HashSet<string>();
+		readonly Queue<string> _cleaner = new Queue<string>();
 
 		public void AddChallenge(string challenge, int expirationTimeInMsec)
 		{
@@ -22,7 +24,11 @@ namespace ScsContentMigrator.Security
 			bool valid = !_challenges.Contains(challenge);
 
 			_challenges.Add(challenge);
-
+			_cleaner.Enqueue(challenge);
+			if (_cleaner.Count > 100000)
+			{
+				_challenges.Remove(_cleaner.Dequeue());
+			}
 			return valid;
 		}
 	}

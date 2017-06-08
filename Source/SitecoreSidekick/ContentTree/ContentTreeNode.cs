@@ -9,6 +9,8 @@ namespace SitecoreSidekick.ContentTree
 	public class ContentTreeNode
 	{
 		public string Icon = "";
+		public string AltIcon = "";
+		public string FallbackIcon = "/scs/platform/resources/scsphoto_scenery.png";
 		public string DisplayName;
 		public string DatabaseName;
 		public string Id;
@@ -38,7 +40,8 @@ namespace SitecoreSidekick.ContentTree
 		{
 			if (item != null)
 			{
-				Icon = GetSrc(ThemeManager.GetIconImage(item, 32, 32, "", "")).Replace("/sitecore/shell/themes/standard/-/media/", "/-/media/");
+				Icon = GetSrc(ThemeManager.GetIconImage(item, 32, 32, "", ""));
+				AltIcon = Icon.Replace("/sitecore/shell/themes/standard/-/media/", "/-/media/");
 			}
 			//if (!string.IsNullOrWhiteSpace(Icon))
 			//{

@@ -60,7 +60,7 @@ li {
 }
 
 .close {
-	background: url(/scs/scsdialog_close.png) no-repeat center center;
+	background: url(/scs/platform/resources/scsdialog_close.png) no-repeat center center;
 	float: right;
 	cursor: pointer;
 }

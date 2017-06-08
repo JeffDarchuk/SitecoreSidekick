@@ -33,7 +33,7 @@
 			vm.refreshHistory();
 			if (scsActiveModule !== "Editing Context")
 				$interval.cancel(running);
-		}, 1000);
+		}, 2000);
 		vm.refreshHistory();
 		vm.refreshRelated = function () {
 			ECFactory.getRelatedItems().then(function (response) {
@@ -47,7 +47,7 @@
 			vm.refreshRelated();
 			if (scsActiveModule !== "Editing Context")
 				$interval.cancel(related);
-		}, 1000);
+		}, 2000);
 		vm.refreshRelated();
 		vm.refreshReferrers = function () {
 			ECFactory.getReferrersItems().then(function (response) {
@@ -61,7 +61,7 @@
 			vm.refreshReferrers();
 			if (scsActiveModule !== "Editing Context")
 				$interval.cancel(referrers);
-		}, 1000);
+		}, 2000);
 		vm.refreshReferrers();
 	}
 })();

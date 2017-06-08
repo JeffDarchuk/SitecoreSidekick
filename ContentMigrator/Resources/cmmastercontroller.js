@@ -5,9 +5,9 @@
         .module('app')
         .controller('cmmastercontroller', cmmastercontroller);
 
-	cmmastercontroller.$inject = ['CMfactory', '$scope', '$timeout', '$window'];
+	cmmastercontroller.$inject = ['CMfactory', '$scope', '$timeout', '$window', 'ScsFactory'];
 
-	function cmmastercontroller(CMfactory, $scope, $timeout, $window) {
+	function cmmastercontroller(CMfactory, $scope, $timeout, $window, ScsFactory) {
 		/* jshint validthis:true */
 		var vm = this;
 		vm.children = true;
@@ -31,10 +31,10 @@
 				return true;
 			},
 			'click': function (val) {
+				delete vm.events.relatedIds;
+				
 				if (val.MissingRemote)
 					return;
-				vm.events.lastClicked = val;
-				vm.setupCompare(val.Compare);
 				if (!vm.events.control) {
 					vm.events.selected = [];
 					vm.events.selectedIds = [];
@@ -47,27 +47,11 @@
 					vm.events.selected.splice(index, 1);
 					vm.events.selectedIds.splice(index, 1);
 				}
+				ScsFactory.contentTreeSelectedRelated(vm.events.selectedIds, vm.server).then(function (response) {
+					vm.events.relatedIds = response.data;
+				});
 			}
 		};
-		vm.setupCompare = function(compare, skipValidation)
-		{
-			for (var el in compare) {
-				if (vm.events.difflang === 'clean')
-					vm.events.difflang = 'none';
-				compare[el].valid = false;
-				for (var i = 0; i < compare[el].length; i++) {
-					if (!skipValidation && !vm.events.validateDiffRow(compare[el][i].Item1, compare[el][i].Item2)) {
-						compare[el][i].valid = false;
-					} else {
-						if (vm.events.difflang === 'none') {
-							vm.events.difflang = el;
-						}
-						compare[el].valid = true;
-						compare[el][i].valid = true;
-					}
-				}
-			}
-		}
 		angular.element($window)
 			.bind("keydown",
 				function($event) {

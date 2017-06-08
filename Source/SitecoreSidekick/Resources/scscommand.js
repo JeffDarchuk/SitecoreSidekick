@@ -25,7 +25,7 @@ window.onload = function () {
 				window.top.document.body.style.height = "";
 			} else {
 				if (!scs.innerHtml)
-					scs.innerHTML = "<iframe id='scs-iframe' frameBorder='0' style='width:100%;height:100%;background-color: transparent;' src='/scs/scs.scs' />";
+					scs.innerHTML = "<iframe id='scs-iframe' frameBorder='0' style='width:100%;height:100%;background-color: transparent;' src='/scs/platform/scs.scs' />";
 				scs.style.display = "block";
 				scs.style.position = "absolute";
 				window.top.scrollTo(0, 0);

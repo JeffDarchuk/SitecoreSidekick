@@ -3,7 +3,7 @@
 	<sitecore>
 		<pipelines>
 			<scsRegister>
-				<processor type="ScsContentMigrator.ContentMigrationHandler, ScsContentMigrator">
+				<processor type="ScsContentMigrator.ContentMigrationRegistration, ScsContentMigrator">
 					<!--
 						This is a shared secret that is used to authenticate to remote servers you want to pull content from.
 						This setting must be:

@@ -11,7 +11,7 @@ namespace SitecoreSidekick.Pipelines.ExperienceEditor
 		{
 			Assert.ArgumentNotNull(args, "args");
 			args.Disposables.Add(new GenericDisposable(() => args.Writer.Write(@"
-<script src='/scs/scscommand.js'>
+<script src='/scs/platform/scscommand.js'>
 
 </script>")));
 		}

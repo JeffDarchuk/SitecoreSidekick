@@ -39,8 +39,8 @@ namespace ScsEditingContext.Pipelines.HttpRequestBegin
 						Item item = database.GetItem(tmp);
 						if (item != null)
 						{
-							EditingContextHandler.Related[HttpContext.Current.Request.Cookies["ASP.NET_SessionId"]?.Value ?? ""] = Globals.LinkDatabase.GetItemReferences(item, true).Select(x => new TypeContentTreeNode(x.GetTargetItem())).OrderBy(x => x.DisplayName).ToList();
-							EditingContextHandler.Referrers[HttpContext.Current.Request.Cookies["ASP.NET_SessionId"]?.Value ?? ""] = Globals.LinkDatabase.GetItemReferrers(item, true).Select(x => new TypeContentTreeNode(x.GetSourceItem())).OrderBy(x => x.DisplayName).ToList();
+							EditingContextRegistration.Related[HttpContext.Current.Request.Cookies["ASP.NET_SessionId"]?.Value ?? ""] = Globals.LinkDatabase.GetItemReferences(item, true).Select(x => new TypeContentTreeNode(x.GetTargetItem())).OrderBy(x => x.DisplayName).ToList();
+							EditingContextRegistration.Referrers[HttpContext.Current.Request.Cookies["ASP.NET_SessionId"]?.Value ?? ""] = Globals.LinkDatabase.GetItemReferrers(item, true).Select(x => new TypeContentTreeNode(x.GetSourceItem())).OrderBy(x => x.DisplayName).ToList();
 						}
 						ContentTreeNode current = new ContentTreeNode(item, false);
 						if (string.IsNullOrWhiteSpace(current.DisplayName))

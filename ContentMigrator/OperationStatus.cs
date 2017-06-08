@@ -63,10 +63,10 @@ namespace ScsContentMigrator
 			var deserializer = new DefaultDeserializer(_logger, new DefaultFieldFilter());
 			_startedTime = DateTime.Now;
 			_args = args;
-			_ids = new HashSet<string>(_args.ids);
+			_ids = new HashSet<string>(_args.Ids);
 			_scDatastore = new SitecoreDataStore(deserializer);
 			OperationId = operationId;
-			_db = Factory.GetDatabase(args.database);
+			_db = Factory.GetDatabase(args.Database);
 			_tp = new CmThreadPool(this);
 			Init();
 
@@ -75,7 +75,7 @@ namespace ScsContentMigrator
 				_tp.Queue(GetNextItem, id);
 			}
 
-			for (int i = 0; i < (_processTemplates ? 1 : ContentMigrationHandler.WriterThreads); i++)
+			for (int i = 0; i < (_processTemplates ? 1 : ContentMigrationRegistration.WriterThreads); i++)
 			{
 				RunDatabaseWriterProcess();
 			}
@@ -98,7 +98,7 @@ namespace ScsContentMigrator
 				_tp.Queue(GetNextItem, id);
 			}
 
-			for (int i = 0; i < (_processTemplates ? 1 : ContentMigrationHandler.WriterThreads); i++)
+			for (int i = 0; i < (_processTemplates ? 1 : ContentMigrationRegistration.WriterThreads); i++)
 			{
 				RunDatabaseWriterProcess();
 			}
@@ -108,9 +108,9 @@ namespace ScsContentMigrator
 		{
 			using (new SecurityDisabler())
 			{
-				foreach (string id in _args.ids)
+				foreach (string id in _args.Ids)
 				{
-					IItemData idata = RemoteContentService.GetRemoteItemData(_args, id);
+					IItemData idata = RemoteContentService.GetRemoteItemData(_args);
 
 					Item parent = _db.GetItem(new ID(idata.ParentId));
 					IItemData tmpData = idata;
@@ -134,8 +134,8 @@ namespace ScsContentMigrator
 					{
 
 						Stack<IItemData> path = new Stack<IItemData>();
-						var tmp = _args.children;
-						_args.children = false;
+						var tmp = _args.Children;
+						_args.Children = false;
 
 						while (parent == null)
 						{
@@ -152,7 +152,7 @@ namespace ScsContentMigrator
 							_currentTracker.Add(cur.Id.ToString());
 						}
 
-						_args.children = tmp;
+						_args.Children = tmp;
 
 					}
 
@@ -174,7 +174,7 @@ namespace ScsContentMigrator
 						};
 					}
 
-					rootNode.Server = _args.server;
+					rootNode.Server = _args.Server;
 					RootNodes.Add(rootNode);
 					
 				}
@@ -231,7 +231,7 @@ namespace ScsContentMigrator
 
 						foreach (var processedNode in RootNodes)
 						{
-							ContentMigrationHandler.GetChecksum(processedNode.Id, true);
+							ContentMigrationRegistration.GetChecksum(processedNode.Id, true);
 						}
 					}
 				}
@@ -334,7 +334,7 @@ namespace ScsContentMigrator
 			{
 				IItemData idata = RemoteContentService.GetRemoteItemData(_args, item);
 				_installerQueue.Enqueue(idata);
-				if (_args.children)
+				if (_args.Children)
 				{
 					QueueChildren(item);
 				}

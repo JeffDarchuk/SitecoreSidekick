@@ -9,6 +9,7 @@ using Rainbow.Model;
 using Rainbow.Storage.Yaml;
 using ScsContentMigrator.Args;
 using ScsContentMigrator.Data;
+using ScsContentMigrator.Models;
 using Sitecore.Diagnostics;
 using SitecoreSidekick;
 
@@ -19,29 +20,43 @@ namespace ScsContentMigrator
 		// TODO: this is ugly AF. Fix this. This class should be named something more descriptive. It shouldn't be static. And it shouldn't have this property on it.
 		internal static SignatureService SignatureService;
 
-		public static IItemData GetRemoteItemData(RemoteContentPullArgs args, string itemId)
+		public static IItemData GetRemoteItemData(ContentTreeModel args, string altId = null)
 		{
 			try
 			{
-				string url = $"{args.server}/scs/cmcontenttreegetitem.scsvc";
-				string parameters = args.GetSerializedData(itemId, false);
+				string url = $"{args.Server}/scs/cm/cmcontenttreegetitem.scsvc";
+				string parameters = "";
+				if (altId == null)
+				{
+					parameters = JsonNetWrapper.SerializeObject(args);
+				}
+				else
+				{
+					parameters = JsonNetWrapper.SerializeObject(new ContentTreeModel()
+					{
+						Children = args.Children,
+						Database = args.Database,
+						Id = altId,
+						Server = args.Server
+					});
+				}
 
 				string yamlList = MakeRequest(url, parameters);
 				string yaml = JsonNetWrapper.DeserializeObject<List<string>>(yamlList).FirstOrDefault();
 
-				var resultItem = DeserializeYaml(yaml, itemId);
+				var resultItem = DeserializeYaml(yaml, altId ?? args.Id ?? args.Ids.FirstOrDefault());
 				if (resultItem == null)
 				{
 					return null;
 				}
 
-				resultItem.DatabaseName = args.database;
+				resultItem.DatabaseName = args.Database;
 
 				return resultItem;
 			}
 			catch (Exception e)
 			{
-				Log.Error("Error getting remote item data for " + itemId, e, args);
+				Log.Error("Error getting remote item data for " + args.Id, e, args);
 			}
 
 			return null;
@@ -79,8 +94,8 @@ namespace ScsContentMigrator
 
 		public static CompareContentTreeNode GetRemoteItem(RemoteContentTreeArgs args, string itemId, bool diff)
 		{
-			string url = $"{args.server}/scs/cmcontenttree.scsvc";
-			string parameters = $@"{{ ""id"": ""{itemId}"", ""database"": ""{args.database}""}}";
+			string url = $"{args.Server}/scs/cm/cmcontenttree.scsvc";
+			string parameters = $@"{{ ""id"": ""{itemId}"", ""database"": ""{args.Database}""}}";
 
 			string response = MakeRequest(url, parameters);
 
@@ -91,7 +106,7 @@ namespace ScsContentMigrator
 				return node;
 			}
 
-			node.BuildDiff(args.database, itemId);
+			node.SimpleCompare(args.Database, itemId);
 
 			return node;
 		}

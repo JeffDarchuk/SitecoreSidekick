@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
+using ScsContentMigrator.Models;
 
 namespace ScsContentMigrator.Args
 {
 	public class RemoteContentPullArgs : RemoteContentTreeArgs
 	{
-		public IEnumerable<string> ids;
 		public bool overwrite;
 		public bool pullParent;
 		public bool mirror;
@@ -18,25 +18,25 @@ namespace ScsContentMigrator.Args
 		{
 		}
 
-		public RemoteContentPullArgs(dynamic data)
+		public RemoteContentPullArgs(PullItemModel data)
 		{
-			ids = ((List<object>)data.ids).Select(x => x.ToString());
-			database = data.database;
-			server = data.server;
-			children = data.children;
-			overwrite = data.overwrite;
-			pullParent = data.pullParent;
-			mirror = data.mirror;
-			preview = data.preview;
-			eventDisabler = data.eventDisabler;
-			bulkUpdate = data.bulkUpdate;
+			Ids = data.Ids;
+			Database = data.Database;
+			Server = data.Server;
+			Children = data.Children;
+			this.overwrite = data.Overwrite;
+			this.pullParent = data.PullParent;
+			this.mirror = data.Mirror;
+			this.preview = data.Preview;
+			this.eventDisabler = data.EventDisabler;
+			this.bulkUpdate = data.BulkUpdate;
 
 		}
 
 		public string GetSerializedData(string altId, bool altChildren)
 		{
 			return
-				$"{{\"id\":\"{altId}\",\"database\":\"{database}\",\"children\":{JsonBool(altChildren)},\"overwrite\":{JsonBool(overwrite)},\"pullParent\":{JsonBool(pullParent)},\"preview\":{JsonBool(preview)},\"bulkUpdate\":{JsonBool(bulkUpdate)},\"eventDisabler\":{JsonBool(eventDisabler)}}}";
+				$"{{\"id\":\"{altId}\",\"database\":\"{Database}\",\"children\":{JsonBool(altChildren)},\"overwrite\":{JsonBool(overwrite)},\"pullParent\":{JsonBool(pullParent)},\"preview\":{JsonBool(preview)},\"bulkUpdate\":{JsonBool(bulkUpdate)},\"eventDisabler\":{JsonBool(eventDisabler)}}}";
 		}
 		private string JsonBool(bool b)
 		{

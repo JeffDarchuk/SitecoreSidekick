@@ -1,15 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Web;
 using System.Web.Mvc;
 
 namespace SitecoreSidekick.Core
 {
-	public interface ISidekick
+	public interface IScsRegistration
 	{
-		string Directive { get; set; }
-		NameValueCollection DirectiveAttributes { get; set; }
-		string ResourcesPath { get; set; }
+		string Directive { get;}
+		NameValueCollection DirectiveAttributes { get;}
+		string ResourcesPath { get;}
+		Type Controller { get;}
 		string Icon { get; }
 		string Name { get; }
 		string CssStyle { get; }
@@ -17,8 +19,6 @@ namespace SitecoreSidekick.Core
 		List<string> Roles { get; }
 		List<string> Users { get; } 
 		string CompileEmbeddedResource(string fileExtension);
-		ActionResult ProcessRequest(HttpContextBase context, string filename, dynamic data);
-		void ProcessResourceRequest(HttpContextBase context, string filename, dynamic data);
 		bool ApplicableSidekick();
 		void RegisterRoutes();
 	}

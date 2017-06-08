@@ -40,15 +40,26 @@
 		vm.selectSidekick($cookies.get("sidekick"));
 	}
 })();
+(function () {
+	angular
+		.module('app').directive('fallbackSrc', function () {
+			var fallbackSrc = {
+				link: function postLink(scope, iElement, iAttrs) {
+					iElement.bind('error', function () {
+						if (!iAttrs.altSrc || angular.element(this).attr("src") === iAttrs.altSrc) {
+							angular.element(this).attr("src", iAttrs.fallbackSrc);
+							return;
+						}
+						angular.element(this).attr("src", iAttrs.altSrc);
+					});
+				}
+			}
+			return fallbackSrc;
+		});
+})();
 $('.fancybox').fancybox({
 	width: '100%', height: '100%', fitToView: true, autoSize: true
 });
-window.onload = function () {
-	document.onkeydown = function (event) {
-		if (window.parent && window.parent.document)
-			window.parent.document.onkeydown(event);
-	};
-};
 $(document).click(function (event) {
 	if (event.target === $("#overlay")[0] || event.target === $("body")[0]) {
 		window.top.document.getElementById("scs").style.display = "none";

@@ -5,14 +5,44 @@
         .module('app')
         .controller('cmcontenttreecontroller', cmcontenttreecontroller);
 
-	cmcontenttreecontroller.$inject = ['CMfactory', 'ScsFactory', '$scope'];
+	cmcontenttreecontroller.$inject = ['CMfactory', '$scope'];
 
-	function cmcontenttreecontroller(CMfactory, ScsFactory, $scope) {
+	function cmcontenttreecontroller(CMfactory, $scope) {
 		/* jshint validthis:true */
 		var vm = this;
 		vm.Open = false;
+		vm.server = "";
+		vm.buildDiff = function(status, id, events) {
+			if (status !== "cmfieldchanged")
+				return;
+			CMfactory.getDiff(id, vm.server).then(function(response) {
+				events.lastClicked = response.data;
+				events.diff = id;
+				vm.setupCompare(events.lastClicked.Compare, false, events);
+			});
+		}
+		vm.setupCompare = function (compare, skipValidation, events) {
+			for (var el in compare) {
+				if (events.difflang === 'clean')
+					events.difflang = 'none';
+				compare[el].valid = false;
+				for (var i = 0; i < compare[el].length; i++) {
+					if (!skipValidation && !events.validateDiffRow(compare[el][i].Item1, compare[el][i].Item2)) {
+						compare[el][i].valid = false;
+					} else {
+						if (events.difflang === 'none') {
+							events.difflang = el;
+						}
+						compare[el].valid = true;
+						compare[el][i].valid = true;
+					}
+				}
+			}
+		}
 		$scope.init = function (nodeId, selectedId, events, server, database) {
+			vm.events = events;
 			if (!server.MissingRemote) {
+				vm.server = server;
 				CMfactory.contentTree(nodeId, database, server).then(function (response) {
 					vm.data = response.data;
 					if (server)
@@ -24,14 +54,9 @@
 				vm.data = server;
 				vm.data.Nodes = new Array();
 			}
-			if (typeof (selectedId) !== "undefined" && selectedId.length > 0)
-				ScsFactory.contentTreeSelectedRelated(nodeId, selectedId, server).then(function (response) {
-					if (response.data)
+			if (typeof (selectedId) !== "undefined" && typeof (events.relatedIds) !== "undefined")
+					if (events.relatedIds[nodeId] || nodeId === "")
 						vm.Open = true;
-				}, function (response) {
-					vm.error = response.data;
-				});
-
 		}
 	}
 })();

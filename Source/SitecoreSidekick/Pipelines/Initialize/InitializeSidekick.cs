@@ -1,4 +1,5 @@
-﻿using System.Web;
+﻿using System;
+using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 using System.Xml;
@@ -10,7 +11,10 @@ using Sitecore.Diagnostics;
 using Sitecore.Globalization;
 using Sitecore.Pipelines;
 using Sitecore.SecurityModel;
+using SitecoreSidekick.Core;
 using SitecoreSidekick.Handlers;
+using SitecoreSidekick.Models;
+using Version = Sitecore.Data.Version;
 
 namespace SitecoreSidekick.Pipelines.Initialize
 {
@@ -29,12 +33,17 @@ namespace SitecoreSidekick.Pipelines.Initialize
 			{
 				var pipeline = CorePipelineFactory.GetPipeline("scsRegister", string.Empty);
 				pipeline.Run(new PipelineArgs());
+				ScsMainRegistration maintmp = new ScsMainRegistration("", "", "");
+				ScsController.Registration[typeof(ScsMainRegistration)] = maintmp;
+				ScsController.Registration[maintmp.Controller] = maintmp;
 				RegisterRoutes("scs");
 			}
 		}
 
 		public static void EnsureDesktopButton()
 		{
+		using (new SecurityDisabler())
+			{
 			var master = Factory.GetDatabase("master", false);
 			if (master == null)
 				return;
@@ -42,14 +51,12 @@ namespace SitecoreSidekick.Pipelines.Initialize
 			if (core == null)
 				return;
 
-			Item sk = core.DataManager.DataEngine.GetItem(new ID(SidekickButton), Language.DefaultLanguage, Version.Latest);
+			Item sk = core.GetItem(new ID(SidekickButton));
 			if (sk != null)
 				return;
-			Item right = core.DataManager.DataEngine.GetItem(new ID(DesktopMenuRight), Language.DefaultLanguage, Version.Latest);
+			Item right = core.GetItem(new ID(DesktopMenuRight));
 			if (right == null)
 				return;
-			using (new SecurityDisabler())
-			{
 				sk = ItemManager.CreateItem("Sitecore Sidekick", right, new ID(ActionTemplate), new ID(SidekickButton));
 				using (new EditContext(sk))
 				{
@@ -62,7 +69,6 @@ namespace SitecoreSidekick.Pipelines.Initialize
 					sk["Tool tip"] = "Open the Sitecore Sidekick";
 				}
 			}
-
 		}
 
 		private static bool IsSc8()
@@ -75,16 +81,15 @@ namespace SitecoreSidekick.Pipelines.Initialize
 
 		public static void RegisterRoutes(string route)
 		{
+			ScsModelBinder.Default = ModelBinders.Binders.DefaultBinder;
+			ModelBinders.Binders.DefaultBinder = new ScsModelBinder();
 			var routes = RouteTable.Routes;
 			using (routes.GetWriteLock())
 			{
-				routes.MapRoute(
-					"Scs", // Route name
-					"scs/{filename}", // URL with parameters
-					new { controller = "ScsMainHandler", action = "scs" } // Parameter defaults
-				);
+				routes.MapRoute("scs", "scs/platform/{action}", new { controller = "SitecoreSidekick.Handlers.ScsMainController, SitecoreSidekick", action = "scs" });
+				routes.MapRoute("scsresources", "scs/platform/{action}/{filename}", new { controller = $"SitecoreSidekick.Handlers.ScsMainController, SitecoreSidekick", action = "resources" });
 			}
-			foreach (var sidekick in ScsMainHandlerController.Sidekicks)
+			foreach (var sidekick in ScsMainRegistration.Sidekicks)
 			{
 				sidekick.RegisterRoutes();
 			}

@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8" />
 	<title>Sitecore Sidekick</title>
-	<link rel="stylesheet" href="/scs/main.css" />
+	<link rel="stylesheet" href="/scs/platform/resources/main.css" />
 	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css" />
 </head>
 <body class="full-height full-width">
@@ -25,8 +25,8 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.js"></script>
-	<script src="/scs/scsangular.js"></script>
-	<script src="/scs/main.js"></script>
+	<script src="/scs/platform/resources/scsangular.js"></script>
+	<script src="/scs/platform/resources/main.js"></script>
 </body>
 
 </html>

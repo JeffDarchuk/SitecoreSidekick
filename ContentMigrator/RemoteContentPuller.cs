@@ -10,7 +10,7 @@ namespace ScsContentMigrator
 	{
 		private static readonly ConcurrentDictionary<string, OperationStatus> Operation = new ConcurrentDictionary<string, OperationStatus>();
 
-		public dynamic PullContentItem(RemoteContentPullArgs args)
+		public string PullContentItem(RemoteContentPullArgs args)
 		{
 			OperationStatus status = RegisterEvent(args);
 			return status.OperationId;

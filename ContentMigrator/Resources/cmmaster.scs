@@ -113,7 +113,7 @@
 		<span class="btn" style="float: right;" ng-click="vm.reset()">Content Migrator Home</span>
 		<span ng-if="vm.spinner" class="btn" style="float: right;" ng-click="vm.stopOperation()">Cancel Operation</span>
 		<input id="showpath" type="checkbox" ng-model="vm.showPath" /><label for="showpath">Show the path for results</label>
-		<h4 class="cmoperationheader"><img ng-if="vm.spinner" class="cmspinner" src="/scs/scsspinner.gif" /></h4>
+		<h4 class="cmoperationheader"><img ng-if="vm.spinner" class="cmspinner" src="/scs/platform/resources/scsspinner.gif" /></h4>
 		<table class="cmresultswrapper">
 			<tr><td class="cmresultslabel"><strong>Server:</strong></td><td style="width:100%">{{vm.streaming.server}}</td></tr>
 			<tr><td class="cmresultslabel"><strong>Root Item:</strong></td><td style="width:100%">{{vm.streaming.id}}</td></tr>
@@ -143,7 +143,7 @@
 	</div>
 	<div ng-repeat="results in vm.response">
 		<div class="cmtabpane" ng-if="results.show">
-			<dir-pagination-controls pagination-id="results.name  +'pagination' " template-url="/scs/scsdirpagination.scs">
+			<dir-pagination-controls pagination-id="results.name  +'pagination' " template-url="/scs/platform/resources/scsdirpagination.scs">
 			</dir-pagination-controls>
 			<div class="cmresults">
 				<span dir-paginate="item in results | itemsPerPage:100" pagination-id="{{results.name}}pagination">

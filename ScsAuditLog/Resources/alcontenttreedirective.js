@@ -11,7 +11,7 @@
     function alcontenttree(ALFactory, $compile, attributes) {
 
         var directive = {
-            templateUrl: "/scs/alcontenttree.scs",
+            templateUrl: "/scs/al/resources/alcontenttree.scs",
             restrict: 'E',
             scope: {
                 parent: '=',

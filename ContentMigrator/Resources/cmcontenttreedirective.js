@@ -11,7 +11,7 @@
     function cmcontenttree(CMfactory, $compile, attributes) {
 
         var directive = {
-            templateUrl: "/scs/cmcontenttree.scs",
+            templateUrl: "/scs/cm/resources/cmcontenttree.scs",
             restrict: 'E',
             scope: {
                 parent: '=',

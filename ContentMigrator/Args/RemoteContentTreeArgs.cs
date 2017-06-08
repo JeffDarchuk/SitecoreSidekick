@@ -1,30 +1,20 @@
 ﻿using Microsoft.CSharp.RuntimeBinder;
+using ScsContentMigrator.Models;
 
 namespace ScsContentMigrator.Args
 {
-	public class RemoteContentTreeArgs
+	public class RemoteContentTreeArgs : ContentTreeModel
 	{
-		public string id;
-		public string database;
-		public string server;
-		public bool children;
-
 		public RemoteContentTreeArgs()
 		{
 		}
-		public RemoteContentTreeArgs(dynamic data)
+		public RemoteContentTreeArgs(string id, string database, string server, bool children = false)
 		{
-			id = data.id;
-			database = data.database;
-			server = data.server;
-			try
-			{
-				children = data.children;
-			}
-			catch (RuntimeBinderException)
-			{
-				//no problems, this field is optional
-			}
+			Id = id;
+			Database = database;
+			Server = server;
+			Children = children;
+
         }
 	}
 }

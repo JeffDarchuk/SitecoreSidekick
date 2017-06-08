@@ -8,7 +8,7 @@
 	function cmmasterdirective() {
 
 		var directive = {
-			templateUrl: "/scs/cmmaster.scs",
+			templateUrl: "/scs/cm/resources/cmmaster.scs",
 			restrict: 'EA'
 		};
 		return directive;

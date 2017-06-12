@@ -55,10 +55,11 @@
 			<p>These options result in much faster processing speed, however the updated content will not be indexed or placed into the link database. Rebuilding the indexes and links may be required before updated items appear in searches or broken links reports.</p>
 		</fieldset>
 
-		<div ng-if="!vm.serverModified">
+		<div ng-if="!vm.serverModified && !vm.spinner">
 			<a class="btn" ng-click="vm.pull(false)">Pull</a>
 			<a class="btn cmpreviewbtn" ng-click="vm.pull(true)">Preview</a>
 		</div>
+		<img ng-if="vm.spinner" class="cmspinner" src="/scs/platform/resources/scsspinner.gif" />
 		
 		<fieldset class="cmresults" ng-if="vm.runningOperations && vm.runningOperations.length > 0">
 			<legend>Currently Running Operations</legend>

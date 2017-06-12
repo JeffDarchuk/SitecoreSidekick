@@ -168,17 +168,12 @@ namespace ScsContentMigrator
 				if (item != null)
 				{
 					Root.Nodes.Add(new CompareContentTreeNode(item, false));
-				}
-
 #pragma warning disable 4014
-				// async method intentionally not awaited to allow processing in the background and this method returning
-				GenerateChecksum(new List<CompareContentTreeNode> { new CompareContentTreeNode(item) });
+					// async method intentionally not awaited to allow processing in the background and this method returning
+					GenerateChecksum(new List<CompareContentTreeNode> { new CompareContentTreeNode(item) });
 #pragma warning restore 4014
+				}
 			}
-
 		}
-		
-
-
 	}
 }

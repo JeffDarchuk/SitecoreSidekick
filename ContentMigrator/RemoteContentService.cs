@@ -159,7 +159,7 @@ namespace ScsContentMigrator
 		// TODO: in future, once this class isn't static any longer, this should be protected virtual
 		private static SecurityProtocolType SetSslCiphers()
 		{
-			return SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11;
+			return SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
 		}
 	}
 }

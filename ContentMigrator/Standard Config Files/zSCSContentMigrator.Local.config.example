@@ -11,7 +11,7 @@
 						- At least 32 characters long
 						- It is highly recommended to use a random string generator for this secret. Do not use dictionary words.
 					-->
-					<param name="authenticationSecret" patch:after="param[@name='databaseWriterThreads']">too short sample</param>
+					<AuthenticationSecret>too short sample</AuthenticationSecret>
 
 					<!--
 						Sync Root Settings

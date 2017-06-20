@@ -25,6 +25,7 @@ using System.Web.Mvc;
 using MicroCHAP;
 using ScsContentMigrator.Models;
 using ScsContentMigrator.Security;
+using Sitecore.Pipelines;
 using SitecoreSidekick;
 using SitecoreSidekick.Core;
 using SitecoreSidekick.Models;
@@ -40,7 +41,7 @@ namespace ScsContentMigrator
 		internal static int WriterThreads = 1;
 		public List<string> ServerList { get; } = new List<string>();
 		public RemoteContentPuller Puller => _puller;
-		public ScsHmacServer HmacServer { get; }
+		public ScsHmacServer HmacServer { get; set; }
 		public override string Directive => "cmmasterdirective";
 		public override NameValueCollection DirectiveAttributes { get; set; }
 		public override string ResourcesPath => "ScsContentMigrator.Resources";
@@ -49,22 +50,10 @@ namespace ScsContentMigrator
 		public override string Icon => "/scs/cm/resources/cm.png";
 		public override string Name => "Content Migrator";
 		public override string CssStyle => "width:100%;min-width:800px;";
+		public string AuthenticationSecret { get; set; }
 
-		public ContentMigrationRegistration(string roles, string isAdmin, string users, string remotePullingThreads, string databaseWriterThreads, string authenticationSecret) : base(roles, isAdmin, users)
+		public ContentMigrationRegistration(string roles, string isAdmin, string users, string remotePullingThreads, string databaseWriterThreads) : base(roles, isAdmin, users)
 		{
-			if (string.IsNullOrWhiteSpace(authenticationSecret))
-			{
-				throw new InvalidOperationException("Sitecore Sidekick Content Migrator was initialized with an empty shared secret. Make a copy of zSCSContentMigrator.Local.config.example, rename it to .config, and set up a unique, long, randomly generated shared secret there.");
-			}
-
-			if (authenticationSecret.Length < 32)
-			{
-				throw new InvalidOperationException("Sitecore Sidekick Content Migrator was initialized with an insecure shared secret. Please use a shared secret of 32 or more characters.");
-			}
-
-			RemoteContentService.SignatureService = new SignatureService(authenticationSecret);
-			HmacServer = new ScsHmacServer(RemoteContentService.SignatureService, new UniqueChallengeStore());
-
 			if (RemoteThreads == 1)
 			{
 				int.TryParse(remotePullingThreads, out RemoteThreads);
@@ -79,6 +68,24 @@ namespace ScsContentMigrator
 			t.Elapsed += async (sender, e) => await GenerateChecksum();
 			t.Start();
 		}
+
+		public override void Process(PipelineArgs args)
+		{
+			if (string.IsNullOrWhiteSpace(AuthenticationSecret))
+			{
+				throw new InvalidOperationException("Sitecore Sidekick Content Migrator was initialized with an empty shared secret. Make a copy of zSCSContentMigrator.Local.config.example, rename it to .config, and set up a unique, long, randomly generated shared secret there.");
+			}
+
+			if (AuthenticationSecret.Length < 32)
+			{
+				throw new InvalidOperationException("Sitecore Sidekick Content Migrator was initialized with an insecure shared secret. Please use a shared secret of 32 or more characters.");
+			}
+
+			RemoteContentService.SignatureService = new SignatureService(AuthenticationSecret);
+			HmacServer = new ScsHmacServer(RemoteContentService.SignatureService, new UniqueChallengeStore());
+			base.Process(args);
+		}
+
 		public void BuildServerList(XmlNode node)
 		{
 			ServerList.Add(node.InnerText);

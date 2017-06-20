@@ -3,6 +3,11 @@
 	white-space: nowrap;
 }
 
+.cmwhite {
+	background-color: aliceblue;
+	color: black;
+}
+
 .cmresults h4 {
 	display: inline;
 }
@@ -31,14 +36,19 @@
 
 .cmselectedtab {
 	border: thin solid darkgray;
-    border-bottom: white;
-    background-color: white;
+	border-bottom: white;
+	background-color: white;
 }
 
 .cmresult {
 	width: 200px;
 	white-space: normal;
 	text-decoration: none;
+}
+
+.cmloading {
+	width: 29px;
+	display: inline-block;
 }
 
 .cmresult div {
@@ -48,60 +58,87 @@
 .cmresult img {
 	float: left;
 }
+
 .cmpreviewbtn {
 	background-color: aquamarine;
 }
+
 .cmresultswrapper {
-    background-color: white;
+	background-color: white;
 }
+
 .cmresultswrapper td {
-    border: none;
+	border: none;
 	padding-bottom: 5px;
 }
-td.cmresultslabel {
-    float: right;
-    white-space: nowrap;
+.cmdiffheading h3 {
+	display: inline-block;
+	background-color: rgb(240, 240, 240);
+	color: black;
 }
+
+.cmdiffheading .btn {
+	display: inline;
+}
+.cmdifftable tr:nth-child(even) {
+	background-color: white;
+}
+
+td.cmresultslabel {
+	float: right;
+	white-space: nowrap;
+}
+
 .cmexecuteoperation {
 	background-color: #fdd;
-    float: right;
+	float: right;
 	margin-top: -43px;
 }
+
 .cmresult img {
-    width: 16px;
+	width: 16px;
 }
+
 .cmmissing {
 	background-color: #ffffff;
 	border: 1px solid #aaaaaa;
 	width: 9px !important;
 	height: 9px !important;
 }
-.cmmoved{
+
+.cmmoved {
 	background-color: #700070;
 }
+
 .cmequal {
 	background-color: #77ff77;
 }
-.cmrenamed{
+
+.cmrenamed {
 	background-color: #f0f030;
 }
-.cmtemplatechanged{
+
+.cmtemplatechanged {
 	background-color: #000000;
 }
-.cmfieldchanged{
+
+.cmfieldchanged {
 	background-color: #ff7777;
 	cursor: pointer;
 }
+
 .cmextra {
 	background-color: grey;
 }
+
 .cmcompare {
-    width: 10px;
-    height: 10px;
-    display: inline-block;
-    vertical-align: middle;
-    margin-bottom: 3px;
+	width: 10px;
+	height: 10px;
+	display: inline-block;
+	vertical-align: middle;
+	margin-bottom: 3px;
 }
+
 .cmdifftable {
 	border-collapse: collapse;
 	vertical-align: text-top;
@@ -115,29 +152,32 @@ td.cmresultslabel {
 	overflow: auto;
 	border: thin solid black;
 }
+
 .cmdifftab {
-    border: thin solid black;
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
-    padding: 3px 6px 0 6px;
-    background-color: darkgrey;
-    color: white;
-    cursor: pointer;
-    margin-right: 5px;
-    font-weight: bold;
-    font-size: 13pt;
-    left: -60px;
+	border: thin solid black;
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+	padding: 3px 6px 0 6px;
+	background-color: darkgrey;
+	color: white;
+	cursor: pointer;
+	margin-right: 5px;
+	font-weight: bold;
+	font-size: 13pt;
+	left: -60px;
 	top: 1px;
-    position: relative;
-	z-index:1000;
+	position: relative;
+	z-index: 1000;
 }
+
 .cmdiffselectedtab {
-	background-color:  rgb(240, 240, 240);
+	background-color: rgb(240, 240, 240);
 	color: black;
 	border-bottom: none;
-	padding-bottom: 2px;
-	top:0;
+	padding-bottom: 3px;
+	top: 0;
 }
+
 .cmchildchanged {
 	width: 2px;
 	margin-left: 4px;
@@ -148,26 +188,33 @@ td.cmresultslabel {
 	border-left: 8px solid #ff7777;
 	border-right: none;
 }
+
 .cmviewresult {
 	margin-left: -5px;
 	padding-right: 15px;
 	border-radius: 0;
 }
+
 .cmlocalonly {
 	opacity: .5;
 }
+
 #cmdifftable tr:first-child td {
 	border-top: none;
 }
+
 #cmdifftable tr td:first-child {
 	border-left: none;
 }
+
 #cmdifftable tr td:last-child {
 	border-right: none;
 }
+
 #cmdifftable tr:nth-child(2) td {
 	width: 100%;
 }
+
 .cmdifftabletree {
 	position: fixed;
 	left: 80px;

@@ -24,19 +24,5 @@ namespace ScsContentMigrator
 				}
 			}
 		}
-
-		public static IEnumerable<string> GetYamlTree(this Item item)
-		{
-			Stack<Item> i = new Stack<Item>();
-			i.Push(item);
-			while (i.Any())
-			{
-				Item currentItem = i.Pop();
-				yield return currentItem.GetYaml();
-				foreach (Item child in currentItem.Children)
-					i.Push(child);
-			}
-		}
-
 	}
 }

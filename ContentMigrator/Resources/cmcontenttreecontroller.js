@@ -18,7 +18,7 @@
 			CMfactory.getDiff(id, vm.server).then(function(response) {
 				events.lastClicked = response.data;
 				events.diff = id;
-				vm.setupCompare(events.lastClicked.Compare, false, events);
+				vm.setupCompare(events.lastClicked.Compare, events.showAll, events);
 			});
 		}
 		vm.setupCompare = function (compare, skipValidation, events) {
@@ -41,9 +41,12 @@
 		}
 		$scope.init = function (nodeId, selectedId, events, server, database) {
 			vm.events = events;
+			vm.data = nodeId;
+			if (typeof(nodeId) === "object")
+				vm.data.loading = true;
 			if (!server.MissingRemote) {
 				vm.server = server;
-				CMfactory.contentTree(nodeId, database, server).then(function (response) {
+				CMfactory.contentTree(nodeId.Id, database, server).then(function (response) {
 					vm.data = response.data;
 					if (server)
 						events.server = server;
@@ -52,6 +55,7 @@
 				});
 			} else {
 				vm.data = server;
+				vm.data.loading = false;
 				vm.data.Nodes = new Array();
 			}
 			if (typeof (selectedId) !== "undefined" && typeof (events.relatedIds) !== "undefined")

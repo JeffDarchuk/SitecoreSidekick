@@ -27,7 +27,7 @@ namespace SitecoreSidekick.Core
 			Roles = roles.Split('|').Where(x => !x.IsWhiteSpaceOrNull()).ToList();
 			Users = users.Split('|').Where(x => !x.IsWhiteSpaceOrNull()).ToList();
 		}
-		public void Process(PipelineArgs args)
+		public virtual void Process(PipelineArgs args)
 		{
 			ScsMainRegistration.RegisterSideKick(this);
 		}

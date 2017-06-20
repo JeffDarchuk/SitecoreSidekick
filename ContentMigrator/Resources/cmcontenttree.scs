@@ -11,36 +11,38 @@
 
 		</div>
 		<a hidefocus="true" ng-class="events.selectedIds.indexOf(vm.data.Id) !== -1 ? 'scContentTreeNodeActive':'scContentTreeNodeNormal'" style="position: relative;" ng-click="events.click(vm.data);">
+			<span class="cmloading" ng-if="!vm.error" ng-hide="!vm.data.loading">
+				<img src="/scs/cm/resources/cmspinner.gif" />
+			</span>
 			<span ng-repeat="status in vm.data.Status" ng-class="status.Item1" ng-click="vm.buildDiff(status.Item1, vm.data.Id, events)" ng-attr-title="{{status.Item2}}" class="cmcompare"></span>
 			<span ng-if="vm.data.Icon" class="scContentTreeSelectable">
 				<img ng-if="!server.MissingRemote" ng-src="{{server}}{{vm.data.Icon}}" fallback-src="{{vm.data.FallbackIcon}}" alt-src="{{vm.data.AltIcon}}" width="16" height="16" class="scContentTreeNodeIcon" alt="" border="0" />
 				<img ng-if="server.MissingRemote" ng-src="{{vm.data.Icon}}" width="16" height="16" class="scContentTreeNodeIcon" alt="" border="0" />
 				{{vm.data.DisplayName}}
 			</span>
-			<span ng-if="!vm.error" ng-hide="vm.data.Icon">
-				<img src="/scs/cm/resources/cmspinner.gif" />
-			</span>
-			<div class="cmdifftableroot cmdifftabletree" ng-if="events.diff && events.diff === vm.data.Id">
-				<span ng-repeat="(key, value) in events.lastClicked.Compare" ng-class="{'cmdifftab cmdiffselectedtab' : key === events.difflang, 'cmdifftab' : key !== eventas.difflang}" ng-if="value.valid" ng-click="events.difflang = key">{{key}}</span>
-				<div ng-repeat="(key, value) in events.lastClicked.Compare" >
-					
-					<table id ="cmdifftable" class="cmdifftable" ng-if="events.difflang === key">
-						<tr ng-repeat="compare in value" ng-if="compare.valid">
-							<td>{{compare.Item1}}</td>
-							<td><pre ng-bind-html="compare.Item2 | sanitize"></pre></td>
-						</tr>
-					</table>
-				</div>
-				<table style="display:table;" class="cmdifftable" ng-if="events.difflang === 'none'">
-					<tr>
-						<td><h4>All differences are in system fields.  Check the 'Show system fields in diff view.' option to see them.</h4></td>
+		</a>
+		<div class="cmdifftableroot cmdifftabletree" ng-if="events.diff && events.diff === vm.data.Id">
+			<span ng-repeat="(key, value) in events.lastClicked.Compare" ng-class="{'cmdifftab cmdiffselectedtab' : key === events.difflang, 'cmdifftab' : key !== events.difflang}" ng-if="value.valid" ng-click="events.difflang = key">{{key}}</span>
+			<div ng-repeat="(key, value) in events.lastClicked.Compare">
+				<table id="cmdifftable" class="cmdifftable" ng-if="events.difflang === key">
+					<tr ng-if="events.showAll" ><td colspan="2" class="cmdiffheading"><h3>{{events.lastClicked.DisplayName}}</h3><span class="btn cmwhite" ng-click="events.showAll = false; vm.setupCompare(events.lastClicked.Compare, false, events)">Hide system fields</span></td="2"></tr>
+					<tr ng-if="!events.showAll"><td colspan="2" class="cmdiffheading"><h3>{{events.lastClicked.DisplayName}}</h3><span class="btn cmwhite" ng-click="events.showAll = true; vm.setupCompare(events.lastClicked.Compare, true, events)">Show system fields</span></td></tr>
+					<tr ng-repeat="compare in value" ng-if="compare.valid">
+						<td>{{compare.Item1}}</td>
+						<td><pre ng-bind-html="compare.Item2 | sanitize"></pre></td>
 					</tr>
 				</table>
 			</div>
-		</a>
+			<table style="display:table;" class="cmdifftable" ng-if="events.difflang === 'none'">
+				<tr><td class="btn" ng-click="events.showAll = true; vm.setupCompare(events.lastClicked.Compare, true, events)">Show system fields</td></tr>
+				<tr>
+					<td><h4>All differences are in system fields.  Check the 'Show system fields in diff view.' option to see them.</h4></td>
+				</tr>
+			</table>
+		</div>
 		<div ng-if="vm.Open" class="scContentTreeIndent" ng-repeat="item in vm.data.Nodes">
-			<cmcontenttree ng-if="!item.MissingRemote" parent="item.Id" database="item.DatabaseName" selected="selected" events="events" server="server"></cmcontenttree>
-			<cmcontenttree ng-if="item.MissingRemote" parent="item.Id" database="item.DatabaseName" selected="selected" events="events" server="item"></cmcontenttree>
+			<cmcontenttree ng-if="!item.MissingRemote" parent="item" database="item.DatabaseName" selected="selected" events="events" server="server"></cmcontenttree>
+			<cmcontenttree ng-if="item.MissingRemote" parent="item" database="item.DatabaseName" selected="selected" events="events" server="item"></cmcontenttree>
 		</div>
 	</div>
 	<pre ng-if="vm.error" class="scserror">{{vm.error}}</pre>

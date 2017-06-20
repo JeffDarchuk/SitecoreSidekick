@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using ScsContentMigrator.Args;
 
 namespace ScsContentMigrator
@@ -12,8 +13,13 @@ namespace ScsContentMigrator
 
 		public string PullContentItem(RemoteContentPullArgs args)
 		{
-			OperationStatus status = RegisterEvent(args);
-			return status.OperationId;
+			var id = Guid.NewGuid().ToString();
+			Task.Run(() =>
+			{
+				RegisterEvent(args, id);
+			});
+
+			return id;
 		}
 
 		public static bool StopOperation(string operationId)
@@ -25,11 +31,10 @@ namespace ScsContentMigrator
 			}
 			return false;
 		}
-		internal static OperationStatus RegisterEvent(RemoteContentPullArgs args)
+		internal static OperationStatus RegisterEvent(RemoteContentPullArgs args, string newOperationId)
 		{
-			var ret = Guid.NewGuid().ToString();
-			Operation[ret] = new OperationStatus(args, ret);
-			return Operation[ret];
+			Operation[newOperationId] = new OperationStatus(args, newOperationId);
+			return Operation[newOperationId];
 		}
 
 		public static IEnumerable<dynamic> GetRunningOperations()

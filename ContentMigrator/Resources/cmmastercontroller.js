@@ -25,6 +25,7 @@
 			'difflang': 'none',
 			'diffreset': true,
 			'standardValues': false,
+			'showAll': true,
 			'validateDiffRow': function (field, diff) {
 				if (!this.standardValues && field.substring(0, 2) === "__") return false;
 				if (!this.standardValues && diff === "~") return false;

@@ -16,6 +16,7 @@ using Sitecore.Data.Managers;
 using Sitecore.Diagnostics;
 using Sitecore.SecurityModel;
 using SitecoreSidekick.ContentTree;
+using Version = Sitecore.Data.Version;
 
 namespace ScsContentMigrator.Data
 {
@@ -72,51 +73,65 @@ namespace ScsContentMigrator.Data
 			Compare = new Dictionary<string, List<Tuple<string, string>>>();
 			IItemData itemData = null;
 			itemData = Data == null ? RemoteContentService.GetRemoteItemData(new ContentTreeModel() {Children = false, Database = DatabaseName, Id = Id, Server = server}) : RemoteContentService.DeserializeYaml(Data, Id);
-			var localItem = Factory.GetDatabase("master", true).DataManager.DataEngine.GetItem(new ID(Id), LanguageManager.DefaultLanguage, Sitecore.Data.Version.Latest);
-
-			foreach (var chk in itemData.SharedFields)
+			using (new SecurityDisabler())
 			{
+				var localItem = Factory.GetDatabase("master", true).DataManager.DataEngine.GetItem(new ID(Id), LanguageManager.DefaultLanguage, Sitecore.Data.Version.Latest);
 
-				if (AreFieldsEqual(localItem.Fields[new ID(chk.FieldId)], chk))
+				foreach (var chk in itemData.SharedFields)
 				{
-					continue;
-				}
 
-				if (!Compare.ContainsKey("shared"))
-				{
-					Compare["shared"] = new List<Tuple<string, string>>();
-				}
-
-				Compare["shared"].Add(chk.BlobId != null
-					? new Tuple<string, string>(chk.NameHint, "Blob value changed")
-					: new Tuple<string, string>(chk.NameHint, HtmlDiff.HtmlDiff.Execute(HttpUtility.HtmlEncode(localItem[new ID(chk.FieldId)].Replace("\r", "")), HttpUtility.HtmlEncode(chk.Value.Replace("\r", "")))));
-			}
-
-			foreach (var ver in itemData.Versions.GroupBy(x => x.Language.Name)
-				.Select(x => x.OrderBy(o => o.VersionNumber).Last())
-				.Union(itemData.UnversionedFields))
-			{
-				Item languageItem = localItem.Database.DataManager.DataEngine.GetItem(new ID(Id), LanguageManager.GetLanguage(ver.Language.Name), Sitecore.Data.Version.Latest);
-
-				foreach (var chk in ver.Fields)
-				{
-					if (AreFieldsEqual(languageItem.Fields[new ID(chk.FieldId)], chk))
+					if (AreFieldsEqual(localItem.Fields[new ID(chk.FieldId)], chk))
 					{
 						continue;
 					}
 
-					if (!Compare.ContainsKey(ver.Language.Name))
+					if (!Compare.ContainsKey("shared"))
 					{
-						Compare[ver.Language.Name] = new List<Tuple<string, string>>();
+						Compare["shared"] = new List<Tuple<string, string>>();
 					}
 
-					Compare[ver.Language.Name].Add(chk.BlobId != null
+					Compare["shared"].Add(chk.BlobId != null
 						? new Tuple<string, string>(chk.NameHint, "Blob value changed")
-						: new Tuple<string, string>(chk.NameHint, HtmlDiff.HtmlDiff.Execute(HttpUtility.HtmlEncode(languageItem[new ID(chk.FieldId)].Replace("\r", "")), HttpUtility.HtmlEncode(chk.Value.Replace("\r", "")))));
+						: new Tuple<string, string>(chk.NameHint, HtmlDiff.HtmlDiff.Execute(HttpUtility.HtmlEncode(localItem[new ID(chk.FieldId)].Replace("\r", "")), HttpUtility.HtmlEncode(chk.Value.Replace("\r", "")))));
+				}
+				foreach (var ver in itemData.Versions)
+				{
+					Item verItem = localItem.Database.DataManager.DataEngine.GetItem(new ID(Id), LanguageManager.GetLanguage(ver.Language.Name), Version.Parse(ver.VersionNumber));
+					foreach (var verfield in ver.Fields)
+					{
+						if (AreFieldsEqual(verItem.Fields[new ID(verfield.FieldId)], verfield))
+						{
+							continue;
+						}
+						string key = ver.Language.Name + " V" + ver.VersionNumber;
+						if (!Compare.ContainsKey(key))
+						{
+							Compare[key] = new List<Tuple<string, string>>();
+						}
+						Compare[key].Add(verfield.BlobId != null
+							? new Tuple<string, string>(verfield.NameHint, "Blob value changed")
+							: new Tuple<string, string>(verfield.NameHint, HtmlDiff.HtmlDiff.Execute(HttpUtility.HtmlEncode(localItem[new ID(verfield.FieldId)].Replace("\r", "")), HttpUtility.HtmlEncode(verfield.Value.Replace("\r", "")))));
+					}
+				}
+				foreach (var unver in itemData.UnversionedFields)
+				{
+					Item verItem = localItem.Database.DataManager.DataEngine.GetItem(new ID(Id), LanguageManager.GetLanguage(unver.Language.Name), Version.Latest);
+					foreach (var unverfield in unver.Fields)
+					{
+						if (AreFieldsEqual(verItem.Fields[new ID(unverfield.FieldId)], unverfield))
+						{
+							continue;
+						}
+						if (!Compare.ContainsKey(unver.Language.Name))
+						{
+							Compare[verItem.Language.Name] = new List<Tuple<string, string>>();
+						}
+						Compare[unver.Language.Name].Add(unverfield.BlobId != null
+							? new Tuple<string, string>(unverfield.NameHint, "Blob value changed")
+							: new Tuple<string, string>(unverfield.NameHint, HtmlDiff.HtmlDiff.Execute(HttpUtility.HtmlEncode(localItem[new ID(unverfield.FieldId)].Replace("\r", "")), HttpUtility.HtmlEncode(unverfield.Value.Replace("\r", "")))));
+					}
 				}
 			}
-
-
 		}
 		public void SimpleCompare(string database, string itemId)
 		{
@@ -132,11 +147,7 @@ namespace ScsContentMigrator.Data
 					}
 
 					ChildChanged = Checksum != ContentMigrationRegistration.GetChecksum(localItem.ID.ToString());
-
-					if (ChildChanged)
-					{
-						Status.Add(new Tuple<string, string>("cmchildchanged", "There are changes in the children of this item."));
-					}
+					
 					if (Revision != localItem[FieldIDs.Revision])
 					{
 						Status.Add(new Tuple<string, string>("cmfieldchanged", "This content item exists on the local server, however the fields have different values."));
@@ -144,6 +155,10 @@ namespace ScsContentMigrator.Data
 					else
 					{
 						Status.Add(new Tuple<string, string>("cmequal", "This content item is equivalent on the source and target servers."));
+					}
+					if (ChildChanged)
+					{
+						Status.Add(new Tuple<string, string>("cmchildchanged", "There are changes in the children of this item."));
 					}
 					HashSet<string> tracker = new HashSet<string>();
 

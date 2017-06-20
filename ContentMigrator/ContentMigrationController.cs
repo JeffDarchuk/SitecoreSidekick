@@ -95,14 +95,20 @@ namespace ScsContentMigrator
 		[ActionName("cmbuilddiff.scsvc")]
 		public ActionResult BuildDiff(DiffRequestModel model)
 		{
-			CompareContentTreeNode ret = new CompareContentTreeNode(Factory.GetDatabase("master").GetItem(model.Id), false);
-			ret.BuildDiff(model.Server);
-			return ScsJson(ret);
+			using (new SecurityDisabler())
+			{
+				CompareContentTreeNode ret = new CompareContentTreeNode(Factory.GetDatabase("master").GetItem(model.Id), false);
+				ret.BuildDiff(model.Server);
+				return ScsJson(ret);
+			}
 		}
 
 		private object OperationQueueLength(string operationId)
 		{
-			return RemoteContentPuller.GetOperation(operationId).QueuedItems();
+			var operation = RemoteContentPuller.GetOperation(operationId);
+			if (operation != null)
+				return operation.QueuedItems();
+			return null;
 		}
 
 		private object StartPreviewAsPull(string operationId)
@@ -167,10 +173,6 @@ namespace ScsContentMigrator
 			using (new SecurityDisabler())
 			{
 				Item item = db.GetItem(data.Id ?? data.Ids.FirstOrDefault());
-				if (data.Children)
-				{
-					return item.GetYamlTree().ToList();
-				}
 
 				return new List<string> { item.GetYaml() };
 			}

@@ -72,7 +72,7 @@ namespace ScsContentMigrator.Data
 		{
 			Compare = new Dictionary<string, List<Tuple<string, string>>>();
 			IItemData itemData = null;
-			itemData = Data == null ? RemoteContentService.GetRemoteItemData(new ContentTreeModel() {Children = false, Database = DatabaseName, Id = Id, Server = server}) : RemoteContentService.DeserializeYaml(Data, Id);
+			itemData = Data == null ? RemoteContentService.GetRemoteItemData(new ContentTreeModel() { Children = false, Database = DatabaseName, Id = Id, Server = server }) : RemoteContentService.DeserializeYaml(Data, Id);
 			using (new SecurityDisabler())
 			{
 				var localItem = Factory.GetDatabase("master", true).DataManager.DataEngine.GetItem(new ID(Id), LanguageManager.DefaultLanguage, Sitecore.Data.Version.Latest);
@@ -94,8 +94,17 @@ namespace ScsContentMigrator.Data
 						? new Tuple<string, string>(chk.NameHint, "Blob value changed")
 						: new Tuple<string, string>(chk.NameHint, HtmlDiff.HtmlDiff.Execute(HttpUtility.HtmlEncode(localItem[new ID(chk.FieldId)].Replace("\r", "")), HttpUtility.HtmlEncode(chk.Value.Replace("\r", "")))));
 				}
+				Dictionary<string, int> tracker = new Dictionary<string, int>();
 				foreach (var ver in itemData.Versions)
 				{
+					if (!tracker.ContainsKey(LanguageManager.GetLanguage(ver.Language.Name).Name))
+					{
+						tracker.Add(LanguageManager.GetLanguage(ver.Language.Name).Name, 1);
+					}
+					else
+					{
+						tracker[LanguageManager.GetLanguage(ver.Language.Name).Name]++;
+					}
 					Item verItem = localItem.Database.DataManager.DataEngine.GetItem(new ID(Id), LanguageManager.GetLanguage(ver.Language.Name), Version.Parse(ver.VersionNumber));
 					foreach (var verfield in ver.Fields)
 					{
@@ -103,7 +112,7 @@ namespace ScsContentMigrator.Data
 						{
 							continue;
 						}
-						string key = ver.Language.Name + " V" + ver.VersionNumber;
+						string key = ver.Language.Name + " v" + ver.VersionNumber;
 						if (!Compare.ContainsKey(key))
 						{
 							Compare[key] = new List<Tuple<string, string>>();
@@ -111,6 +120,32 @@ namespace ScsContentMigrator.Data
 						Compare[key].Add(verfield.BlobId != null
 							? new Tuple<string, string>(verfield.NameHint, "Blob value changed")
 							: new Tuple<string, string>(verfield.NameHint, HtmlDiff.HtmlDiff.Execute(HttpUtility.HtmlEncode(localItem[new ID(verfield.FieldId)].Replace("\r", "")), HttpUtility.HtmlEncode(verfield.Value.Replace("\r", "")))));
+					}
+				}
+				foreach (var lang in localItem.Languages.Where(x => !tracker.ContainsKey(x.Name)))
+				{
+					Item langItem = localItem.Database.DataManager.DataEngine.GetItem(new ID(Id), lang, Version.Latest);
+					for (int ver = 1; ver <= langItem.Versions.Count; ver++)
+					{
+						string key = "Extra version";
+						if (!Compare.ContainsKey(key))
+						{
+							Compare[key] = new List<Tuple<string, string>>();
+						}
+						Compare[key].Add(new Tuple<string, string>("Extra local version exists that's not on the remote.", $"{lang.Name} v{ver}"));
+					}
+				}
+				foreach (var lang in localItem.Languages.Where(x => tracker.ContainsKey(x.Name)))
+				{
+					Item langItem = localItem.Database.DataManager.DataEngine.GetItem(new ID(Id), lang, Version.Latest);
+					for (int ver = tracker[lang.Name]+1; ver <= langItem.Versions.Count; ver++)
+					{
+						string key = "Extra version";
+						if (!Compare.ContainsKey(key))
+						{
+							Compare[key] = new List<Tuple<string, string>>();
+						}
+						Compare[key].Add(new Tuple<string, string>("Extra local version exists that's not on the remote.", $"{lang.Name} v{ver}"));
 					}
 				}
 				foreach (var unver in itemData.UnversionedFields)
@@ -132,6 +167,7 @@ namespace ScsContentMigrator.Data
 					}
 				}
 			}
+
 		}
 		public void SimpleCompare(string database, string itemId)
 		{
@@ -146,8 +182,8 @@ namespace ScsContentMigrator.Data
 						Status.Add(new Tuple<string, string>("cmmissing", "This content item only exists on the remote server."));
 					}
 
-					ChildChanged = Checksum != ContentMigrationRegistration.GetChecksum(localItem.ID.ToString());
-					
+					ChildChanged = Checksum != ContentMigrationRegistration.GetChecksum(localItem.ID.ToString()) && ((bool)localItem?.HasChildren);
+
 					if (Revision != localItem[FieldIDs.Revision])
 					{
 						Status.Add(new Tuple<string, string>("cmfieldchanged", "This content item exists on the local server, however the fields have different values."));

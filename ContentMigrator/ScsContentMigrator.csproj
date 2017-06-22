@@ -67,6 +67,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -112,6 +113,7 @@
     <Compile Include="ContentAgent.cs" />
     <Compile Include="ContentMigrationController.cs" />
     <Compile Include="ContentMigrationRegistration.cs" />
+    <Compile Include="Data\ChecksumGenerator.cs" />
     <Compile Include="Data\CompareContentTreeNode.cs" />
     <Compile Include="ErrorItemData.cs" />
     <Compile Include="MchapOrLoggedInAttribute.cs" />

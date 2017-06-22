@@ -29,6 +29,10 @@
 				var data = { "operationId": operationId, "lineNumber": lineNumber };
 				return $http.post("/scs/cm/cmopeartionstatus.scsvc", data);
 			},
+			operationLog: function(operationId, lineNumber) {
+				var data = { "operationId": operationId, "lineNumber": lineNumber };
+				return $http.post("/scs/cm/cmopeartionlog.scsvc", data);
+			},
 			operations: function() {
 				return $http.get("/scs/cm/cmoperationlist.scsvc");
 			},

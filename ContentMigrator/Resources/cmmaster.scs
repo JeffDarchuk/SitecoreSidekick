@@ -7,6 +7,7 @@
 		<fieldset ng-if="!vm.serverModified">
 			<legend>Select a content item to pull</legend>
 			<div>
+				<span><i class="cmmultiroot">Ctr+Click to select multiple roots.</i></span>
 				<cmcontenttree parent="''" database="'master'" selected="vm.events.selectedIds" events="vm.events" server="vm.server" standardValues="vm.diffStandardValues"></cmcontenttree>
 				<p>
 					<strong>Legend</strong><br/>
@@ -120,12 +121,16 @@
 			<tr><td class="cmresultslabel"><strong>Elapsed time:</strong></td><td>{{vm.response.Time}} seconds</td></tr>
 			<tr><td class="cmresultslabel"><strong>Date Completed:</strong></td><td>{{vm.response.Date}}</td> </tr>
 		</table>
+		<div>
+			<div ng-if="vm.displayLog" class="btn" ng-click="vm.displayLog = false;vm.getStatus();">Show Items</div>
+		<div ng-if="!vm.displayLog" class="btn" ng-click="vm.displayLog = true;vm.getStatus();">Show Log</div>
+		</div>
 		<div ng-if="vm.spinner">Items in queue: {{vm.queuedItems}}</div>
-		<a ng-repeat="results in vm.response" class="btn cmtab" ng-class="{cmselectedtab: vm.response[results.name].show}" ng-show="results.length > 0 && results.name" ng-click="vm.toggle(results.name)"> {{results.displayName}} - {{results.length}}</a>
+		<a ng-repeat="results in vm.response" class="btn cmtab" ng-class="{cmselectedtab: vm.response[results.name].show}" ng-show="results.length > 0 && results.name && !vm.displayLog" ng-click="vm.toggle(results.name)"> {{results.displayName}} - {{results.length}}</a>
 	</div>
 	<div style="position:fixed;left:100px;top:120px;" class="cmdifftableroot" ng-if="vm.resultDiff">
 		<span class="cmdifftab cmdiffselectedtab cmviewresult"><a title="Click to open this item in the Content Editor." class="cmopenresult fancybox fancybox.iframe" href="/sitecore/shell/Applications/Content%20Editor.aspx?sc_content=master&fo={{vm.resultId}}">→</a></span>
-		<span ng-repeat="(key, value) in vm.resultDiff" ng-class="{'cmdifftab cmdiffselectedtab' : key === vm.events.difflang, 'cmdifftab' : key !== vm.events.difflang}" ng-if="value.valid" ng-click="vm.events.difflang = key">{{key}}</span>
+		<span ng-repeat="(key, value) in vm.resultDiff" ng-class="{'cmdifftab cmdiffselectedtab' : key === vm.events.difflang, 'cmdifftab' : key !== vm.events.difflang}" ng-click="vm.events.difflang = key">{{key}}</span>
 		
 		<div ng-repeat="(key, value) in vm.resultDiff">
 
@@ -137,24 +142,25 @@
 			</table>
 		</div>
 	</div>
-	<div ng-repeat="results in vm.response">
+
+	<div ng-if="!vm.displayLog" ng-repeat="results in vm.response">
 		<div class="cmtabpane" ng-if="results.show">
 			<dir-pagination-controls pagination-id="results.name  +'pagination' " template-url="/scs/platform/resources/scsdirpagination.scs">
 			</dir-pagination-controls>
 			<div class="cmresults">
 				<span dir-paginate="item in results | itemsPerPage:100" pagination-id="{{results.name}}pagination">
-					<span class="cmerrorpane" ng-if="results.name === 'Error'">
+					<span class="cmerrorpane" ng-if="results.name === 'Error' || results.name === 'Warning'">
 						<h4>{{item.Name}}</h4>
 						<pre>{{item.Path}}</pre>
 					</span>
-					<span ng-if="results.name !== 'Error' && !vm.isEmptyObject(item.Events)">
-						<a class="btn cmresult" ng-click="vm.resultDiff = item.Events;vm.resultId=item.Id;vm.setupCompare(item.Events, true)">
+					<span ng-if="results.name !== 'Error' && results.name !== 'Warning' && !vm.isEmptyObject(item.Events)">
+						<a class="btn cmresult" ng-click="vm.initializeDiff(item.Events, item.Id)">
 							<img ng-src="{{item.Icon}}" />
 							<h4>{{item.Name}}</h4>
 							<div ng-if="vm.showPath">{{item.Path}}</div>
 						</a>
 					</span>
-					<span ng-if="results.name !== 'Error' && vm.isEmptyObject(item.Events)">
+					<span ng-if="results.name !== 'Error' && results.name !== 'Warning' && vm.isEmptyObject(item.Events)">
 						<a title="Click to open this item in the Content Editor." class="btn cmresult fancybox fancybox.iframe" href="/sitecore/shell/Applications/Content%20Editor.aspx?sc_content=master&fo={{vm.resultId}}">
 							<img ng-src="{{item.Icon}}" />
 							<h4>{{item.Name}}</h4>
@@ -164,6 +170,16 @@
 				</span>
 			</div>
 		</div>
+	</div>
+	<div class="cmlog" ng-if="vm.displayLog">
+		<dir-pagination-controls pagination-id="logpagination" template-url="/scs/platform/resources/scsdirpagination.scs">
+		</dir-pagination-controls>
+		<table>
+			<tr dir-paginate="item in vm.response.log | itemsPerPage:100" pagination-id="logpagination">
+				<td class="cmlogheading">{{item[0]}}</td><td>{{item[1]}}</td>
+			</tr>
+		</table>
+		
 	</div>
 	<pre ng-if="vm.error" class="scserror">{{vm.error}}</pre>
 </div>

@@ -105,8 +105,8 @@ namespace ScsContentMigrator
 			{
 				return node;
 			}
-
-			node.SimpleCompare(args.Database, itemId);
+			if (!string.IsNullOrWhiteSpace(itemId))
+				node.SimpleCompare(args.Database, itemId);
 
 			return node;
 		}

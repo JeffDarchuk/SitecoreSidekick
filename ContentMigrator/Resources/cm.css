@@ -174,7 +174,7 @@ td.cmresultslabel {
 	background-color: rgb(240, 240, 240);
 	color: black;
 	border-bottom: none;
-	padding-bottom: 3px;
+	padding-bottom: 2px;
 	top: 0;
 }
 
@@ -220,4 +220,21 @@ td.cmresultslabel {
 	left: 80px;
 	z-index: 100;
 	top: 125px;
+}
+.cmmultiroot {
+	display: inline-block;
+	padding-bottom: 5px;
+}
+.cmlog td:nth-child(even) {
+	background-color: #eee;
+	border-top: thin solid black;
+	border-bottom: thin solid black;
+}
+.cmlog td {
+	padding: 5px;
+}
+.cmlogheading {
+	white-space: nowrap;
+	color: darkgreen;
+	font-weight: bold;
 }

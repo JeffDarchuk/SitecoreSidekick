@@ -9,6 +9,7 @@ using Sitecore.Data;
 using Sitecore.Data.Fields;
 using Sitecore.Data.Items;
 using Sitecore.Data.Managers;
+using Sitecore.Diagnostics;
 
 namespace ScsContentMigrator.CMRainbow
 {
@@ -61,72 +62,93 @@ namespace ScsContentMigrator.CMRainbow
 		public void CreatedNewItem(Item targetItem)
 		{
 			BeginEvent(targetItem, "Created", GetSrc(ThemeManager.GetIconImage(targetItem, 32, 32, "", "")), false);
-			LoggerOutput.Add("Created new item at target: " +targetItem.ID);
+			string status = $"{DateTime.Now:h:mm:ss tt} [CREATED] Created new item {targetItem.DisplayName} - {targetItem.ID}";
+			LoggerOutput.Add(status);
+			Log.Info(status, this);
 		}
 
 		public void MovedItemToNewParent(Item newParentItem, Item oldParentItem, Item movedItem)
 		{
 			BeginEvent(movedItem, "Moved", GetSrc(ThemeManager.GetIconImage(movedItem, 32, 32, "", "")), false);
-			LoggerOutput.Add($"Moved Item {movedItem.ID} from {oldParentItem.ID} to {newParentItem.ID}");
+			string status = $"{DateTime.Now:h:mm:ss tt} [MOVED] Moved Item {movedItem.ID} from {oldParentItem.ID} to {newParentItem.ID}";
+			LoggerOutput.Add(status);
+			Log.Info(status, this);
 		}
 
 		public void RemovingOrphanedVersion(Item versionToRemove)
 		{
-			BeginEvent(versionToRemove, "Removed", GetSrc(ThemeManager.GetIconImage(versionToRemove, 32, 32, "", "")), false);
-			LoggerOutput.Add($"Removing orphaned item {versionToRemove.ID}");
+			BeginEvent(versionToRemove.DisplayName + " v"+versionToRemove.Version.Number, versionToRemove.ID.ToString(), versionToRemove.Paths.FullPath , "Removed Version", GetSrc(ThemeManager.GetIconImage(versionToRemove, 32, 32, "", "")), versionToRemove.Database.Name, false);
+			string status = $"{DateTime.Now:h:mm:ss tt} [REMOVED VERSION] Removing orphaned item version {versionToRemove.DisplayName} v{versionToRemove.Version.Number} - {versionToRemove.ID}";
+			LoggerOutput.Add(status);
+			Log.Info(status, this);
 
 		}
 
 		public void RenamedItem(Item targetItem, string oldName)
 		{
 			BeginEvent(targetItem, "Renamed", GetSrc(ThemeManager.GetIconImage(targetItem, 32, 32, "", "")), false);
-			LoggerOutput.Add($"Renaming item {targetItem.ID} from name {oldName} to {targetItem.Name}");
+			string status = $"{DateTime.Now:h:mm:ss tt} [RENAMED] Renaming item {targetItem.DisplayName} - {targetItem.ID} from name {oldName} to {targetItem.Name}";
+			LoggerOutput.Add(status);
+			Log.Info(status, this);
 		}
 
 		public void ChangedBranchTemplate(Item targetItem, string oldBranchId)
 		{
 			BeginEvent(targetItem, "Branch Change", GetSrc(ThemeManager.GetIconImage(targetItem, 32, 32, "", "")), false);
-			LoggerOutput.Add($"Branch Template moved for item {targetItem.ID} from {oldBranchId} to {targetItem.BranchId}");
+			string status = $"{DateTime.Now:h:mm:ss tt} [BRANCH MOVED] Branch Template moved for item {targetItem.DisplayName} - {targetItem.ID} from {oldBranchId} to {targetItem.BranchId}";
+			LoggerOutput.Add(status);
+			Log.Info(status, this);
 		}
 
 		public void ChangedTemplate(Item targetItem, TemplateItem oldTemplate)
 		{
 			BeginEvent(targetItem, "Template Change", GetSrc(ThemeManager.GetIconImage(targetItem, 32, 32, "", "")), false);
-			LoggerOutput.Add($"Template changed for item {targetItem.ID} from {oldTemplate.ID} to {targetItem.TemplateID}");
+			string status = $"{DateTime.Now:h:mm:ss tt} [TEMPLATE CHANGED] Template changed for item {targetItem.DisplayName} - {targetItem.ID} from {oldTemplate.ID} to {targetItem.TemplateID}";
+			LoggerOutput.Add(status);
+			Log.Info(status, this);
 		}
 
 		public void AddedNewVersion(Item newVersion)
 		{
 			BeginEvent(newVersion, "New Version", GetSrc(ThemeManager.GetIconImage(newVersion, 32, 32, "", "")), false);
-			LoggerOutput.Add($"Added new version for item {newVersion.ID}");
+			string status = $"{DateTime.Now:h:mm:ss tt} [ADDED VERSION] Added new version for item {newVersion.DisplayName} - {newVersion.ID}";
+			LoggerOutput.Add(status);
+			Log.Info(status, this);
 		}
 
 		public void WroteBlobStream(Item item, IItemFieldValue field)
 		{
 			BeginEvent(item, "Wrote Blob", GetSrc(ThemeManager.GetIconImage(item, 32, 32, "", "")), false);
-			LoggerOutput.Add($"Wrote blob stream for item {item.ID}");
+			string status = $"{DateTime.Now:h:mm:ss tt} [WROTE BLOB] Wrote blob stream for item {item.DisplayName} - {item.ID}";
+			LoggerOutput.Add(status);
+			Log.Info(status, this);
 		}
 
 		public void UpdatedChangedFieldValue(Item item, IItemFieldValue field, string oldValue)
 		{
-			
-			LoggerOutput.Add($"Field {field.NameHint} value changed for item {item.ID} from {oldValue} to {item[new ID(field.FieldId)]}");
+			string status = $"{DateTime.Now:h:mm:ss tt} [FIELD CHANGED] Field {field.NameHint} value changed for item {item.DisplayName} - {item.ID} from {oldValue} to {item[new ID(field.FieldId)]}";
+			LoggerOutput.Add(status);
+			Log.Info(status, this);
 			if (!LinesSupport.ContainsKey(item.ID.Guid.ToString()))
 				LinesSupport[item.ID.Guid.ToString()] = new {Events = new Dictionary<string, List<Tuple<string, string>>>()};
-			if (!LinesSupport[item.ID.Guid.ToString()].Events.ContainsKey(item.Language.Name))
-				LinesSupport[item.ID.Guid.ToString()].Events[item.Language.Name] = new List<Tuple<string, string>>();
-			LinesSupport[item.ID.Guid.ToString()].Events[item.Language.Name].Add(new Tuple<string, string>(field.NameHint,
+			if (!LinesSupport[item.ID.Guid.ToString()].Events.ContainsKey(item.Language.Name + " v" + item.Version.Number))
+				LinesSupport[item.ID.Guid.ToString()].Events[item.Language.Name + " v" + item.Version.Number] = new List<Tuple<string, string>>();
+			LinesSupport[item.ID.Guid.ToString()].Events[item.Language.Name + " v" + item.Version.Number].Add(new Tuple<string, string>(field.NameHint,
 				HtmlDiff.HtmlDiff.Execute(HttpUtility.HtmlEncode(oldValue), HttpUtility.HtmlEncode(item[new ID(field.FieldId)]))));
 		}
 
 		public void ResetFieldThatDidNotExistInSerialized(Field field)
 		{
-			LoggerOutput.Add($"Reset a field {field.Name} that doesn't exist in serialized item ");
+			string status = $"{DateTime.Now:h:mm:ss tt} [FIELD RESET] Reset a field {field.Name} that doesn't exist in item {field.Item.DisplayName} - {field.Item.ID}";
+			LoggerOutput.Add(status);
+			Log.Info(status, this);
 		}
 
 		public void SkippedPastingIgnoredField(Item item, IItemFieldValue field)
 		{
-			LoggerOutput.Add($"Skipped an ignored field {field.NameHint} in item {item.ID} ");
+			string status = $"{DateTime.Now:h:mm:ss tt} [SKIPPED] Skipped an ignored field {field.NameHint} in item {item.DisplayName} - {item.ID} ";
+			LoggerOutput.Add(status);
+			Log.Info(status, this);
 		}
 	}
 }

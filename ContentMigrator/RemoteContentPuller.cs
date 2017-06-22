@@ -57,5 +57,14 @@ namespace ScsContentMigrator
 				for (int i = lineNumber; i < Operation[operationId].Lines.Count; i++)
 					yield return Operation[operationId].Lines[i];
 		}
+
+		public static IEnumerable<string> OperationLog(string operationId, int lineNumber)
+		{
+			if (Operation == null || string.IsNullOrWhiteSpace(operationId))
+				yield break;
+			if (Operation.ContainsKey(operationId))
+				for (int i = lineNumber; i < Operation[operationId].LoggerOutput.Count; i++)
+					yield return Operation[operationId].LoggerOutput[i];
+		}
 	}
 }

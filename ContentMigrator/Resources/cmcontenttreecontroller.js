@@ -59,7 +59,7 @@
 				vm.data.Nodes = new Array();
 			}
 			if (typeof (selectedId) !== "undefined" && typeof (events.relatedIds) !== "undefined")
-					if (events.relatedIds[nodeId] || nodeId === "")
+					if (events.relatedIds[nodeId.Id] || nodeId === "")
 						vm.Open = true;
 		}
 	}

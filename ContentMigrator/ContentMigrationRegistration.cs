@@ -34,9 +34,9 @@ namespace ScsContentMigrator
 {
 	public class ContentMigrationRegistration : ScsRegistration
 	{
-		private static readonly ConcurrentDictionary<string, int> Checksum = new ConcurrentDictionary<string, int>();
+		private static ChecksumGenerator Checksum = new ChecksumGenerator();
 		private static readonly RemoteContentPuller _puller = new RemoteContentPuller();
-		public CompareContentTreeNode Root { get; } = new CompareContentTreeNode { DatabaseName = "master", DisplayName = "Root", Icon = "/~/icon/Applications/32x32/media_stop.png", Open = true, Nodes = new List<ContentTreeNode>() };
+		public static CompareContentTreeNode Root { get; } = new CompareContentTreeNode { DatabaseName = "master", DisplayName = "Root", Icon = "/~/icon/Applications/32x32/media_stop.png", Open = true, Nodes = new List<ContentTreeNode>() };
 		internal static int RemoteThreads = 1;
 		internal static int WriterThreads = 1;
 		public List<string> ServerList { get; } = new List<string>();
@@ -64,13 +64,17 @@ namespace ScsContentMigrator
 				int.TryParse(databaseWriterThreads, out WriterThreads);
 			}
 
-			Timer t = new Timer(60 * 1000);
-			t.Elapsed += async (sender, e) => await GenerateChecksum();
-			t.Start();
+			//Timer t = new Timer(60 * 1000);
+			//t.Elapsed += async (sender, e) => await GenerateChecksum();
+			//t.Start();
 		}
 
 		public override void Process(PipelineArgs args)
 		{
+#pragma warning disable 4014
+			//async call to rebuild the checksum that won't block startup.
+			//GenerateChecksum();
+#pragma warning restore 4014
 			if (string.IsNullOrWhiteSpace(AuthenticationSecret))
 			{
 				throw new InvalidOperationException("Sitecore Sidekick Content Migrator was initialized with an empty shared secret. Make a copy of zSCSContentMigrator.Local.config.example, rename it to .config, and set up a unique, long, randomly generated shared secret there.");
@@ -91,70 +95,19 @@ namespace ScsContentMigrator
 			ServerList.Add(node.InnerText);
 		}
 
-		private async Task GenerateChecksum(List<CompareContentTreeNode> roots = null)
+		//public static async Task GenerateChecksum()
+		//{
+		//	Task ret = Task.Run(() =>
+		//	{
+		//		Checksum = new ChecksumGenerator().Generate(Root.Nodes.Select(x => new ID(x.Id)), "master");
+		//	});
+
+		//	await ret;
+		//}
+
+		public static int GetChecksum(string id)
 		{
-			Task ret = Task.Run(() =>
-			{
-				var db = Factory.GetDatabase("master", false);
-				if (db == null) return;
-
-				foreach (CompareContentTreeNode node in roots ?? Root.Nodes.OfType<CompareContentTreeNode>())
-				{
-					// this caches the checksum value internally
-					GetChecksum(node.Id, true);
-				}
-			});
-
-			await ret;
-		}
-
-		public static int GetChecksum(string id, bool force = false, bool childrenOnly = true)
-		{
-			if (!Checksum.ContainsKey(id) || force)
-			{
-				using (new SecurityDisabler())
-				{
-					Database db = Factory.GetDatabase("master", false);
-					Stack<Item> processing = new Stack<Item>();
-					Stack<Item> checksumGeneration = new Stack<Item>();
-					processing.Push(db.GetItem(id));
-
-					while (processing.Any())
-					{
-						Item child = processing.Pop();
-						checksumGeneration.Push(child);
-						foreach (Item subchild in child.Children)
-							processing.Push(subchild);
-					}
-
-					while (checksumGeneration.Any())
-					{
-						Item cur = checksumGeneration.Pop();
-						int checksum = 0;
-						foreach (Item child in cur.Children.OrderBy(x => x.ID.ToString()))
-						{
-							checksum = (checksum + (Checksum.ContainsKey(child.ID.ToString()) ? Checksum[child.ID.ToString()].ToString() : "-1")).GetHashCode();
-						}
-						Checksum["children" + cur.ID] = checksum;
-						checksum = (checksum + cur.Statistics.Revision).GetHashCode();
-						Checksum[cur.ID.ToString()] = checksum;
-					}
-					
-				}
-			}
-			if (childrenOnly)
-			{
-				if (!Checksum.ContainsKey("children" + id))
-					return -1;
-				return Checksum["children" + id];
-			}
-
-			if (!Checksum.ContainsKey(id))
-			{
-				return -1;
-			}
-
-			return Checksum[id];
+			return Checksum.Generate(id, "master");
 		}
 		public static void StartContentSync(RemoteContentPullArgs args)
 		{
@@ -175,10 +128,6 @@ namespace ScsContentMigrator
 				if (item != null)
 				{
 					Root.Nodes.Add(new CompareContentTreeNode(item, false));
-#pragma warning disable 4014
-					// async method intentionally not awaited to allow processing in the background and this method returning
-					GenerateChecksum(new List<CompareContentTreeNode> { new CompareContentTreeNode(item) });
-#pragma warning restore 4014
 				}
 			}
 		}

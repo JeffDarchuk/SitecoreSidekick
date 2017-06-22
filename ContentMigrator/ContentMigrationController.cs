@@ -53,9 +53,16 @@ namespace ScsContentMigrator
 
 		[ScsLoggedIn]
 		[ActionName("cmopeartionstatus.scsvc")]
-		public ActionResult PullItemYaml(OperationStatusRequestModel data)
+		public ActionResult Status(OperationStatusRequestModel data)
 		{
 			return ScsJson(GetOperationStatus(data));
+		}
+
+		[ScsLoggedIn]
+		[ActionName("cmopeartionlog.scsvc")]
+		public ActionResult LogStatus(OperationStatusRequestModel data)
+		{
+			return ScsJson(GetOperationLog(data));
 		}
 
 		[ScsLoggedIn]
@@ -67,7 +74,7 @@ namespace ScsContentMigrator
 
 		[ScsLoggedIn]
 		[ActionName("cmstopoperation.scsvc")]
-		public ActionResult OperationList(string operationId)
+		public ActionResult Stop(string operationId)
 		{
 			return ScsJson(StopOperation(operationId));
 		}
@@ -141,6 +148,11 @@ namespace ScsContentMigrator
 			return ((IEnumerable<object>)RemoteContentPuller.OperationStatus(data.OperationId, data.LineNumber)).ToList();
 		}
 
+		private object GetOperationLog(OperationStatusRequestModel data)
+		{
+			return ((IEnumerable<object>)RemoteContentPuller.OperationLog(data.OperationId, data.LineNumber)).ToList();
+		}
+
 		private object PullItem(PullItemModel data)
 		{
 			try
@@ -185,6 +197,10 @@ namespace ScsContentMigrator
 		{
 			try
 			{
+				if (data.Id == null)
+				{
+					data.Id = "";
+				}
 				var args = new RemoteContentTreeArgs(data.Id, data.Database, data.Server, data.Children);
 				if (args.Server != null)
 				{
@@ -206,7 +222,7 @@ namespace ScsContentMigrator
 			using (new SecurityDisabler())
 			{
 				if (data.Id == "")
-					return GetScsRegistration<ContentMigrationRegistration>().Root;
+					return ContentMigrationRegistration.Root;
 				Database db = Factory.GetDatabase(data.Database);
 				Item i = db.GetItem(new ID(data.Id));
 				return new CompareContentTreeNode(i);

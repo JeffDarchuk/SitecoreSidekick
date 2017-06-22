@@ -2,8 +2,8 @@
 	'use strict';
 
 	angular
-        .module('app')
-        .controller('cmmastercontroller', cmmastercontroller);
+		.module('app')
+		.controller('cmmastercontroller', cmmastercontroller);
 
 	cmmastercontroller.$inject = ['CMfactory', '$scope', '$timeout', '$window', 'ScsFactory'];
 
@@ -19,6 +19,7 @@
 		vm.server = "";
 		vm.spinner = false;
 		vm.isPreview = false;
+		vm.displayLog = false;
 		vm.events = {
 			'selectedIds': [],
 			'selected': [],
@@ -33,7 +34,7 @@
 			},
 			'click': function (val) {
 				delete vm.events.relatedIds;
-				
+
 				if (val.MissingRemote)
 					return;
 				if (!vm.events.control) {
@@ -55,41 +56,49 @@
 		};
 		angular.element($window)
 			.bind("keydown",
-				function($event) {
-					vm.events.control = $event.ctrlKey;
-				});
+			function ($event) {
+				vm.events.control = $event.ctrlKey;
+			});
 		angular.element($window)
 			.bind("keyup",
-				function ($event) {
-					vm.events.control = false;
-				});
+			function ($event) {
+				vm.events.control = false;
+			});
 		angular.element($window)
 			.bind("mousedown",
-				function($event) {
-					var target = $event.target;
-					while (target && target.tagName !== "body") {
-						if (target.className && target.className.indexOf("cmdifftableroot") > -1) {
-							return;
-						}
-						target = target.parentNode;
+			function ($event) {
+				var target = $event.target;
+				while (target && target.tagName !== "body") {
+					if (target.className && target.className.indexOf("cmdifftableroot") > -1) {
+						return;
 					}
-					vm.resultDiff = false;
-					vm.events.difflang = 'clean';
-					vm.events.diff = false;
-				});
+					target = target.parentNode;
+				}
+				vm.resultDiff = false;
+				vm.events.difflang = 'clean';
+				vm.events.diff = false;
+			});
 		vm.pull = function (preview) {
 			if (preview || confirm("Are you sure you would like to pull content from the items " + vm.listSources())) {
 				vm.spinner = true;
 				if (!vm.serverModified && vm.events.selected && vm.events.selectedIds.length > 0)
 					CMfactory.contentTreePullItem(vm.events.selectedIds, vm.events.selected[0].DatabaseName, vm.events.server, vm.children, vm.overwrite, vm.pullParent, vm.mirror, preview, vm.eventDisabler, vm.bulkUpdate).then(function (response) {
 						vm.streamResults(response.data, vm.events.server, vm.listIds(), vm.listSources(), preview);
-					}, function(response) {
+					}, function (response) {
 						vm.error = response.data;
 					});
 				else {
 					vm.spinner = false;
 					vm.response = { "Error": "Unable to pull from selected remote sitecore node." };
 				}
+			}
+		}
+		vm.initializeDiff = function (events, id) {
+			vm.resultDiff = events;
+			vm.resultId = id;
+			for (var el in events) {
+				vm.events.difflang = el;
+				break;
 			}
 		}
 		vm.listSources = function () {
@@ -106,7 +115,7 @@
 			}
 			return ret.join(", ");
 		}
-		vm.streamResults = function(id, server, itemId, name, preview) {
+		vm.streamResults = function (id, server, itemId, name, preview) {
 			vm.operationId = id;
 			vm.spinner = true;
 			vm.getStatus();
@@ -132,10 +141,11 @@
 			}
 			vm.response = new Object();
 			vm.response.lineNumber = 0;
+			vm.response.log = [];
 			vm.response.viewingNone = true;
 			vm.isPreview = preview;
 		}
-		vm.stopOperation = function() {
+		vm.stopOperation = function () {
 			CMfactory.stopOperation(vm.operationId);
 		}
 		vm.serverModified = true;
@@ -146,7 +156,7 @@
 		CMfactory.contentTreeServerList().then(function (response) {
 			vm.serverList = response.data;
 		});
-		vm.GetOperationsInProgress = function() {
+		vm.GetOperationsInProgress = function () {
 			CMfactory.operations().then(function (response) {
 				vm.completedOperations = new Array();
 				vm.runningOperations = new Array();
@@ -159,9 +169,9 @@
 					tmp["finished"] = response.data[i].FinishedTime;
 					if (response.data[i].IsPreview) {
 						vm.previewOperations.push(tmp);
-					}else if (response.data[i].Cancelled) {
+					} else if (response.data[i].Cancelled) {
 						vm.cancelledOperations.push(tmp);
-					}else if (response.data[i].Completed) {
+					} else if (response.data[i].Completed) {
 						vm.completedOperations.push(tmp);
 					} else {
 						vm.runningOperations.push(tmp);
@@ -169,7 +179,7 @@
 				}
 				vm.operationList = response.data;
 				if (scsActiveModule === "Content Migrator")
-					setTimeout(function() { vm.GetOperationsInProgress() }, 1000);
+					setTimeout(function () { vm.GetOperationsInProgress() }, 1000);
 			});
 		}
 		vm.runPreview = function () {
@@ -179,48 +189,71 @@
 			}
 		}
 		vm.GetOperationsInProgress();
-		vm.getStatus = function() {
+		vm.getStatus = function () {
 			if (vm.operationId) {
 				setTimeout(function () {
 					if (vm.response.lineNumber > -1)
-						CMfactory.queuedItems(vm.operationId).then(function(response) {
+						CMfactory.queuedItems(vm.operationId).then(function (response) {
 							vm.queuedItems = response.data;
 						});
-						CMfactory.operationStatus(vm.operationId, vm.response.lineNumber).then(function (response) {
-							if (vm.response.lineNumber > -1) {
-								var ending = null;
-								for (var i = 0; i < response.data.length; i++) {
-									vm.response.lineNumber++;
-									if (typeof (response.data[i].Time) !== "undefined") {
-										ending = response.data[i];
-									} else {
-										if (typeof (vm.response[response.data[i].Operation]) === "undefined") {
-											vm.response[response.data[i].Operation] = new Array();
-											vm.response[response.data[i].Operation].name = response.data[i].Operation;
-											vm.response[response.data[i].Operation].displayName = response.data[i].Operation.replace(/_/g," ");
-											if (vm.response.viewingNone) {
-												vm.response.viewingNone = false;
-												vm.response[response.data[i].Operation].show = true;
+					if (!vm.displayLog) {
+						CMfactory.operationStatus(vm.operationId, vm.response.lineNumber).then(function(response) {
+								if (vm.response.lineNumber > -1) {
+									var ending = null;
+									for (var i = 0; i < response.data.length; i++) {
+										vm.response.lineNumber++;
+										if (typeof (response.data[i].Time) !== "undefined") {
+											ending = response.data[i];
+										} else {
+											if (typeof (vm.response[response.data[i].Operation]) === "undefined") {
+												vm.response[response.data[i].Operation] = new Array();
+												vm.response[response.data[i].Operation].name = response.data[i].Operation;
+												vm.response[response.data[i].Operation].displayName = response.data[i].Operation.replace(/_/g, " ");
+												if (vm.response.viewingNone) {
+													vm.response.viewingNone = false;
+													vm.response[response.data[i].Operation].show = true;
+												}
 											}
+											vm.response[response.data[i].Operation].push(response.data[i]);
 										}
-										vm.response[response.data[i].Operation].push(response.data[i]);
+									}
+									if (ending !== null) {
+										vm.spinner = false;
+										vm.response.Items = ending.Items;
+										vm.response.Time = ending.Time;
+										vm.response.Date = ending.Date;
+										vm.response.Cancelled = ending.Cancelled;
+										return;
 									}
 								}
-								if (ending !== null) {
-									vm.spinner = false;
-									vm.response.Items = ending.Items;
-									vm.response.Time = ending.Time;
-									vm.response.Date = ending.Date;
-									vm.response.Cancelled = ending.Cancelled;
-									return;
+								vm.getStatus();
+							},
+							vm.getStatus);
+					} else {
+						CMfactory.operationLog(vm.operationId, vm.response.log.length).then(function(response) {
+							for (var i = 0; i < response.data.length; i++) {
+								var entry = response.data[i];
+								if (entry[0] !== "{") {
+									var parts = entry.split("]");
+									parts[0] += ']';
+									vm.response.log.push(parts);
+									continue;
 								}
+								var ending = JSON.parse(entry);
+								vm.spinner = false;
+								vm.response.Items = ending.Items;
+								vm.response.Time = ending.Time;
+								vm.response.Date = ending.Date;
+								vm.response.Cancelled = ending.Cancelled;
+								return;
 							}
 							vm.getStatus();
-						}, vm.getStatus);
-				}, 100);
+						});
+					}
+				}, 500);
 			}
 		}
-		vm.reset = function() {
+		vm.reset = function () {
 			vm.response = new Object();
 			vm.operationId = null;
 			vm.isPreview = false;
@@ -232,7 +265,7 @@
 			}
 			vm.response[el].show = true;
 		}
-		vm.isEmptyObject = function(obj) {
+		vm.isEmptyObject = function (obj) {
 			for (var prop in obj) {
 				if (Object.prototype.hasOwnProperty.call(obj, prop)) {
 					return false;

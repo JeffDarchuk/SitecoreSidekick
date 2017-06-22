@@ -19,6 +19,7 @@ using Sitecore.Data.Managers;
 using Sitecore.Data.Serialization.Exceptions;
 using Sitecore.Diagnostics;
 using Sitecore.SecurityModel;
+using SitecoreSidekick;
 using SitecoreSidekick.ContentTree;
 
 namespace ScsContentMigrator
@@ -29,7 +30,7 @@ namespace ScsContentMigrator
 		private readonly RemoteContentPullArgs _args;
 		private bool _doneRemote = false;
 		public List<dynamic> Lines => _logger.Lines;
-		public List<string> LoggerOutput { get; }
+		public List<string> LoggerOutput => _logger.LoggerOutput;
 		private CmThreadPool _tp = null;
 		private readonly DefaultLogger _logger;
 		private readonly ConcurrentQueue<IItemData> _installerQueue = new ConcurrentQueue<IItemData>();
@@ -58,7 +59,6 @@ namespace ScsContentMigrator
 		{
 			_sw.Start();
 
-			LoggerOutput = new List<string>();
 			_logger = new DefaultLogger();
 			var deserializer = new DefaultDeserializer(_logger, new DefaultFieldFilter());
 			_startedTime = DateTime.Now;
@@ -176,7 +176,7 @@ namespace ScsContentMigrator
 
 					rootNode.Server = _args.Server;
 					RootNodes.Add(rootNode);
-					
+
 				}
 			}
 		}
@@ -184,15 +184,16 @@ namespace ScsContentMigrator
 		{
 			Task.Run(async () =>
 			{
-				using (new SecurityDisabler())
-				{
-					bool islast = await ProcessItemQueue();
-					if (Completed) return;
-					if (islast)
-					{
-						if (Completed) return;
 
-						if (_args.mirror && !Cancelled)
+				bool islast = await ProcessItemQueue();
+				if (Completed) return;
+				if (islast)
+				{
+					if (Completed) return;
+
+					if (_args.mirror && !Cancelled)
+					{
+						using (new SecurityDisabler())
 						{
 							foreach (Guid guid in _allowedItems)
 							{
@@ -214,25 +215,21 @@ namespace ScsContentMigrator
 								}
 							}
 						}
+					}
 
-						Completed = true;
-						dynamic last = new ExpandoObject();
-						last.Date = $"{DateTime.Now:F}";
-						last.Time = _sw.Elapsed.TotalSeconds;
-						last.Items = _logger.Lines.Count;
-						last.Cancelled = Cancelled;
-						_logger.Lines.Add(last);
-						_finishedTime = DateTime.Now;
+					Completed = true;
+					dynamic last = new ExpandoObject();
+					last.Date = $"{DateTime.Now:F}";
+					last.Time = _sw.Elapsed.TotalSeconds;
+					last.Items = _logger.Lines.Count;
+					last.Cancelled = Cancelled;
+					_logger.Lines.Add(last);
+					_logger.LoggerOutput.Add(JsonNetWrapper.SerializeObject(last));
+					_finishedTime = DateTime.Now;
 
-						if (_args.bulkUpdate || _args.eventDisabler)
-						{
-							Sitecore.Caching.CacheManager.ClearAllCaches();
-						}
-
-						foreach (var processedNode in RootNodes)
-						{
-							ContentMigrationRegistration.GetChecksum(processedNode.Id, true);
-						}
+					if (_args.bulkUpdate || _args.eventDisabler)
+					{
+						Sitecore.Caching.CacheManager.ClearAllCaches();
 					}
 				}
 			});
@@ -382,6 +379,10 @@ namespace ScsContentMigrator
 
 							_scDatastore.Save(idata);
 						}
+						catch (TemplateMissingFieldException tm)
+						{
+							_logger.BeginEvent(new ErrorItemData() { Name = idata.Name, Path = tm.ToString() }, "Warning", "", false);
+						}
 						catch (ParentItemNotFoundException)
 						{
 							_logger.BeginEvent(idata, "Skipped Error on parent", "", false);
@@ -432,10 +433,24 @@ namespace ScsContentMigrator
 
 								using (new SecurityDisabler())
 								{
-									_scDatastore.Save(idata);
-								}
+									try
+									{
+										_scDatastore.Save(idata);
+									}
+									catch (TemplateMissingFieldException tm)
+									{
 
-								_logger.CompleteEvent(idata.Id.ToString());
+										_logger.BeginEvent(new ErrorItemData() { Name = idata.Name, Path = tm.ToString() }, "Warning", "", false);
+									}
+								}
+								if (_logger.LinesSupport[idata.Id.ToString()].Events.Count != 0)
+								{
+									_logger.CompleteEvent(idata.Id.ToString());
+								}
+								else
+								{
+									_logger.BeginEvent(idata, "Skipped", _logger.GetSrc(ThemeManager.GetIconImage(exists, 32, 32, "", "")), false);
+								}
 							}
 							finally
 							{

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SitecoreSidekick", "Source\SitecoreSidekick\SitecoreSidekick.csproj", "{0DA36C4A-1B13-4891-A263-5F994127051C}"
 EndProject
@@ -11,7 +11,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScsEditingContext", "ScsEdi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScsAuditLog", "ScsAuditLog\ScsAuditLog.csproj", "{96A08E68-0029-4DAE-AA1B-290706A22F6A}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SitecoreSidekick.Shared", "Source\SitecoreSidekick.Shared\SitecoreSidekick.Shared.shproj", "{DC668275-6331-4090-B89A-91B367231F79}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SitecoreSidekick.Shared.UnitTests", "Source\SitecoreSidekick.Shared.UnitTests\SitecoreSidekick.Shared.UnitTests.csproj", "{3BF608D1-CF04-4A9C-A098-B5455492F6FD}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Source\SitecoreSidekick.Shared\SitecoreSidekick.Shared.projitems*{3bf608d1-cf04-4a9c-a098-b5455492f6fd}*SharedItemsImports = 4
+		Source\SitecoreSidekick.Shared\SitecoreSidekick.Shared.projitems*{dc668275-6331-4090-b89a-91b367231f79}*SharedItemsImports = 13
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -33,6 +41,10 @@ Global
 		{96A08E68-0029-4DAE-AA1B-290706A22F6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{96A08E68-0029-4DAE-AA1B-290706A22F6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{96A08E68-0029-4DAE-AA1B-290706A22F6A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3BF608D1-CF04-4A9C-A098-B5455492F6FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3BF608D1-CF04-4A9C-A098-B5455492F6FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3BF608D1-CF04-4A9C-A098-B5455492F6FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3BF608D1-CF04-4A9C-A098-B5455492F6FD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

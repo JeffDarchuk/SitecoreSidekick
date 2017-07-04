@@ -17,7 +17,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\..\..\inetpub\wwwroot\Debut\Source\Debut.Web\bin\</OutputPath>
+    <OutputPath>C:\inetpub\wwwroot\Debut\Source\Debut.Web\bin\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -108,6 +108,8 @@
     <Compile Include="Pipelines\Initialize\InitializeSidekick.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScsLoggedInAttribute.cs" />
+    <Compile Include="Services\Interface\IScsRegistrationService.cs" />
+    <Compile Include="Services\ScsRegistrationService.cs" />
     <Compile Include="StringExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -156,4 +158,5 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\scsphoto_scenery.png" />
   </ItemGroup>
+  <Import Project="..\SitecoreSidekick.Shared\SitecoreSidekick.Shared.projitems" Label="Shared" />
 </Project>

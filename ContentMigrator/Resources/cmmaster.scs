@@ -59,8 +59,8 @@
 		
 		<fieldset class="cmresults" ng-if="vm.runningOperations && vm.runningOperations.length > 0">
 			<legend>Currently Running Operations</legend>
-			<a class="btn cmresult" ng-click="vm.streamResults(item.operationId, item.rootNodes[0].Server, item.rootNodes, item.rootNodes, false)" ng-repeat="item in vm.runningOperations">
-				<span>{{item.finished}}</span>
+			<a class="btn cmresult" ng-click="vm.streamResults(item.operationId, item.server, item.rootNodes, item.rootNodes, false)" ng-repeat="item in vm.runningOperations">
+				<span>{{item.started}}</span>
 				<div ng-repeat="root in item.rootNodes | limitTo:4">
 					<img ng-src="{{root.Icon}}" />
 					<h4>{{root.DisplayName}}</h4>
@@ -70,8 +70,8 @@
 		</fieldset>
 		<fieldset class="cmresults" ng-if="vm.completedOperations && vm.completedOperations.length > 0">
 			<legend>Completed Operations</legend>
-			<a class="btn cmresult" ng-click="vm.streamResults(item.operationId, item.rootNodes[0].Server, item.rootNodes, item.rootNodes, false)" ng-repeat="item in vm.completedOperations">
-				<span>{{item.finished}}</span>
+			<a class="btn cmresult" ng-click="vm.streamResults(item.operationId, item.server, item.rootNodes, item.rootNodes, false)" ng-repeat="item in vm.completedOperations">
+				<span>{{item.started}}</span>
 				<div ng-repeat="root in item.rootNodes | limitTo:4">
 					<img ng-src="{{root.Icon}}" />
 					<h4>{{root.DisplayName}}</h4>
@@ -81,8 +81,8 @@
 		</fieldset>
 		<fieldset class="cmresults cmresultspreview" ng-if="vm.previewOperations && vm.previewOperations.length > 0">
 			<legend>Preview Operations</legend>
-			<a class="btn cmresult" ng-click="vm.streamResults(item.operationId, item.rootNodes[0].Server, item.rootNodes, item.rootNodes, true)" ng-repeat="item in vm.previewOperations">
-				<span>{{item.finished}}</span>
+			<a class="btn cmresult" ng-click="vm.streamResults(item.operationId, item.server, item.rootNodes, item.rootNodes, true)" ng-repeat="item in vm.previewOperations">
+				<span>{{item.started}}</span>
 				<div ng-repeat="root in item.rootNodes | limitTo:4">
 					<img ng-src="{{root.Icon}}" />
 					<h4>{{root.DisplayName}}</h4>
@@ -92,8 +92,8 @@
 		</fieldset>
 		<fieldset class="cmresults cmresultspreview" ng-if="vm.cancelledOperations && vm.cancelledOperations.length > 0">
 			<legend>Cancelled Operations</legend>
-			<a class="btn cmresult" ng-click="vm.streamResults(item.operationId, item.rootNodes[0].Server, item.rootNodes, item.rootNodes, false)" ng-repeat="item in vm.cancelledOperations">
-				<span>{{item.finished}}</span>
+			<a class="btn cmresult" ng-click="vm.streamResults(item.operationId, item.server, item.rootNodes, item.rootNodes, false)" ng-repeat="item in vm.cancelledOperations">
+				<span>{{item.started}}</span>
 				<div ng-repeat="root in item.rootNodes | limitTo:4">
 					<img ng-src="{{root.Icon}}" />
 					<h4>{{root.DisplayName}}</h4>
@@ -145,6 +145,9 @@
 
 	<div ng-if="!vm.displayLog" ng-repeat="results in vm.response">
 		<div class="cmtabpane" ng-if="results.show">
+			<div ng-if="results.name === 'Changed'">
+				<h4>Click an item to see a diff of what happened to it.</h4>
+			</div>
 			<dir-pagination-controls pagination-id="results.name  +'pagination' " template-url="/scs/platform/resources/scsdirpagination.scs">
 			</dir-pagination-controls>
 			<div class="cmresults">

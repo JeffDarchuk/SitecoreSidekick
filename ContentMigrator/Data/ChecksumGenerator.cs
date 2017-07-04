@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
+using Sitecore;
 using Sitecore.Data;
 using Sitecore.Diagnostics;
 
@@ -10,73 +11,113 @@ namespace ScsContentMigrator.Data
 {
 	public class ChecksumGenerator
 	{
-		public int Generate(string id, string database)
+		public Checksum Generate(List<ID> ids, string database)
 		{
 			using (var sqlConnection = new SqlConnection(System.Configuration.ConfigurationManager.ConnectionStrings[database].ConnectionString))
 			{
 				sqlConnection.Open();
-				using (var sqlCommand = ConstructSqlBatch(id))
+				using (var sqlCommand = ConstructSqlBatch(ids))
 				{
 					sqlCommand.Connection = sqlConnection;
 				
 					using (var reader = sqlCommand.ExecuteReader())
 					{
-						StringBuilder sb = new StringBuilder();
+						var checksum = new Checksum();
 						while (reader.Read())
 						{
-							sb.Append(reader["Value"]);
+							checksum.LoadRow(reader["ID"].ToString(), reader["ParentID"].ToString(), reader["Value"].ToString());
 						}
-						return sb.ToString().GetHashCode();
+						checksum.Generate();
+						return checksum;
 					}
 				}
 			}
 		}
-		private SqlCommand ConstructSqlBatch(string id)
+		//to get on demand checksums, prooved to not scale well.
+		//public int Generate(ID id, string database)
+		//{
+		//	using (var sqlConnection = new SqlConnection(System.Configuration.ConfigurationManager.ConnectionStrings[database].ConnectionString))
+		//	{
+		//		sqlConnection.Open();
+		//		using (var sqlCommand = ConstructSqlBatch(id))
+		//		{
+		//			sqlCommand.Connection = sqlConnection;
+
+		//			using (var reader = sqlCommand.ExecuteReader())
+		//			{
+		//				var checksum = new Checksum();
+		//				StringBuilder sb = new StringBuilder();
+		//				while (reader.Read())
+		//				{
+		//					sb.Append(reader["Value"]);
+		//				}
+		//				checksum.Generate();
+		//				return sb.ToString().GetHashCode();
+		//			}
+		//		}
+		//	}
+		//}
+		private SqlCommand ConstructSqlBatch(List<ID> id)
 		{
 			var command = new SqlCommand();
 
 			var sql = new StringBuilder(8000);
 
-			// ITEM DATA QUERY - gets top level metadata about included items (no fields)
 			sql.Append($@"
-				IF OBJECT_ID('tempdb..#TempItemData') IS NOT NULL DROP Table #TempItemData
-				CREATE TABLE #TempItemData(
-					 ID uniqueidentifier,
-					 Name nvarchar(256),
-					 TemplateID uniqueidentifier,
-					 MasterID uniqueidentifier,
-					 ParentID uniqueidentifier
-				 );
 				WITH Roots AS (
 					SELECT Id
 					FROM Items
-					WHERE ID = '{id}'
+					where Id {BuildSqlInStatement(id, command, "r")}
 				), tree AS (
-					SELECT x.ID, x.Name, x.TemplateID, x.MasterID, x.ParentID
+					SELECT x.ID, x.ParentID
 					FROM Items x
 					INNER JOIN Roots ON x.ID = Roots.ID
 					UNION ALL
-					SELECT y.ID, y.Name, y.TemplateID, y.MasterID, y.ParentID
+					SELECT y.ID, y.ParentID
 					FROM Items y
 					INNER JOIN tree t ON y.ParentID = t.ID
 				)
-				INSERT INTO #TempItemData
-				SELECT *
-				FROM tree
-
-				SELECT DISTINCT Value
-				FROM VersionedFields v
-				INNER JOIN #TempItemData t ON v.ItemId = t.ID
-				WHERE v.FieldId = '8CDC337E-A112-42FB-BBB4-4143751E123F'
-				ORDER BY Value
+				SELECT t.ID, t.ParentID, v.Value
+				FROM tree t
+				inner join VersionedFields v on v.ItemId = t.ID
+				WHERE v.FieldId = '{FieldIDs.Revision.Guid:D}'
 
 ");
 
 			command.CommandText = sql.ToString();
-
-
 			return command;
 		}
+//		private SqlCommand ConstructSqlBatch(ID id)
+//		{
+//			var command = new SqlCommand();
+
+//			var sql = new StringBuilder(8000);
+
+//			sql.Append($@"
+//				WITH Roots AS (
+//					SELECT Id
+//					FROM Items
+//					where Id = '{id.Guid:D}'
+//				), tree AS (
+//					SELECT x.ID, x.ParentID
+//					FROM Items x
+//					INNER JOIN Roots ON x.ID = Roots.ID
+//					UNION ALL
+//					SELECT y.ID, y.ParentID
+//					FROM Items y
+//					INNER JOIN tree t ON y.ParentID = t.ID
+//				)
+//				SELECT v.Value
+//				FROM tree t
+//				inner join VersionedFields v on v.ItemId = t.ID
+//				WHERE v.FieldId = '{FieldIDs.Revision.Guid:D}'
+//				order by v.Value
+
+//");
+
+//			command.CommandText = sql.ToString();
+//			return command;
+//		}
 		private StringBuilder BuildSqlInStatement(List<ID> parameters, SqlCommand command, string parameterPrefix)
 		{
 

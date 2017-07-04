@@ -166,7 +166,8 @@
 					var tmp = new Object();
 					tmp["rootNodes"] = response.data[i].RootNodes;
 					tmp["operationId"] = response.data[i].OperationId;
-					tmp["finished"] = response.data[i].FinishedTime;
+					tmp["started"] = new Date(Date.parse(response.data[i].StartedTime)).toString();
+					tmp["server"] = response.data[i].Server;
 					if (response.data[i].IsPreview) {
 						vm.previewOperations.push(tmp);
 					} else if (response.data[i].Cancelled) {

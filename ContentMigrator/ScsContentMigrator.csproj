@@ -19,7 +19,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\..\inetpub\wwwroot\Debut\Source\Debut.Web\bin\</OutputPath>
+    <OutputPath>C:\inetpub\wwwroot\Debut\Source\Debut.Web\bin\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -105,31 +105,41 @@
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="Args\RemoteContentPullArgs.cs" />
     <Compile Include="Args\RemoteContentTreeArgs.cs" />
     <Compile Include="CMRainbow\DefaultItemComparer.cs" />
-    <Compile Include="CMThreadPool.cs" />
     <Compile Include="ConcurrentHashSet.cs" />
     <Compile Include="ContentAgent.cs" />
     <Compile Include="ContentMigrationController.cs" />
     <Compile Include="ContentMigrationRegistration.cs" />
+    <Compile Include="Data\Checksum.cs" />
     <Compile Include="Data\ChecksumGenerator.cs" />
+    <Compile Include="Models\ChildrenItemDataModel.cs" />
     <Compile Include="Data\CompareContentTreeNode.cs" />
     <Compile Include="ErrorItemData.cs" />
     <Compile Include="MchapOrLoggedInAttribute.cs" />
+    <Compile Include="Models\ContentMigrationOperationStatus.cs" />
     <Compile Include="Models\ContentTreeModel.cs" />
     <Compile Include="Models\DiffRequestModel.cs" />
     <Compile Include="Models\OperationStatusRequestModel.cs" />
     <Compile Include="Models\PullItemModel.cs" />
-    <Compile Include="RemoteContentService.cs" />
+    <Compile Include="Core\ContentItemInstaller.cs" />
+    <Compile Include="Core\ContentItemPuller.cs" />
+    <Compile Include="Core\ContentMigration.cs" />
+    <Compile Include="Core\Interface\IContentItemInstaller.cs" />
+    <Compile Include="Core\Interface\IContentItemPuller.cs" />
+    <Compile Include="Core\Interface\IContentMigration.cs" />
+    <Compile Include="Services\Interface\IRemoteContentService.cs" />
+    <Compile Include="Services\Interface\ISitecoreAccessService.cs" />
     <Compile Include="ItemExtensions.cs" />
-    <Compile Include="OperationStatus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CMRainbow\DefaultFieldFilter.cs" />
     <Compile Include="CMRainbow\DefaultLogger.cs" />
-    <Compile Include="RemoteContentPuller.cs" />
     <Compile Include="Security\ScsHmacServer.cs" />
     <Compile Include="Security\UniqueChallengeStore.cs" />
+    <Compile Include="Services\ContentMigrationManagerService.cs" />
+    <Compile Include="Services\Interface\IContentMigrationManagerService.cs" />
+    <Compile Include="Services\RemoteContentService.cs" />
+    <Compile Include="Services\SitecoreAccessService.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Source\SitecoreSidekick\SitecoreSidekick.csproj">
@@ -177,6 +187,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\cmphoto_scenery.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

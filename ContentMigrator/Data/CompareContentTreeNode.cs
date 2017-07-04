@@ -7,6 +7,8 @@ using Rainbow.Model;
 using Rainbow.Storage.Sc;
 using ScsContentMigrator.Args;
 using ScsContentMigrator.Models;
+using ScsContentMigrator.Services;
+using ScsContentMigrator.Services.Interface;
 using Sitecore;
 using Sitecore.Configuration;
 using Sitecore.Data;
@@ -16,6 +18,7 @@ using Sitecore.Data.Managers;
 using Sitecore.Diagnostics;
 using Sitecore.SecurityModel;
 using SitecoreSidekick.ContentTree;
+using SitecoreSidekick.Shared.IoC;
 using Version = Sitecore.Data.Version;
 
 namespace ScsContentMigrator.Data
@@ -23,7 +26,7 @@ namespace ScsContentMigrator.Data
 	public class CompareContentTreeNode : ContentTreeNode
 	{
 		private static readonly List<IFieldComparer> Comparers = new List<IFieldComparer>();
-
+		private readonly IRemoteContentService _remoteContent;
 		static CompareContentTreeNode()
 		{
 			Comparers.Add(new CheckboxComparison());
@@ -31,6 +34,7 @@ namespace ScsContentMigrator.Data
 			Comparers.Add(new MultilistComparison());
 			Comparers.Add(new XmlComparison());
 			Comparers.Add(new DefaultComparison());
+			Container.Register<IRemoteContentService, RemoteContentService>();
 		}
 
 		public string Data;
@@ -43,17 +47,24 @@ namespace ScsContentMigrator.Data
 
 		public CompareContentTreeNode()
 		{
+			_remoteContent = Container.Resolve<IRemoteContentService>();
 		}
 
+		public CompareContentTreeNode(IRemoteContentService remoteContent)
+		{
+			_remoteContent = remoteContent;
+		}
 		public CompareContentTreeNode(Item item, bool open = true) : base(item, open)
 		{
-			Revision = item[FieldIDs.Revision];
+			SortedSet<string> tmp = new SortedSet<string>();
+			foreach (Item version in item.Versions.GetVersions(true))
+			{
+				tmp.Add(version[FieldIDs.Revision]);
+			}
+			Revision = string.Join("", tmp);
 			Checksum = ContentMigrationRegistration.GetChecksum(item.ID.ToString());
-		}
+			_remoteContent = Container.Resolve<IRemoteContentService>();
 
-		public IItemData ItemData()
-		{
-			return RemoteContentService.DeserializeYaml(Data, Id);
 		}
 
 		private bool AreFieldsEqual(Field local, IItemFieldValue remote)
@@ -72,8 +83,8 @@ namespace ScsContentMigrator.Data
 		{
 			Compare = new Dictionary<string, List<Tuple<string, string>>>();
 			IItemData itemData = null;
-			itemData = Data == null ? RemoteContentService.GetRemoteItemData(new ContentTreeModel() { Children = false, Database = DatabaseName, Id = Id, Server = server }) : RemoteContentService.DeserializeYaml(Data, Id);
-			using (new SecurityDisabler())
+			itemData = _remoteContent.GetRemoteItemData(Guid.Parse(Id), server);
+				using (new SecurityDisabler())
 			{
 				var localItem = Factory.GetDatabase("master", true).DataManager.DataEngine.GetItem(new ID(Id), LanguageManager.DefaultLanguage, Sitecore.Data.Version.Latest);
 
@@ -180,11 +191,12 @@ namespace ScsContentMigrator.Data
 					if (localItem == null)
 					{
 						Status.Add(new Tuple<string, string>("cmmissing", "This content item only exists on the remote server."));
+						return;
 					}
 
-					ChildChanged = Checksum != ContentMigrationRegistration.GetChecksum(localItem.ID.ToString()) && ((bool)localItem?.HasChildren);
-
-					if (Revision != localItem[FieldIDs.Revision])
+					ChildChanged = Checksum != ContentMigrationRegistration.GetChecksum(localItem.ID.ToString());
+					CompareContentTreeNode local = new CompareContentTreeNode(localItem);
+					if (Revision != local.Revision)
 					{
 						Status.Add(new Tuple<string, string>("cmfieldchanged", "This content item exists on the local server, however the fields have different values."));
 					}

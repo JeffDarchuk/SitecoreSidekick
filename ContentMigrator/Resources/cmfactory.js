@@ -19,8 +19,8 @@
 				return $http.post("/scs/cm/cmcontenttreegetitem.scsvc", data);
 			},
 			contentTreePullItem: function (ids, database, server, children, overwrite, pullParent, mirror, preview, eventDisabler, bulkUpdate) {
-				var data = { "ids": ids, "database": database, "server": server, "children": children, "overwrite": overwrite, "pullParent": pullParent, "mirror": mirror, "preview": preview, "eventDisabler": eventDisabler, "bulkUpdate": bulkUpdate };
-				return $http.post("/scs/cm/cmcontenttreepullitem.scsvc", data);
+				var data = { "ids": ids, "database": database, "server": server, "children": children, "overwrite": overwrite, "pullParent": pullParent, "removeLocalNotInRemote": mirror, "preview": preview, "eventDisabler": eventDisabler, "bulkUpdate": bulkUpdate };
+				return $http.post("/scs/cm/cmstartoperation.scsvc", data);
 			},
 			contentTreeServerList: function () {
 				return $http.get("/scs/cm/cmserverlist.scsvc");

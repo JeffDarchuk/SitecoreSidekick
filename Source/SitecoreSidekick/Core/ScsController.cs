@@ -9,6 +9,8 @@ using System.Linq.Expressions;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
+using SitecoreSidekick.Services.Interface;
+using SitecoreSidekick.Shared.IoC;
 
 namespace SitecoreSidekick.Core
 {
@@ -16,17 +18,18 @@ namespace SitecoreSidekick.Core
 	{
 		private readonly ConcurrentDictionary<string, string> _resourceCache = new ConcurrentDictionary<string, string>();
 		private readonly ConcurrentDictionary<string, byte[]> _imageCache = new ConcurrentDictionary<string, byte[]>();
-		internal static Dictionary<Type, IScsRegistration> Registration = new Dictionary<Type, IScsRegistration>();
+		private IScsRegistrationService _registration;
 
-		public static T GetScsRegistration<T>() where T : class, IScsRegistration
+		protected ScsController()
 		{
-			return Registration[typeof(T)] as T;
+			_registration = Container.Resolve<IScsRegistrationService>();
 		}
 
-		public static IScsRegistration GetScsRegistration(Type t)
+		protected ScsController(IScsRegistrationService registration)
 		{
-			return Registration[t];
+			_registration = registration;
 		}
+
 		[ScsLoggedIn]
 		public virtual ActionResult Resources(string filename)
 		{
@@ -159,7 +162,7 @@ namespace SitecoreSidekick.Core
 			filename = filename.ToLowerInvariant();
 			string result;
 			if (_resourceCache.TryGetValue(filename, out result)) return result;
-			using (var stream = GetType().Assembly.GetManifestResourceStream(GetScsRegistration(GetType()).ResourcesPath + "." + filename))
+			using (var stream = GetType().Assembly.GetManifestResourceStream(_registration.GetScsRegistration(GetType()).ResourcesPath + "." + filename))
 			{
 				if (stream != null)
 				{
@@ -185,7 +188,7 @@ namespace SitecoreSidekick.Core
 			filename = filename.ToLowerInvariant();
 			byte[] result;
 			if (_imageCache.TryGetValue(filename, out result)) return result;
-			using (var stream = GetType().Assembly.GetManifestResourceStream(GetScsRegistration(GetType()).ResourcesPath + "." + filename))
+			using (var stream = GetType().Assembly.GetManifestResourceStream(_registration.GetScsRegistration(GetType()).ResourcesPath + "." + filename))
 			{
 				if (stream != null)
 				{

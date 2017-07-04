@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Linq;
 using System.Reflection;
-using FluentAssertions.Common;
 
 namespace SitecoreSidekick.Shared.IoC
 {
@@ -116,7 +116,7 @@ namespace SitecoreSidekick.Shared.IoC
 					if (_registeredObject == null) return;
 
 					// If the registered object supports IDisposable, invoke it.
-					if (_registeredObject.GetType().Implements(typeof(IDisposable)))
+					if (_registeredObject.GetType().GetInterfaces().Any(x => x == typeof(IDisposable)))
 					{
 						_registeredObject.GetType().GetMethod(nameof(IDisposable.Dispose)).Invoke(_registeredObject, null);
 					}

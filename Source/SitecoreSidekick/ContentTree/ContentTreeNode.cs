@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Sitecore.Configuration;
 using Sitecore.Data.Items;
 using Sitecore.Data.Managers;
 
@@ -22,6 +23,9 @@ namespace SitecoreSidekick.ContentTree
 		{
 		}
 
+		public ContentTreeNode(string id) : this(Factory.GetDatabase("master", false)?.GetItem(id), false)
+		{
+		}
 		public ContentTreeNode(Item item, bool open = true)
 		{
 			if (item != null)

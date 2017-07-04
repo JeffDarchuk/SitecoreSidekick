@@ -14,11 +14,23 @@ using SitecoreSidekick;
 using SitecoreSidekick.ContentTree;
 using SitecoreSidekick.Core;
 using SitecoreSidekick.Pipelines.HttpRequestBegin;
+using SitecoreSidekick.Services.Interface;
+using SitecoreSidekick.Shared.IoC;
 
 namespace ScsEditingContext
 {
 	public class EditingContextController: ScsController
 	{
+		private readonly IScsRegistrationService _registration;
+		public EditingContextController()
+		{
+			_registration = Container.Resolve<IScsRegistrationService>();
+		}
+
+		protected EditingContextController(IScsRegistrationService registration)
+		{
+			_registration = registration;
+		}
 		[ScsLoggedIn]
 		[ActionName("getcommonlocations.json")]
 		public ActionResult CommonLocations()
@@ -103,7 +115,7 @@ namespace ScsEditingContext
 
 		private dynamic GetCommonLocations()
 		{
-			EditingContextRegistration ec = GetScsRegistration<EditingContextRegistration>();
+			EditingContextRegistration ec = _registration.GetScsRegistration<EditingContextRegistration>();
 			dynamic ret = new ExpandoObject();
 			ret.editor = ec.EditorLocations;
 			if (IsAdmin.CurrentUserAdmin())

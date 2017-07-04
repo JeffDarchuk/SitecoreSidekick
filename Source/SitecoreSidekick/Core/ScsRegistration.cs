@@ -10,6 +10,9 @@ using Sitecore.Mvc.Extensions;
 using Sitecore.Pipelines;
 using SitecoreSidekick.Handlers;
 using SitecoreSidekick.Pipelines.HttpRequestBegin;
+using SitecoreSidekick.Services;
+using SitecoreSidekick.Services.Interface;
+using SitecoreSidekick.Shared.IoC;
 
 namespace SitecoreSidekick.Core
 {
@@ -20,16 +23,25 @@ namespace SitecoreSidekick.Core
 		public bool AdminOnly { get; }
 		public List<string> Roles { get; }
 		public List<string> Users { get; }
-
+		public IScsRegistrationService Registration { get; }
 		protected ScsRegistration(string roles, string isAdmin, string users)
 		{
 			AdminOnly = isAdmin == "true";
 			Roles = roles.Split('|').Where(x => !x.IsWhiteSpaceOrNull()).ToList();
 			Users = users.Split('|').Where(x => !x.IsWhiteSpaceOrNull()).ToList();
+			Registration = Container.Resolve<IScsRegistrationService>();
+		}
+		protected ScsRegistration(string roles, string isAdmin, string users, IScsRegistrationService registration)
+		{
+			AdminOnly = isAdmin == "true";
+			Roles = roles.Split('|').Where(x => !x.IsWhiteSpaceOrNull()).ToList();
+			Users = users.Split('|').Where(x => !x.IsWhiteSpaceOrNull()).ToList();
+			Registration = registration;
 		}
 		public virtual void Process(PipelineArgs args)
 		{
-			ScsMainRegistration.RegisterSideKick(this);
+			Registration.RegisterSidekick(this);
+			Registration.RegisterSidekick(Controller, this);
 		}
 
 		public bool ApplicableSidekick()

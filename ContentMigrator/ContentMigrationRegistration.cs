@@ -21,26 +21,29 @@ using System.Timers;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
 using System.IO;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Web.Mvc;
 using MicroCHAP;
+using ScsContentMigrator.Core.Interface;
 using ScsContentMigrator.Models;
 using ScsContentMigrator.Security;
+using ScsContentMigrator.Services;
+using ScsContentMigrator.Services.Interface;
 using Sitecore.Pipelines;
 using SitecoreSidekick;
 using SitecoreSidekick.Core;
 using SitecoreSidekick.Models;
+using SitecoreSidekick.Shared.IoC;
 
 namespace ScsContentMigrator
 {
 	public class ContentMigrationRegistration : ScsRegistration
 	{
-		private static ChecksumGenerator Checksum = new ChecksumGenerator();
-		private static readonly RemoteContentPuller _puller = new RemoteContentPuller();
+		private static Checksum _checksum;
 		public static CompareContentTreeNode Root { get; } = new CompareContentTreeNode { DatabaseName = "master", DisplayName = "Root", Icon = "/~/icon/Applications/32x32/media_stop.png", Open = true, Nodes = new List<ContentTreeNode>() };
-		internal static int RemoteThreads = 1;
-		internal static int WriterThreads = 1;
+		public int RemoteThreads { get; }= 1;
+		public int WriterThreads { get; }= 1;
 		public List<string> ServerList { get; } = new List<string>();
-		public RemoteContentPuller Puller => _puller;
 		public ScsHmacServer HmacServer { get; set; }
 		public override string Directive => "cmmasterdirective";
 		public override NameValueCollection DirectiveAttributes { get; set; }
@@ -52,29 +55,44 @@ namespace ScsContentMigrator
 		public override string CssStyle => "width:100%;min-width:800px;";
 		public string AuthenticationSecret { get; set; }
 
+		static ContentMigrationRegistration()
+		{
+			Container.Register<IContentMigrationManagerService, ContentMigrationManagerService>();
+			Container.Register<IRemoteContentService, Services.RemoteContentService>();
+			Container.Register<ISitecoreAccessService, SitecoreAccessService>();
+		}
+
 		public ContentMigrationRegistration(string roles, string isAdmin, string users, string remotePullingThreads, string databaseWriterThreads) : base(roles, isAdmin, users)
 		{
 			if (RemoteThreads == 1)
 			{
-				int.TryParse(remotePullingThreads, out RemoteThreads);
+				int remoteTmp;
+				int.TryParse(remotePullingThreads, out remoteTmp);
+				RemoteThreads = remoteTmp;
 			}
 
 			if (WriterThreads == 1)
 			{
-				int.TryParse(databaseWriterThreads, out WriterThreads);
+				int writerTmp;
+				int.TryParse(databaseWriterThreads, out writerTmp);
+				WriterThreads = writerTmp;
 			}
 
-			//Timer t = new Timer(60 * 1000);
-			//t.Elapsed += async (sender, e) => await GenerateChecksum();
-			//t.Start();
+			Timer t = new Timer(20 * 1000);
+			t.Elapsed += (sender, e) => 
+			{
+				_checksum = new ChecksumGenerator().Generate(Root.Nodes.Select(x => new ID(x.Id)).ToList(), "master");
+			};
+			t.Start();
 		}
 
 		public override void Process(PipelineArgs args)
 		{
-#pragma warning disable 4014
-			//async call to rebuild the checksum that won't block startup.
-			//GenerateChecksum();
-#pragma warning restore 4014
+			Task.Run(() =>
+			{
+				_checksum = new ChecksumGenerator().Generate(Root.Nodes.Select(x => new ID(x.Id)).ToList(), "master");
+			});
+			
 			if (string.IsNullOrWhiteSpace(AuthenticationSecret))
 			{
 				throw new InvalidOperationException("Sitecore Sidekick Content Migrator was initialized with an empty shared secret. Make a copy of zSCSContentMigrator.Local.config.example, rename it to .config, and set up a unique, long, randomly generated shared secret there.");
@@ -85,8 +103,6 @@ namespace ScsContentMigrator
 				throw new InvalidOperationException("Sitecore Sidekick Content Migrator was initialized with an insecure shared secret. Please use a shared secret of 32 or more characters.");
 			}
 
-			RemoteContentService.SignatureService = new SignatureService(AuthenticationSecret);
-			HmacServer = new ScsHmacServer(RemoteContentService.SignatureService, new UniqueChallengeStore());
 			base.Process(args);
 		}
 
@@ -95,25 +111,10 @@ namespace ScsContentMigrator
 			ServerList.Add(node.InnerText);
 		}
 
-		//public static async Task GenerateChecksum()
-		//{
-		//	Task ret = Task.Run(() =>
-		//	{
-		//		Checksum = new ChecksumGenerator().Generate(Root.Nodes.Select(x => new ID(x.Id)), "master");
-		//	});
-
-		//	await ret;
-		//}
-
 		public static int GetChecksum(string id)
 		{
-			return Checksum.Generate(id, "master");
+			return _checksum?.GetChecksum(id) ?? -1;
 		}
-		public static void StartContentSync(RemoteContentPullArgs args)
-		{
-			_puller.PullContentItem(args);
-		}
-
 		public void BuildRoot(XmlNode node)
 		{
 			string dbName = "master";

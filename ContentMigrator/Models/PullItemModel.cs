@@ -14,7 +14,7 @@ namespace ScsContentMigrator.Models
 		public bool Children;
 		public bool Overwrite;
 		public bool PullParent;
-		public bool Mirror;
+		public bool RemoveLocalNotInRemote;
 		public bool Preview;
 		public bool EventDisabler;
 		public bool BulkUpdate;

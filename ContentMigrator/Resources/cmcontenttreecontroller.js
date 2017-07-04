@@ -42,11 +42,13 @@
 		$scope.init = function (nodeId, selectedId, events, server, database) {
 			vm.events = events;
 			vm.data = nodeId;
+			vm.loading = true;
 			if (typeof(nodeId) === "object")
 				vm.data.loading = true;
 			if (!server.MissingRemote) {
 				vm.server = server;
 				CMfactory.contentTree(nodeId.Id, database, server).then(function (response) {
+					vm.loading = false;
 					vm.data = response.data;
 					if (server)
 						events.server = server;
@@ -54,6 +56,7 @@
 					vm.error = response.data;
 				});
 			} else {
+				vm.loading = false;
 				vm.data = server;
 				vm.data.loading = false;
 				vm.data.Nodes = new Array();

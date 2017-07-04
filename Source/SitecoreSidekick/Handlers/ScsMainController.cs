@@ -8,13 +8,26 @@ using System.Web.Mvc;
 using Microsoft.CSharp.RuntimeBinder;
 using Sitecore.Configuration;
 using Sitecore.Data.Items;
+using Sitecore.SecurityModel;
 using SitecoreSidekick.Core;
 using SitecoreSidekick.Models;
+using SitecoreSidekick.Services.Interface;
+using SitecoreSidekick.Shared.IoC;
 
 namespace SitecoreSidekick.Handlers
 {
 	public class ScsMainController : ScsController
 	{
+		private readonly IScsRegistrationService _registration;
+		public ScsMainController()
+		{
+			_registration = Container.Resolve<IScsRegistrationService>();
+		}
+
+		protected ScsMainController(IScsRegistrationService registration)
+		{
+			_registration = registration;
+		}
 		[ActionName("scsvalid.scsvc")]
 		public ActionResult Valid()
 		{
@@ -51,9 +64,9 @@ namespace SitecoreSidekick.Handlers
 			if (filename.Equals("scsangular.js") || filename.Equals("scscommand.js"))
 				return Content(GetResource(filename), "application/javascript");
 			if (filename.EndsWith(".js"))
-				return Content(GetScsRegistration<ScsMainRegistration>().GetJs, "application/javascript");
+				return Content(_registration.Js, "application/javascript");
 			if (filename.EndsWith(".css"))
-				return Content(GetScsRegistration<ScsMainRegistration>().GetCss, "text/css");
+				return Content(_registration.Css, "text/css");
 			return base.Resources(filename);
 		}
 
@@ -84,15 +97,18 @@ namespace SitecoreSidekick.Handlers
 
 		private void BuildRelatedTree(Dictionary<string, string> ret, string selectedId)
 		{
-			var db = Factory.GetDatabase("master", false);
-			if (db == null)
-				return;
-			Item i = db.GetItem(selectedId).Parent;
-			while (i != null)
+			using (new SecurityDisabler())
 			{
-				if (!ret.ContainsKey(i.ID.ToString()))
-					ret.Add(i.ID.ToString(), "1");
-				i = i.Parent;
+				var db = Factory.GetDatabase("master", false);
+				if (db == null)
+					return;
+				Item i = db.GetItem(selectedId).Parent;
+				while (i != null)
+				{
+					if (!ret.ContainsKey(i.ID.ToString()))
+						ret.Add(i.ID.ToString(), "1");
+					i = i.Parent;
+				}
 			}
 		}
 
@@ -138,10 +154,10 @@ body{
 
 		private string GetAllSidekickDirectives()
 		{
-			ScsMainRegistration sidekick = GetScsRegistration<ScsMainRegistration>();
-			var basicAngularIf = $"!vm.sidekick || ({"vm.sidekick != '" + string.Join("' && vm.sidekick != '", sidekick.GetSidekicks.Select(x => x.Name).ToArray())}')";
+			ScsMainRegistration sidekick = _registration.GetScsRegistration<ScsMainRegistration>();
+			var basicAngularIf = $"!vm.sidekick || ({"vm.sidekick != '" + string.Join("' && vm.sidekick != '", _registration.GetAllSidekicks().Select(x => x.Name).ToArray())}')";
 			var sb = new StringBuilder($"<div ng-style=\"({basicAngularIf}) && {{'width':'{sidekick.CssStyle}', 'background-color':'white'}}\"><h3 id=\"sidekickHeader\" ng-if=\"{basicAngularIf}\">{sidekick.Name}<span class='close' onclick='window.top.document.getElementById(\"scs\").style.display=\"none\";'></span></h3>");
-			foreach (var sk in sidekick.GetSidekicks.Where(x => x.ApplicableSidekick()))
+			foreach (var sk in _registration.GetAllSidekicks().Where(x => x.ApplicableSidekick() && x.Name != "Sitecore Sidekick"))
 			{
 				sb.Append(
 					$"<div ng-if=\"{basicAngularIf}\" ng-click=\"vm.selectSidekick('{sk.Name}')\" class=\"btn scsbtn\"><img ng-src=\"{sk.Icon}\" width=\"32\" height=\"32\" class=\"scContentTreeNodeIcon\" border=\"0\"><div>{sk.Name}</div></div>");

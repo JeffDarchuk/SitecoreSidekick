@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
@@ -14,7 +15,9 @@ using Sitecore.SecurityModel;
 using SitecoreSidekick.Core;
 using SitecoreSidekick.Handlers;
 using SitecoreSidekick.Models;
-using Version = Sitecore.Data.Version;
+using SitecoreSidekick.Services;
+using SitecoreSidekick.Services.Interface;
+using SitecoreSidekick.Shared.IoC;
 
 namespace SitecoreSidekick.Pipelines.Initialize
 {
@@ -24,6 +27,20 @@ namespace SitecoreSidekick.Pipelines.Initialize
 		public const string DesktopMenuRight = "{10148DC7-DCA6-4ACA-AC90-46FBF59A1D1F}";
 		public const string SidekickButton = "{3F324240-7645-4C70-A337-64A9D4A91549}";
 		public const string ActionTemplate = "{F58958D2-555B-4F56-946C-589E8866880C}";
+		private readonly IScsRegistrationService _registration;
+		static InitializeSidekick()
+		{
+			Container.Register<IScsRegistrationService, ScsRegistrationService>();
+		}
+		public InitializeSidekick()
+		{
+			_registration = Container.Resolve<IScsRegistrationService>();
+		}
+
+		public InitializeSidekick(IScsRegistrationService registration)
+		{
+			_registration = registration;
+		}
 		public void Process(PipelineArgs args)
 		{
 
@@ -31,11 +48,11 @@ namespace SitecoreSidekick.Pipelines.Initialize
 			EnsureDesktopButton();
 			if (Factory.GetDatabase("master", false) != null)
 			{
+				ScsMainRegistration maintmp = new ScsMainRegistration("", "", "");
+				_registration.RegisterSidekick(maintmp);
+				_registration.RegisterSidekick(maintmp.Controller, maintmp);
 				var pipeline = CorePipelineFactory.GetPipeline("scsRegister", string.Empty);
 				pipeline.Run(new PipelineArgs());
-				ScsMainRegistration maintmp = new ScsMainRegistration("", "", "");
-				ScsController.Registration[typeof(ScsMainRegistration)] = maintmp;
-				ScsController.Registration[maintmp.Controller] = maintmp;
 				RegisterRoutes("scs");
 			}
 		}
@@ -79,7 +96,7 @@ namespace SitecoreSidekick.Pipelines.Initialize
 			return selectSingleNode != null && selectSingleNode.InnerText == "8";
 		}
 
-		public static void RegisterRoutes(string route)
+		public void RegisterRoutes(string route)
 		{
 			ScsModelBinder.Default = ModelBinders.Binders.DefaultBinder;
 			ModelBinders.Binders.DefaultBinder = new ScsModelBinder();
@@ -89,7 +106,7 @@ namespace SitecoreSidekick.Pipelines.Initialize
 				routes.MapRoute("scs", "scs/platform/{action}", new { controller = "SitecoreSidekick.Handlers.ScsMainController, SitecoreSidekick", action = "scs" });
 				routes.MapRoute("scsresources", "scs/platform/{action}/{filename}", new { controller = $"SitecoreSidekick.Handlers.ScsMainController, SitecoreSidekick", action = "resources" });
 			}
-			foreach (var sidekick in ScsMainRegistration.Sidekicks)
+			foreach (var sidekick in _registration.GetAllSidekicks().Where(x=> x.Name != "Sitecore Sidekick"))
 			{
 				sidekick.RegisterRoutes();
 			}

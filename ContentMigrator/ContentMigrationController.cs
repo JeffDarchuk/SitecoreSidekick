@@ -9,9 +9,13 @@ using System.Web.Mvc;
 using System.Xml;
 using MicroCHAP;
 using Microsoft.CSharp.RuntimeBinder;
+using Rainbow.Model;
+using Rainbow.Storage.Yaml;
 using ScsContentMigrator.Args;
 using ScsContentMigrator.Data;
 using ScsContentMigrator.Models;
+using ScsContentMigrator.Services;
+using ScsContentMigrator.Services.Interface;
 using Sitecore.Configuration;
 using Sitecore.Data;
 using Sitecore.Data.Items;
@@ -19,11 +23,93 @@ using Sitecore.Diagnostics;
 using Sitecore.SecurityModel;
 using SitecoreSidekick;
 using SitecoreSidekick.Core;
+using SitecoreSidekick.Services.Interface;
+using SitecoreSidekick.Shared.IoC;
 
 namespace ScsContentMigrator
 {
 	public class ContentMigrationController : ScsController
 	{
+		private readonly ISitecoreAccessService _sitecore;
+		private readonly IScsRegistrationService _registration;
+		private readonly IContentMigrationManagerService _migrationManager;
+		private readonly IRemoteContentService _remoteContent;
+		public static YamlSerializationFormatter Formatter = new YamlSerializationFormatter(null, null);
+
+		public ContentMigrationController()
+		{
+			_sitecore = Container.Resolve<ISitecoreAccessService>();
+			_registration = Container.Resolve<IScsRegistrationService>();
+			_migrationManager = Container.Resolve<IContentMigrationManagerService>();
+			_remoteContent = Container.Resolve<IRemoteContentService>();
+		}
+
+		protected ContentMigrationController(ISitecoreAccessService sitecore, IScsRegistrationService registration, IContentMigrationManagerService migrationManager, IRemoteContentService remoteContent)
+		{
+			_sitecore = sitecore;
+			_registration = registration;
+			_migrationManager = migrationManager;
+			_remoteContent = remoteContent;
+		}
+
+		[MchapOrLoggedIn]
+		[ActionName("cmgetitemyaml.scsvc")]
+		public ActionResult GetItemYaml(string id)
+		{
+			Assert.ArgumentNotNullOrEmpty(id, "id");
+			using (var stream = new MemoryStream())
+			{
+				Formatter.WriteSerializedItem(_sitecore.GetItemData(Guid.Parse(id)), stream);
+				stream.Seek(0, SeekOrigin.Begin);
+
+				using (var reader = new StreamReader(stream))
+				{
+					return Content(reader.ReadToEnd());
+				}
+			}
+			
+		}
+
+		[MchapOrLoggedIn]
+		[ActionName("cmgetitemyamlwithchildren.scsvc")]
+		public ActionResult GetItemYamlWithChildren(string id)
+		{
+			Assert.ArgumentNotNullOrEmpty(id, "id");
+			using (var stream = new MemoryStream())
+			{
+				using (new SecurityDisabler())
+				{
+					IItemData item = _sitecore.GetItemData(Guid.Parse(id));
+					Formatter.WriteSerializedItem(item, stream);
+					stream.Seek(0, SeekOrigin.Begin);
+
+					using (var reader = new StreamReader(stream))
+					{
+						return ScsJson(new ChildrenItemDataModel
+						{
+							Item = reader.ReadToEnd(),
+							Children = item.GetChildren().Select(x => x.Id).ToList()
+						});
+					}
+				}
+			}
+		}
+
+		[ScsLoggedIn]
+		[ActionName("cmstartoperation.scsvc")]
+		public ActionResult StartOperation(PullItemModel data)
+		{
+			return Content(_migrationManager.StartContentMigration(data));
+		}
+
+
+
+
+
+
+
+
+
 		[MchapOrLoggedIn]
 		[ActionName("cmcontenttree.scsvc")]
 		public ActionResult ContentTree(ContentTreeModel data)
@@ -35,7 +121,7 @@ namespace ScsContentMigrator
 		[ActionName("cmserverlist.scsvc")]
 		public ActionResult GetServerList()
 		{
-			return ScsJson(GetScsRegistration<ContentMigrationRegistration>().ServerList);
+			return ScsJson(_registration.GetScsRegistration<ContentMigrationRegistration>().ServerList);
 		}
 		[MchapOrLoggedIn]
 		[ActionName("cmcontenttreegetitem.scsvc")]
@@ -44,25 +130,25 @@ namespace ScsContentMigrator
 			return ScsJson(GetItemYaml(data));
 		}
 
-		[ScsLoggedIn]
-		[ActionName("cmcontenttreepullitem.scsvc")]
-		public ActionResult PullItemYaml(PullItemModel data)
+		[MchapOrLoggedIn]
+		[ActionName("cmitemdatachildren.scsvc")]
+		public ActionResult GetItemDataWithChildren(string id)
 		{
-			return ScsJson(PullItem(data));
+			return ScsJson(ItemDataWithChildren(id));
 		}
 
 		[ScsLoggedIn]
 		[ActionName("cmopeartionstatus.scsvc")]
 		public ActionResult Status(OperationStatusRequestModel data)
 		{
-			return ScsJson(GetOperationStatus(data));
+			return ScsJson(_migrationManager.GetItemLogEntries(data.OperationId, data.LineNumber));
 		}
 
 		[ScsLoggedIn]
 		[ActionName("cmopeartionlog.scsvc")]
 		public ActionResult LogStatus(OperationStatusRequestModel data)
 		{
-			return ScsJson(GetOperationLog(data));
+			return ScsJson(_migrationManager.GetAuditLogEntries(data.OperationId, data.LineNumber));
 		}
 
 		[ScsLoggedIn]
@@ -76,7 +162,7 @@ namespace ScsContentMigrator
 		[ActionName("cmstopoperation.scsvc")]
 		public ActionResult Stop(string operationId)
 		{
-			return ScsJson(StopOperation(operationId));
+			return ScsJson(_migrationManager.CancelContentMigration(operationId));
 		}
 
 		[ScsLoggedIn]
@@ -110,72 +196,36 @@ namespace ScsContentMigrator
 			}
 		}
 
+		private object ItemDataWithChildren(string id)
+		{
+			var ret = new ChildrenItemDataModel();
+			Guid guid = Guid.Parse(id);
+			ret.Item = _sitecore.GetItem(guid).GetYaml();
+			ret.Children = _sitecore.GetChildrenIds(guid);
+			return ret;
+		}
+
 		private object OperationQueueLength(string operationId)
 		{
-			var operation = RemoteContentPuller.GetOperation(operationId);
-			if (operation != null)
-				return operation.QueuedItems();
-			return null;
+			return _migrationManager.GetContentMigration(operationId)?.ItemsInQueueToInstall;
 		}
 
 		private object StartPreviewAsPull(string operationId)
 		{
-			RemoteContentPuller.GetOperation(operationId).RunPreviewAsFullOperation();
+			_migrationManager.GetContentMigration(operationId).StartOperationFromPreview();
 			return true;
-		}
-
-		private object StopOperation(string operationId)
-		{
-			return RemoteContentPuller.StopOperation(operationId);
 		}
 
 		private object GetOperationList()
 		{
-			return RemoteContentPuller.GetRunningOperations().OrderBy(x =>
-			{
-				DateTime tmp;
-				if (DateTime.TryParseExact(x.FinishedTime, "MMM d h:mm tt", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out tmp))
-				{
-					return tmp;
-				}
-
-				return DateTime.Now;
-			}).ToList();
-		}
-
-		private object GetOperationStatus(OperationStatusRequestModel data)
-		{
-			return ((IEnumerable<object>)RemoteContentPuller.OperationStatus(data.OperationId, data.LineNumber)).ToList();
-		}
-
-		private object GetOperationLog(OperationStatusRequestModel data)
-		{
-			return ((IEnumerable<object>)RemoteContentPuller.OperationLog(data.OperationId, data.LineNumber)).ToList();
-		}
-
-		private object PullItem(PullItemModel data)
-		{
-			try
-			{
-				var args = new RemoteContentPullArgs(data);
-				if (args.Server != null)
-				{
-					return GetScsRegistration<ContentMigrationRegistration>().Puller.PullContentItem(args);
-				}
-			}
-			catch (Exception ex)
-			{
-				Log.Error("Problem pulling item from remote server", ex, this);
-				return new { Error = "Problem pulling item from remote server\n\n" + ex };
-			}
-			return true;
+			return _migrationManager.GetAllContentMigrations().Select(x => x.Status).OrderBy(x => x.StartedTime).ToList();
 		}
 
 		private List<string> GetItemYaml(ContentTreeModel data)
 		{
 			Request.InputStream.Seek(0, SeekOrigin.Begin);
 			string payload = new StreamReader(Request.InputStream).ReadToEnd();
-			if (!GetScsRegistration<ContentMigrationRegistration>().HmacServer.ValidateRequest(new HttpRequestWrapper(System.Web.HttpContext.Current.Request), x => new[] { new SignatureFactor("payload", payload) }))
+			if (!_registration.GetScsRegistration<ContentMigrationRegistration>().HmacServer.ValidateRequest(new HttpRequestWrapper(System.Web.HttpContext.Current.Request), x => new[] { new SignatureFactor("payload", payload) }))
 			{
 				System.Web.HttpContext.Current.Response.StatusCode = 403;
 				return null;
@@ -204,7 +254,7 @@ namespace ScsContentMigrator
 				var args = new RemoteContentTreeArgs(data.Id, data.Database, data.Server, data.Children);
 				if (args.Server != null)
 				{
-					return RemoteContentService.GetRemoteItem(args, args.Id, true);
+					return _remoteContent.GetContentTreeNode(args);
 				}
 			}
 			catch (RuntimeBinderException)
@@ -213,7 +263,7 @@ namespace ScsContentMigrator
 			}
 			Request.InputStream.Seek(0, SeekOrigin.Begin);
 			string payload = new StreamReader(Request.InputStream).ReadToEnd();
-			if (!GetScsRegistration<ContentMigrationRegistration>().HmacServer.ValidateRequest(new HttpRequestWrapper(System.Web.HttpContext.Current.Request), x => new[] { new SignatureFactor("payload", payload) }))
+			if (!_registration.GetScsRegistration<ContentMigrationRegistration>().HmacServer.ValidateRequest(new HttpRequestWrapper(System.Web.HttpContext.Current.Request), x => new[] { new SignatureFactor("payload", payload) }))
 			{
 				System.Web.HttpContext.Current.Response.StatusCode = 403;
 				return null;

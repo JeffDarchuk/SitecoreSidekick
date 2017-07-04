@@ -11,7 +11,7 @@
 
 		</div>
 		<a hidefocus="true" ng-class="events.selectedIds.indexOf(vm.data.Id) !== -1 ? 'scContentTreeNodeActive':'scContentTreeNodeNormal'" style="position: relative;" ng-click="events.click(vm.data);">
-			<span class="cmloading" ng-if="!vm.error" ng-hide="!vm.data.loading">
+			<span class="cmloading" ng-if="!vm.error" ng-hide="!vm.loading">
 				<img src="/scs/cm/resources/cmspinner.gif" />
 			</span>
 			<span ng-repeat="status in vm.data.Status" ng-class="status.Item1" ng-click="vm.buildDiff(status.Item1, vm.data.Id, events)" ng-attr-title="{{status.Item2}}" class="cmcompare"></span>

@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web.Mvc;
-using Microsoft.CSharp.RuntimeBinder;
+﻿using Microsoft.CSharp.RuntimeBinder;
 using Sitecore.Configuration;
 using Sitecore.Data.Items;
 using Sitecore.SecurityModel;
@@ -19,23 +12,31 @@ namespace SitecoreSidekick.Handlers
 	public class ScsMainController : ScsController
 	{
 		private readonly IScsRegistrationService _registration;
+		private readonly IAuthenticationService _authenticationService;
+		private readonly IJsonSerializationService _jsonSerializationService;
+		private readonly IScsRegistrationService _scsRegistrationService;
 		public ScsMainController()
 		{
-			_registration = Bootstrap.Container.Resolve<IScsRegistrationService>();
+			_registration = Container.Resolve<IScsRegistrationService>();
+			_authenticationService = Bootstrap.Container.Resolve<IAuthenticationService>();
+			_jsonSerializationService = Bootstrap.Container.Resolve<IJsonSerializationService>();
+			_scsRegistrationService = Bootstrap.Container.Resolve<IScsRegistrationService>();
 		}
 
 		protected ScsMainController(IScsRegistrationService registration)
 		{
 			_registration = registration;
+			_authenticationService = Bootstrap.Container.Resolve<IAuthenticationService>();
+			_jsonSerializationService = Bootstrap.Container.Resolve<IJsonSerializationService>();
+			_scsRegistrationService = Bootstrap.Container.Resolve<IScsRegistrationService>();
 		}
 		[ActionName("scsvalid.scsvc")]
 		public ActionResult Valid()
 		{
-			string ticket = Sitecore.Web.Authentication.TicketManager.GetCurrentTicketId();
+			string ticket = _authenticationService.GetCurrentTicketId();
 			if (!string.IsNullOrWhiteSpace(ticket))
-				Sitecore.Web.Authentication.TicketManager.Relogin(ticket);
-			var user = Sitecore.Context.User;
-			if (!user.IsAuthenticated)
+				_authenticationService.Relogin(ticket);
+			if (!_authenticationService.IsAuthenticated)
 			{
 				return ScsJson(false);
 			}
@@ -77,8 +78,8 @@ namespace SitecoreSidekick.Handlers
 				if (data.Server != null)
 				{
 					WebClient wc = new WebClient { Encoding = Encoding.UTF8 };
-					var node = JsonNetWrapper.DeserializeObject<Dictionary<string, string>>(wc.UploadString($"{data.Server}/scs/platform/contenttreeselectedrelated.scsvc", "POST",
-									$@"{{ ""selectedIds"": {JsonNetWrapper.SerializeObject(data.SelectedIds)}, ""server"": null}}"));
+					var node = _jsonSerializationService.DeserializeObject<Dictionary<string, string>>(wc.UploadString($"{data.Server}/scs/platform/contenttreeselectedrelated.scsvc", "POST",
+									$@"{{ ""selectedIds"": {_jsonSerializationService.SerializeObject(data.SelectedIds)}, ""server"": null}}"));
 
 					return node;
 				}

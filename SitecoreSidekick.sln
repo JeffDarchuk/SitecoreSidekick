@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SitecoreSidekick.Shared.Uni
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScsContactSearch", "ScsContactSearch\ScsContactSearch.csproj", "{681701E3-77DD-4053-A0AF-B51AFFB295E8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SitecoreSidekick.UnitTests", "Source\SitecoreSidekick.UnitTests\SitecoreSidekick.UnitTests.csproj", "{23421921-4A34-4FB4-AB8F-1B2CEB204F07}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Source\SitecoreSidekick.Shared\SitecoreSidekick.Shared.projitems*{0da36c4a-1b13-4891-a263-5f994127051c}*SharedItemsImports = 4
@@ -52,6 +54,10 @@ Global
 		{681701E3-77DD-4053-A0AF-B51AFFB295E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{681701E3-77DD-4053-A0AF-B51AFFB295E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{681701E3-77DD-4053-A0AF-B51AFFB295E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{23421921-4A34-4FB4-AB8F-1B2CEB204F07}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{23421921-4A34-4FB4-AB8F-1B2CEB204F07}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{23421921-4A34-4FB4-AB8F-1B2CEB204F07}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{23421921-4A34-4FB4-AB8F-1B2CEB204F07}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

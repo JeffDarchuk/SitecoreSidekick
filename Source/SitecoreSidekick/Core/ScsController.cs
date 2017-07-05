@@ -1,11 +1,11 @@
-﻿using System;
+﻿using SitecoreSidekick.Services;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
@@ -16,6 +16,7 @@ namespace SitecoreSidekick.Core
 {
 	public abstract class ScsController : Controller
 	{
+		private readonly IJsonSerializationService _jsonSerializationService;
 		private readonly ConcurrentDictionary<string, string> _resourceCache = new ConcurrentDictionary<string, string>();
 		private readonly ConcurrentDictionary<string, byte[]> _imageCache = new ConcurrentDictionary<string, byte[]>();
 		private readonly IScsRegistrationService _registration;
@@ -54,7 +55,8 @@ namespace SitecoreSidekick.Core
 					return Content(GetResource(filename), "image/svg+xml");
 				if (filename.EndsWith(".js"))
 					return Content(GetResource(filename), "text/javascript");
-			}catch(ScsEmbeddedResourceNotFoundException){}
+			}
+			catch (ScsEmbeddedResourceNotFoundException) { }
 			Response.StatusCode = 404;
 			return Content("Requested resource not found");
 
@@ -136,7 +138,7 @@ namespace SitecoreSidekick.Core
 		{
 			if (o == null) return;
 			context.Response.StatusCode = 200;
-			var json = JsonNetWrapper.SerializeObject(o);
+			var json = _jsonSerializationService.SerializeObject(o);
 			context.Response.AppendHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1.
 			context.Response.AppendHeader("Pragma", "no-cache"); // HTTP 1.0.
 			context.Response.AppendHeader("Expires", "0"); // Proxies.
@@ -145,7 +147,7 @@ namespace SitecoreSidekick.Core
 
 		public virtual ActionResult ScsJson(object o)
 		{
-			return Content(JsonNetWrapper.SerializeObject(o), "application/json");
+			return Content(_jsonSerializationService.SerializeObject(o), "application/json");
 		}
 		/// <summary>
 		/// extracts the resource out of the binary
@@ -165,7 +167,8 @@ namespace SitecoreSidekick.Core
 					{
 						result = reader.ReadToEnd();
 					}
-				}else throw new ScsEmbeddedResourceNotFoundException();
+				}
+				else throw new ScsEmbeddedResourceNotFoundException();
 			}
 
 			_resourceCache[filename] = result;

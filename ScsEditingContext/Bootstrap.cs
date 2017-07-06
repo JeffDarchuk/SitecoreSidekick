@@ -1,9 +1,11 @@
-﻿using System.Linq;
-using SitecoreSidekick.Services;
-using SitecoreSidekick.Services.Interface;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using SitecoreSidekick.Shared.IoC;
 
-namespace SitecoreSidekick
+namespace ScsEditingContext
 {
 	public class Bootstrap
 	{
@@ -33,15 +35,10 @@ namespace SitecoreSidekick
 
 		private static Container InitializeContainer()
 		{
-			Container container = new Container();
+			Container container = SitecoreSidekick.Bootstrap.Container;
 
 			// Register components here
-			container.Register<IAuthenticationService, AuthenticationService>();
-			container.Register<IJsonSerializationService, JsonSerializationService>();
-			container.Register<IScsRegistrationService, ScsRegistrationService>();
-			container.Register<IMainfestResourceStreamService, MainfestResourceStreamService>();
-			container.RegisterFactory<IHttpClientService>(args => args.Any() ? new HttpClientService(args[0].ToString()) : new HttpClientService());
-			container.Register<ISitecoreDataAccessService, SitecoreDataAccessService>();
+
 
 			return container;
 		}

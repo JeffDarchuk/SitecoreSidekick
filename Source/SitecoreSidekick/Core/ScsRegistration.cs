@@ -1,4 +1,8 @@
-﻿using System;
+﻿using Sitecore.Mvc.Extensions;
+using Sitecore.Pipelines;
+using SitecoreSidekick.Pipelines.HttpRequestBegin;
+using SitecoreSidekick.Services.Interface;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
@@ -6,13 +10,6 @@ using System.Linq;
 using System.Text;
 using System.Web.Mvc;
 using System.Web.Routing;
-using Sitecore.Mvc.Extensions;
-using Sitecore.Pipelines;
-using SitecoreSidekick.Handlers;
-using SitecoreSidekick.Pipelines.HttpRequestBegin;
-using SitecoreSidekick.Services;
-using SitecoreSidekick.Services.Interface;
-using SitecoreSidekick.Shared.IoC;
 
 namespace SitecoreSidekick.Core
 {

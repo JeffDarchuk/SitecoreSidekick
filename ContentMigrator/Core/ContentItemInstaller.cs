@@ -1,16 +1,7 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Web.Hosting;
-using Rainbow.Diff;
+﻿using Rainbow.Diff;
 using Rainbow.Model;
 using Rainbow.Storage;
-using Rainbow.Storage.Sc;
 using Rainbow.Storage.Sc.Deserialization;
-using ScsContentMigrator.Args;
 using ScsContentMigrator.CMRainbow;
 using ScsContentMigrator.Core.Interface;
 using ScsContentMigrator.Models;
@@ -24,8 +15,12 @@ using Sitecore.Diagnostics;
 using Sitecore.SecurityModel;
 using SitecoreSidekick;
 using SitecoreSidekick.ContentTree;
-using SitecoreSidekick.Shared.IoC;
-using ItemData = Rainbow.Storage.Sc.ItemData;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ScsContentMigrator.Core
 {
@@ -44,14 +39,8 @@ namespace ScsContentMigrator.Core
 
 		public ContentItemInstaller()
 		{
-			var deserializer = new DefaultDeserializer(_logger, new DefaultFieldFilter());
-			_scDatastore = new SitecoreDataStore(deserializer);			
+			_scDatastore = Bootstrap.Container.Resolve<IDataStore>(_logger);
 			_sitecore = Bootstrap.Container.Resolve<ISitecoreAccessService>();
-		}
-		public ContentItemInstaller(ISitecoreAccessService sitecore, IDataStore dataStore)
-		{
-			_scDatastore = dataStore;
-			_sitecore = sitecore;
 		}
 
 		public IEnumerable<dynamic> GetItemLogEntries(int lineToStartFrom)
@@ -261,7 +250,7 @@ namespace ScsContentMigrator.Core
 				{
 					try
 					{
-						
+
 						if (localData != null)
 						{
 							_logger.BeginEvent(remoteData, "Changed", _logger.GetSrc(ThemeManager.GetIconImage(localItem, 32, 32, "", "")), true);

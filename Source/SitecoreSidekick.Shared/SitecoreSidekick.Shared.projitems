@@ -10,6 +10,5 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)IoC\Container.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)IoC\IContainer.cs" />
   </ItemGroup>
 </Project>

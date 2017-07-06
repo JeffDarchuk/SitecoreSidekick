@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using MicroCHAP;
+﻿using MicroCHAP;
 using Rainbow.Model;
 using Rainbow.Storage.Yaml;
 using ScsContentMigrator.Args;
@@ -15,20 +8,22 @@ using ScsContentMigrator.Security;
 using ScsContentMigrator.Services.Interface;
 using Sitecore.Diagnostics;
 using SitecoreSidekick;
-using SitecoreSidekick.Core;
 using SitecoreSidekick.Services.Interface;
-using SitecoreSidekick.Shared.IoC;
+using System;
+using System.IO;
+using System.Net;
+using System.Text;
 
 namespace ScsContentMigrator.Services
 {
 	public class RemoteContentService : IRemoteContentService
 	{
-		private ISignatureService _ss;
-		private readonly IScsRegistrationService _registration;
+		private readonly ISignatureService _ss;
 
 		public RemoteContentService()
 		{
-			_registration = Bootstrap.Container.Resolve<IScsRegistrationService>();
+			var registration = Bootstrap.Container.Resolve<IScsRegistrationService>();
+			_ss = Bootstrap.Container.Resolve<ISignatureService>(registration.GetScsRegistration<ContentMigrationRegistration>().AuthenticationSecret);
 		}
 
 		public RemoteContentService(ISignatureService signature)

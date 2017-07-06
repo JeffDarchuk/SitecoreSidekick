@@ -1,6 +1,8 @@
 ﻿using FluentAssertions;
 using SitecoreSidekick.Shared.IoC;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace SitecoreSidekick.Shared.UnitTests.IoC
@@ -56,6 +58,31 @@ namespace SitecoreSidekick.Shared.UnitTests.IoC
 			IMyClass myClassInstance = container.Resolve<IMyClass>();
 
 			myClassInstance.GetType().ShouldBeEquivalentTo(typeof(MyOtherClass));
+		}
+
+		[Fact]
+		public void RegisterFactory_ResolvesDifferentInstances()
+		{
+			int instanceCount = 5;
+			Container container = new Container();
+
+			container.RegisterFactory<IMyClass>(args => new MyClass());
+
+			List<IMyClass> myClassInstances = new List<IMyClass>();
+
+			for (int idx = 0; idx < instanceCount; idx++)
+			{
+				IMyClass myClassInstance = container.Resolve<IMyClass>();
+				myClassInstance.Counter = idx;
+				myClassInstances.Add(myClassInstance);
+			}
+
+			myClassInstances.Count.Should().Be(instanceCount);
+
+			for (int idx = 0; idx < instanceCount; idx++)
+			{
+				myClassInstances.Any(mci => mci.Counter == idx).Should().BeTrue();
+			}
 		}
 
 		[Fact]

@@ -78,6 +78,7 @@
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Bootstrap.cs" />
     <Compile Include="EditingContextController.cs" />
     <Compile Include="EditingContextRegistration.cs" />
     <Compile Include="Pipelines\HttpRequestBegin\RegisterEvent.cs" />

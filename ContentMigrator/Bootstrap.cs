@@ -1,22 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Rainbow.Storage;
+using Rainbow.Storage.Sc;
+using Rainbow.Storage.Sc.Deserialization;
+using ScsContentMigrator.CMRainbow;
+using ScsContentMigrator.Core;
+using ScsContentMigrator.Core.Interface;
 using ScsContentMigrator.Services;
 using ScsContentMigrator.Services.Interface;
-using SitecoreSidekick.Services;
-using SitecoreSidekick.Services.Interface;
 using SitecoreSidekick.Shared.IoC;
+using System.Linq;
+using MicroCHAP;
 
 namespace ScsContentMigrator
 {
 	public class Bootstrap
 	{
-		internal static readonly object BootstrapLock = new object();
+		private static readonly object BootstrapLock = new object();
+		/// <summary>
+		/// Sets the container to use to an existing container
+		/// </summary>
+		/// <param name="container">The container to use</param>
+		public static void SetContainer(Container container)
+		{
+			_container = container;
+		}
 
-		private static IContainer _container;
-		public static IContainer Container
+		private static Container _container;
+		public static Container Container
 		{
 			get
 			{
@@ -29,15 +38,24 @@ namespace ScsContentMigrator
 			}
 		}
 
-		private static IContainer InitializeContainer()
+		private static Container InitializeContainer()
 		{
-			Container container = new Container();
+			Container container = SitecoreSidekick.Bootstrap.Container;
 
-			// Register components here			
-			container.Register<IScsRegistrationService, ScsRegistrationService>();
+			// Register components here
+			container.Register<IContentMigrationManagerService, ContentMigrationManagerService>();
 			container.Register<IRemoteContentService, RemoteContentService>();
 			container.Register<ISitecoreAccessService, SitecoreAccessService>();
-			container.Register<IContentMigrationManagerService, ContentMigrationManagerService>();			
+			container.RegisterFactory<IDataStore>(args =>
+			{
+				IDefaultDeserializerLogger logger = (IDefaultDeserializerLogger)args.FirstOrDefault(a => a is IDefaultDeserializerLogger);
+				var deserializer = new DefaultDeserializer(logger, new DefaultFieldFilter());
+				return new SitecoreDataStore(deserializer);
+			});
+			container.RegisterFactory<IContentItemPuller>(args => new ContentItemPuller());
+			container.RegisterFactory<IContentItemInstaller>(args => new ContentItemInstaller());
+			container.RegisterFactory<ISignatureService>(args=> new SignatureService((string)args[0]));
+
 			return container;
 		}
 	}

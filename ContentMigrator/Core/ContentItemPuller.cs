@@ -1,20 +1,17 @@
-﻿using System;
+﻿using Rainbow.Model;
+using Rainbow.Storage.Yaml;
+using ScsContentMigrator.Core.Interface;
+using ScsContentMigrator.Models;
+using ScsContentMigrator.Services;
+using ScsContentMigrator.Services.Interface;
+using Sitecore.Diagnostics;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web.Hosting;
-using Rainbow.Model;
-using Rainbow.Storage.Yaml;
-using ScsContentMigrator.Core.Interface;
-using ScsContentMigrator.Data;
-using ScsContentMigrator.Models;
-using ScsContentMigrator.Services;
-using ScsContentMigrator.Services.Interface;
-using Sitecore.Diagnostics;
-using SitecoreSidekick.Shared.IoC;
 
 namespace ScsContentMigrator.Core
 {
@@ -29,10 +26,7 @@ namespace ScsContentMigrator.Core
 		{
 			_remoteContent = Bootstrap.Container.Resolve<IRemoteContentService>();
 		}
-		public ContentItemPuller(IRemoteContentService remoteContent)
-		{
-			_remoteContent = remoteContent;
-		}
+
 		public BlockingCollection<IItemData> ItemsToInstall => _gatheredRemoteItems;
 
 		public bool Completed { get; private set; }
@@ -58,7 +52,7 @@ namespace ScsContentMigrator.Core
 							{
 								break;
 							}
-							lock(_locker)
+							lock (_locker)
 								processing++;
 							ChildrenItemDataModel remoteContentItem = _remoteContent.GetRemoteItemDataWithChildren(id, server);
 							IItemData itemData = DeserializeYaml(remoteContentItem.Item, id.ToString());

@@ -44,14 +44,6 @@ namespace ScsContentMigrator
 			_remoteContent = Bootstrap.Container.Resolve<IRemoteContentService>();
 		}
 
-		protected ContentMigrationController(ISitecoreAccessService sitecore, IScsRegistrationService registration, IContentMigrationManagerService migrationManager, IRemoteContentService remoteContent)
-		{
-			_sitecore = sitecore;
-			_registration = registration;
-			_migrationManager = migrationManager;
-			_remoteContent = remoteContent;
-		}
-
 		[MchapOrLoggedIn]
 		[ActionName("cmgetitemyaml.scsvc")]
 		public ActionResult GetItemYaml(string id)

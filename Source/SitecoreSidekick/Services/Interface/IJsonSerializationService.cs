@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SitecoreSidekick.Services
+namespace SitecoreSidekick.Services.Interface
 {
 	public interface IJsonSerializationService
 	{

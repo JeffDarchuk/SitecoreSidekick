@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using Rainbow.Diff.Fields;
+﻿using Rainbow.Diff.Fields;
 using Rainbow.Model;
 using Rainbow.Storage.Sc;
-using ScsContentMigrator.Args;
-using ScsContentMigrator.Models;
-using ScsContentMigrator.Services;
 using ScsContentMigrator.Services.Interface;
 using Sitecore;
 using Sitecore.Configuration;
@@ -18,7 +11,10 @@ using Sitecore.Data.Managers;
 using Sitecore.Diagnostics;
 using Sitecore.SecurityModel;
 using SitecoreSidekick.ContentTree;
-using SitecoreSidekick.Shared.IoC;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
 using Version = Sitecore.Data.Version;
 
 namespace ScsContentMigrator.Data
@@ -33,7 +29,7 @@ namespace ScsContentMigrator.Data
 			Comparers.Add(new MultiLineTextComparison());
 			Comparers.Add(new MultilistComparison());
 			Comparers.Add(new XmlComparison());
-			Comparers.Add(new DefaultComparison());			
+			Comparers.Add(new DefaultComparison());
 		}
 
 		public string Data;
@@ -49,10 +45,6 @@ namespace ScsContentMigrator.Data
 			_remoteContent = Bootstrap.Container.Resolve<IRemoteContentService>();
 		}
 
-		public CompareContentTreeNode(IRemoteContentService remoteContent)
-		{
-			_remoteContent = remoteContent;
-		}
 		public CompareContentTreeNode(Item item, bool open = true) : base(item, open)
 		{
 			SortedSet<string> tmp = new SortedSet<string>();
@@ -83,7 +75,7 @@ namespace ScsContentMigrator.Data
 			Compare = new Dictionary<string, List<Tuple<string, string>>>();
 			IItemData itemData = null;
 			itemData = _remoteContent.GetRemoteItemData(Guid.Parse(Id), server);
-				using (new SecurityDisabler())
+			using (new SecurityDisabler())
 			{
 				var localItem = Factory.GetDatabase("master", true).DataManager.DataEngine.GetItem(new ID(Id), LanguageManager.DefaultLanguage, Sitecore.Data.Version.Latest);
 
@@ -148,7 +140,7 @@ namespace ScsContentMigrator.Data
 				foreach (var lang in localItem.Languages.Where(x => tracker.ContainsKey(x.Name)))
 				{
 					Item langItem = localItem.Database.DataManager.DataEngine.GetItem(new ID(Id), lang, Version.Latest);
-					for (int ver = tracker[lang.Name]+1; ver <= langItem.Versions.Count; ver++)
+					for (int ver = tracker[lang.Name] + 1; ver <= langItem.Versions.Count; ver++)
 					{
 						string key = "Extra version";
 						if (!Compare.ContainsKey(key))

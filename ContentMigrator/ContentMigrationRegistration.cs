@@ -1,39 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Dynamic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Web;
-using System.Xml;
-using Microsoft.CSharp.RuntimeBinder;
-using ScsContentMigrator.Args;
-using ScsContentMigrator.Data;
+﻿using ScsContentMigrator.Data;
+using ScsContentMigrator.Security;
 using Sitecore.Configuration;
 using Sitecore.Data;
-using Sitecore.Data.Items;
-using Sitecore.Diagnostics;
+using Sitecore.Pipelines;
 using Sitecore.SecurityModel;
 using SitecoreSidekick.ContentTree;
-using SitecoreSidekick.Handlers;
-using System.Timers;
-using System.Threading.Tasks;
-using System.Collections.Concurrent;
-using System.IO;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Web.Mvc;
-using MicroCHAP;
-using ScsContentMigrator.Core.Interface;
-using ScsContentMigrator.Models;
-using ScsContentMigrator.Security;
-using ScsContentMigrator.Services;
-using ScsContentMigrator.Services.Interface;
-using Sitecore.Pipelines;
-using SitecoreSidekick;
 using SitecoreSidekick.Core;
-using SitecoreSidekick.Models;
-using SitecoreSidekick.Shared.IoC;
+using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Timers;
+using System.Xml;
 
 namespace ScsContentMigrator
 {
@@ -41,8 +20,8 @@ namespace ScsContentMigrator
 	{
 		private static Checksum _checksum;
 		public static CompareContentTreeNode Root { get; } = new CompareContentTreeNode { DatabaseName = "master", DisplayName = "Root", Icon = "/~/icon/Applications/32x32/media_stop.png", Open = true, Nodes = new List<ContentTreeNode>() };
-		public int RemoteThreads { get; }= 1;
-		public int WriterThreads { get; }= 1;
+		public int RemoteThreads { get; } = 1;
+		public int WriterThreads { get; } = 1;
 		public List<string> ServerList { get; } = new List<string>();
 		public override string Directive => "cmmasterdirective";
 		public override NameValueCollection DirectiveAttributes { get; set; }
@@ -53,7 +32,7 @@ namespace ScsContentMigrator
 		public override string Name => "Content Migrator";
 		public override string CssStyle => "width:100%;min-width:800px;";
 		public string AuthenticationSecret { get; set; }
-		
+
 		public ContentMigrationRegistration(string roles, string isAdmin, string users, string remotePullingThreads, string databaseWriterThreads) : base(roles, isAdmin, users)
 		{
 			if (RemoteThreads == 1)
@@ -71,7 +50,7 @@ namespace ScsContentMigrator
 			}
 
 			Timer t = new Timer(20 * 1000);
-			t.Elapsed += (sender, e) => 
+			t.Elapsed += (sender, e) =>
 			{
 				_checksum = new ChecksumGenerator().Generate(Root.Nodes.Select(x => new ID(x.Id)).ToList(), "master");
 			};
@@ -84,7 +63,7 @@ namespace ScsContentMigrator
 			{
 				_checksum = new ChecksumGenerator().Generate(Root.Nodes.Select(x => new ID(x.Id)).ToList(), "master");
 			});
-			
+
 			if (string.IsNullOrWhiteSpace(AuthenticationSecret))
 			{
 				throw new InvalidOperationException("Sitecore Sidekick Content Migrator was initialized with an empty shared secret. Make a copy of zSCSContentMigrator.Local.config.example, rename it to .config, and set up a unique, long, randomly generated shared secret there.");

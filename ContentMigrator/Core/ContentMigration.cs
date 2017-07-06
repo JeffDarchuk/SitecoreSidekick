@@ -1,14 +1,11 @@
-﻿using System;
+﻿using ScsContentMigrator.Core.Interface;
+using ScsContentMigrator.Models;
+using ScsContentMigrator.Services.Interface;
+using SitecoreSidekick.Services.Interface;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using ScsContentMigrator.Args;
-using ScsContentMigrator.Core.Interface;
-using ScsContentMigrator.Models;
-using ScsContentMigrator.Services.Interface;
-using SitecoreSidekick.ContentTree;
-using SitecoreSidekick.Services.Interface;
-using SitecoreSidekick.Shared.IoC;
 
 namespace ScsContentMigrator.Core
 {
@@ -27,17 +24,8 @@ namespace ScsContentMigrator.Core
 			_remoteContent = Bootstrap.Container.Resolve<IRemoteContentService>();
 			_sitecoreAccess = Bootstrap.Container.Resolve<ISitecoreAccessService>();
 			_registration = Bootstrap.Container.Resolve<IScsRegistrationService>();
-			_puller = new ContentItemPuller();
-			_installer = new ContentItemInstaller();
-		}
-
-		public ContentMigration(IContentItemPuller puller, IContentItemInstaller installer, IRemoteContentService remoteContent, ISitecoreAccessService sitecoreAccess, IScsRegistrationService registration)
-		{
-			_puller = puller;
-			_installer = installer;
-			_remoteContent = remoteContent;
-			_sitecoreAccess = sitecoreAccess;
-			_registration = registration;
+			_puller = Bootstrap.Container.Resolve<IContentItemPuller>();
+			_installer = Bootstrap.Container.Resolve<IContentItemInstaller>();
 		}
 
 		public int ItemsInQueueToInstall => _puller.ItemsToInstall.Count;

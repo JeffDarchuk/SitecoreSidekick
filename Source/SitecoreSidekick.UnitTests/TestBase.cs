@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
 
 namespace SitecoreSidekick.UnitTests
 {
@@ -27,15 +28,25 @@ namespace SitecoreSidekick.UnitTests
 		/// <returns>A new instance of the provided type</returns>
 		protected T CreateInstance<T>()
 		{
-			IEnumerable<FieldInfo> fields = typeof(T).GetFields(BindingFlags.NonPublic | BindingFlags.Instance).Where(f => f.FieldType.IsInterface);
+			RegisterDependencies(typeof(T));
+			return Activator.CreateInstance<T>();
+		}
+
+		/// <summary>
+		/// Recursively registers all dependencies (private readonly Interfaces) required to create the provided type.
+		/// </summary>
+		/// <param name="t">The type to register dependencies for</param>
+		private void RegisterDependencies(Type t)
+		{
+			if (t.BaseType != null) RegisterDependencies(t.BaseType);
+			IEnumerable<FieldInfo> fields = t.GetFields(BindingFlags.NonPublic | BindingFlags.Instance).Where(f => f.FieldType.IsInterface);			
 			foreach (FieldInfo field in fields)
 			{
 				if (Container.ContainsRegistration(field.FieldType)) continue;
+				RegisterDependencies(field.FieldType);
 				object fieldImplementation = Substitute.For(new[] { field.FieldType }, new object[] { });
 				Container.Register(field.FieldType, fieldImplementation);
 			}
-
-			return Activator.CreateInstance<T>();
 		}
 
 		/// <summary>

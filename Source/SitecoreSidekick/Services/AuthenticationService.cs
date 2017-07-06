@@ -1,4 +1,6 @@
-﻿namespace SitecoreSidekick.Services.Implementation
+﻿using SitecoreSidekick.Services.Interface;
+
+namespace SitecoreSidekick.Services
 {
 	public class AuthenticationService : IAuthenticationService
 	{

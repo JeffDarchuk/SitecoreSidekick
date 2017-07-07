@@ -20,37 +20,35 @@ namespace SitecoreSidekick.Core
 		public bool AdminOnly { get; }
 		public List<string> Roles { get; }
 		public List<string> Users { get; }
-		public IScsRegistrationService Registration { get; }
+		private readonly IScsRegistrationService _scsRegistrationService;
+		private readonly IAuthorizationService _authorizationService;
+		private readonly IMainfestResourceStreamService _manifestResourceStreamService;
+
 		protected ScsRegistration(string roles, string isAdmin, string users)
 		{
 			AdminOnly = isAdmin == "true";
 			Roles = roles.Split('|').Where(x => !x.IsWhiteSpaceOrNull()).ToList();
 			Users = users.Split('|').Where(x => !x.IsWhiteSpaceOrNull()).ToList();
-			Registration = Bootstrap.Container.Resolve<IScsRegistrationService>();
+			_scsRegistrationService = Bootstrap.Container.Resolve<IScsRegistrationService>();
+			_authorizationService = Bootstrap.Container.Resolve<IAuthorizationService>();
+			_manifestResourceStreamService = Bootstrap.Container.Resolve<IMainfestResourceStreamService>();
 		}
-		protected ScsRegistration(string roles, string isAdmin, string users, IScsRegistrationService registration)
-		{
-			AdminOnly = isAdmin == "true";
-			Roles = roles.Split('|').Where(x => !x.IsWhiteSpaceOrNull()).ToList();
-			Users = users.Split('|').Where(x => !x.IsWhiteSpaceOrNull()).ToList();
-			Registration = registration;
-		}
+
 		public virtual void Process(PipelineArgs args)
 		{
-			Registration.RegisterSidekick(this);
-			Registration.RegisterSidekick(Controller, this);
+			_scsRegistrationService.RegisterSidekick(this);
+			_scsRegistrationService.RegisterSidekick(Controller, this);
 		}
 
 		public bool ApplicableSidekick()
-		{
-			bool admin = IsAdmin.CurrentUserAdmin();
-			if (admin)
+		{			
+			if (_authorizationService.IsCurrentUserAdmin)
 				return true;
 			if (AdminOnly)
 				return false;
 			if (Roles.Count == 0)
 				return true;
-			return IsAdmin.CurrentUserInRoleList(Roles);
+			return _authorizationService.IsCurrentUserInRole(Roles);
 		}
 
 		public virtual void RegisterRoutes()
@@ -66,24 +64,14 @@ namespace SitecoreSidekick.Core
 		public string GetResource(string filename)
 		{
 			filename = filename.ToLowerInvariant();
-			string result = "";
-			using (var stream = GetType().Assembly.GetManifestResourceStream(ResourcesPath + "." + filename))
-			{
-				if (stream != null)
-				{
-					using (var reader = new StreamReader(stream))
-					{
-						result = reader.ReadToEnd();
-					}
-				}
-			}
+			string result = _manifestResourceStreamService.GetManifestResourceText(GetType(), ResourcesPath + "." + filename, () => "");
 			return result;
 		}
 		public string CompileEmbeddedResource(string fileExtension)
 		{
 			StringBuilder sb = new StringBuilder();
 
-			foreach (var resource in GetType().Assembly.GetManifestResourceNames().Where(x => x.EndsWith(fileExtension) && x.StartsWith(ResourcesPath)).Select(x => x.Substring(ResourcesPath.Length + 1)))
+			foreach (var resource in _manifestResourceStreamService.GetManifestResourceNames(GetType()).Where(x => x.EndsWith(fileExtension) && x.StartsWith(ResourcesPath)).Select(x => x.Substring(ResourcesPath.Length + 1)))
 			{
 				if (!resource.Equals("scsangular.js"))
 				{

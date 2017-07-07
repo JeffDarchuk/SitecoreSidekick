@@ -75,8 +75,10 @@ namespace SitecoreSidekick.UnitTests.Handlers
 		{
 			string endTag = "</head>";
 			string expectedStartTag = "<style>";
-			GetSubstitute<IScsRegistrationService>().GetScsRegistration<ScsMainRegistration>().Returns(Substitute.For<ScsMainRegistration>("","",""));
-			GetSubstitute<IMainfestResourceStreamService>().GetManifestResourceText(Arg.Any<string>()).Returns(endTag);
+
+			var scsMainRegistration =  CreateInstance<ScsMainRegistration>("", "", "");
+			GetSubstitute<IScsRegistrationService>().GetScsRegistration<ScsMainRegistration>().Returns(scsMainRegistration);
+			GetSubstitute<IMainfestResourceStreamService>().GetManifestResourceText(Arg.Any<Type>(), Arg.Any<string>(), Arg.Any<Func<string>>()).Returns(endTag);
 
 			var scsMainController = CreateInstance<ScsMainController>();
 			scsMainController.ControllerContext = ContextSubstitute();
@@ -94,8 +96,9 @@ namespace SitecoreSidekick.UnitTests.Handlers
 		{
 			string endTag = "<head>";
 			string expectedStartTag = "<head>";
-			GetSubstitute<IScsRegistrationService>().GetScsRegistration<ScsMainRegistration>().Returns(Substitute.For<ScsMainRegistration>("", "", ""));
-			GetSubstitute<IMainfestResourceStreamService>().GetManifestResourceText(Arg.Any<string>()).Returns(endTag);
+			var scsMainRegistration = CreateInstance<ScsMainRegistration>("", "", "");
+			GetSubstitute<IScsRegistrationService>().GetScsRegistration<ScsMainRegistration>().Returns(scsMainRegistration);
+			GetSubstitute<IMainfestResourceStreamService>().GetManifestResourceText(Arg.Any<Type>(), Arg.Any<string>(), Arg.Any<Func<string>>()).Returns(endTag);
 
 			var scsMainController = CreateInstance<ScsMainController>();
 			scsMainController.ControllerContext = ContextSubstitute();
@@ -109,28 +112,25 @@ namespace SitecoreSidekick.UnitTests.Handlers
 
 		[Fact]
 		public async Task SelectRelated_ServerNotDefined_GetsFromSitecoreDatabase()
-		{
-			var itemId = ID.NewID;
-			var definition = new ItemDefinition(itemId, string.Empty, ID.Null, ID.Null);
-			var data = new ItemData(definition, Language.Current, Sitecore.Data.Version.First, new FieldList());
-			Item item = Substitute.For<Item>(itemId, data, Substitute.For<Database>());
-
-			GetSubstitute<ISitecoreDataAccessService>().GetItem(Arg.Any<string>()).Returns(item);
+		{			
 			var scsMainController = CreateInstance<ScsMainController>();
+			GetSubstitute<ISitecoreDataAccessService>().GetItem(Arg.Any<string>()).Returns(new ScsSitecoreItem());
 
 			await scsMainController.SelectedRelated(new ContentSelectedRelatedModel { SelectedIds = new List<string> { "Id" } });
 
-			GetSubstitute<ISitecoreDataAccessService>().GetItem(Arg.Any<string>()).Received(1);
+			GetSubstitute<ISitecoreDataAccessService>().Received(1).GetItem(Arg.Any<string>());
 		}
 
-		private ControllerContext ContextSubstitute()
+		[Fact]
+		public async Task SelectRelated_ServerDefined_GetsFromServer()
 		{
-			HttpRequestBase request = Substitute.For<HttpRequestBase>();
-			HttpContextBase httpContext = Substitute.For<HttpContextBase>();
-			httpContext.Request.Returns(request);
-			ControllerContext controllerContext = Substitute.For<ControllerContext>();
-			controllerContext.HttpContext.Returns(httpContext);
-			return controllerContext;
+			string server = "http://google.com";
+			var scsMainController = CreateInstance<ScsMainController>();			
+			GetSubstitute<ISitecoreDataAccessService>().GetItem(Arg.Any<string>()).Returns(new ScsSitecoreItem());
+
+			await scsMainController.SelectedRelated(new ContentSelectedRelatedModel { SelectedIds = new List<string> { "Id" }, Server = server});
+
+			await GetSubstitute<IHttpClientService>().Received(1).Post(Arg.Any<string>(), Arg.Any<string>());
 		}
 	}
 }

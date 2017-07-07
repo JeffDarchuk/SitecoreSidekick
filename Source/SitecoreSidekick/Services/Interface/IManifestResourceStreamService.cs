@@ -9,7 +9,8 @@ namespace SitecoreSidekick.Services.Interface
 {
 	public interface IMainfestResourceStreamService
 	{
-		string GetManifestResourceText(string fileName);
-		byte[] GetManifestResourceImage(string fileName, ImageFormat imageFormat);
+		string GetManifestResourceText(Type callingAssembly, string fileName, Func<string> onNotFound = null);
+		byte[] GetManifestResourceImage(Type callingAssembly, string fileName, ImageFormat imageFormat, Func<byte[]> onNotFound = null);
+		IEnumerable<string> GetManifestResourceNames(Type callingAssembly);
 	}
 }

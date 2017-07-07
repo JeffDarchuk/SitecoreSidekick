@@ -4,21 +4,30 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Reflection.Emit;
+using System.Threading;
+using System.Web;
+using System.Web.Mvc;
 
 namespace SitecoreSidekick.UnitTests
 {
-	public class TestBase
+	public static class TestLocker
 	{
+		private static readonly SemaphoreSlim TestLock = new SemaphoreSlim(1);
+		public static void Wait() => TestLock.Wait();
+		public static void Release() => TestLock.Release();
+	}
+
+	public class TestBase : IDisposable
+	{		
 		/// <summary>
 		/// The IoC container
 		/// </summary>
 		protected Container Container { get; }
 
 		protected TestBase()
-		{
-			Container = new Container();
-			Bootstrap.SetContainer(Container);
+		{			
+			TestLocker.Wait();			
+			Container = new Container();			
 		}
 
 		/// <summary>
@@ -26,10 +35,14 @@ namespace SitecoreSidekick.UnitTests
 		/// </summary>
 		/// <typeparam name="T">The type of instance to create</typeparam>
 		/// <returns>A new instance of the provided type</returns>
-		protected T CreateInstance<T>()
+		protected T CreateInstance<T>(params object[] args)
 		{
-			RegisterDependencies(typeof(T));
-			return Activator.CreateInstance<T>();
+			RegisterDependencies(typeof(T));					
+			Bootstrap.SetContainer(Container);			
+			if (args.Any())
+				return (T) Activator.CreateInstance(typeof(T), args);
+				
+			return Activator.CreateInstance<T>();			
 		}
 
 		/// <summary>
@@ -69,6 +82,37 @@ namespace SitecoreSidekick.UnitTests
 		protected T GetSubstitute<T>() where T : class
 		{
 			return !Container.ContainsRegistration<T>() ? CreateSubstitute<T>() : Container.Resolve<T>();
+		}
+
+		/// <summary>
+		/// Creates a substitute for the provided type and registers all of its dependencies in the container
+		/// </summary>
+		/// <typeparam name="T">The type of object to create a substitute for</typeparam>
+		/// <param name="args">[Optional] arguments to provide to the substitute for creation</param>
+		/// <returns>A substitute for the provided type</returns>
+		protected T CreateSubstituteFor<T>(params object[] args) where T : class
+		{
+			RegisterDependencies(typeof(T));
+			return Substitute.For<T>(args);
+		}
+
+		/// <summary>
+		/// Gets a substitute for the ControllerContext
+		/// </summary>
+		/// <returns>A substitute for the ControllerContext</returns>
+		protected ControllerContext ContextSubstitute()
+		{
+			HttpRequestBase request = Substitute.For<HttpRequestBase>();
+			HttpContextBase httpContext = Substitute.For<HttpContextBase>();
+			httpContext.Request.Returns(request);
+			ControllerContext controllerContext = Substitute.For<ControllerContext>();
+			controllerContext.HttpContext.Returns(httpContext);
+			return controllerContext;
+		}
+
+		public void Dispose()
+		{
+			TestLocker.Release();			
 		}
 	}
 }

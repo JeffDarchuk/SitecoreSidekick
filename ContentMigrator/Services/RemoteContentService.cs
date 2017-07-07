@@ -19,11 +19,12 @@ namespace ScsContentMigrator.Services
 	public class RemoteContentService : IRemoteContentService
 	{
 		private readonly ISignatureService _ss;
-
+		private readonly IJsonSerializationService _jsonSerializationService;
 		public RemoteContentService()
 		{
 			var registration = Bootstrap.Container.Resolve<IScsRegistrationService>();
 			_ss = Bootstrap.Container.Resolve<ISignatureService>(registration.GetScsRegistration<ContentMigrationRegistration>().AuthenticationSecret);
+			_jsonSerializationService = Bootstrap.Container.Resolve<IJsonSerializationService>();
 		}
 
 		public RemoteContentService(ISignatureService signature)
@@ -33,7 +34,7 @@ namespace ScsContentMigrator.Services
 		public IItemData GetRemoteItemData(Guid id, string server)
 		{
 			string url = $"{server}/scs/cm/cmgetitemyaml.scsvc";
-			string parameters = JsonNetWrapper.SerializeObject(id);
+			string parameters = _jsonSerializationService.SerializeObject(id);
 			string yaml = MakeRequest(url, parameters);
 			return DeserializeYaml(yaml, id.ToString());
 		}
@@ -41,9 +42,9 @@ namespace ScsContentMigrator.Services
 		public ChildrenItemDataModel GetRemoteItemDataWithChildren(Guid id, string server)
 		{
 			string url = $"{server}/scs/cm/cmgetitemyamlwithchildren.scsvc";
-			string parameters = JsonNetWrapper.SerializeObject(id);
+			string parameters = _jsonSerializationService.SerializeObject(id);
 			string json = MakeRequest(url, parameters);
-			return JsonNetWrapper.DeserializeObject<ChildrenItemDataModel>(json);
+			return _jsonSerializationService.DeserializeObject<ChildrenItemDataModel>(json);
 		}
 		private string MakeRequest(string url, string parameters)
 		{
@@ -132,7 +133,7 @@ namespace ScsContentMigrator.Services
 
 			string response = MakeRequest(url, parameters);
 
-			var node = JsonNetWrapper.DeserializeObject<CompareContentTreeNode>(response);
+			var node = _jsonSerializationService.DeserializeObject<CompareContentTreeNode>(response);
 
 			if (!string.IsNullOrWhiteSpace(args.Id))
 				node.SimpleCompare(args.Database, args.Id);

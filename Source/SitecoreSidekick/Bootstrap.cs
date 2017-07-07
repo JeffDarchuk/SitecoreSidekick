@@ -7,7 +7,7 @@ namespace SitecoreSidekick
 {
 	public class Bootstrap
 	{
-		private static readonly object BootstrapLock = new object();
+		internal static readonly object BootstrapLock = new object();
 		/// <summary>
 		/// Sets the container to use to an existing container
 		/// </summary>
@@ -37,6 +37,7 @@ namespace SitecoreSidekick
 
 			// Register components here
 			container.Register<IAuthenticationService, AuthenticationService>();
+			container.Register<IAuthorizationService, AuthorizationService>();
 			container.Register<IJsonSerializationService, JsonSerializationService>();
 			container.Register<IScsRegistrationService, ScsRegistrationService>();
 			container.Register<IMainfestResourceStreamService, MainfestResourceStreamService>();

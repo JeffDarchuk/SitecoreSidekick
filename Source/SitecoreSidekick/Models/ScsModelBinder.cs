@@ -6,11 +6,19 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using Sitecore.Publishing;
+using SitecoreSidekick.Services.Interface;
 
 namespace SitecoreSidekick.Models
 {
 	public class ScsModelBinder : IModelBinder
 	{
+		private readonly IJsonSerializationService _jsonSerializationService;
+
+		public ScsModelBinder()
+		{
+			_jsonSerializationService = Bootstrap.Container.Resolve<IJsonSerializationService>();
+		}
+
 		internal static IModelBinder Default;
 		public object BindModel(ControllerContext controllerContext, ModelBindingContext bindingContext)
 		{
@@ -19,7 +27,7 @@ namespace SitecoreSidekick.Models
 				return Default.BindModel(controllerContext, bindingContext);
 			Stream s = controllerContext.HttpContext.Request.InputStream;
 			s.Seek(0, SeekOrigin.Begin);
-			return JsonNetWrapper.DeserializeObject(new StreamReader(s).ReadToEnd(), bindingContext.ModelType);
+			return _jsonSerializationService.DeserializeObject(new StreamReader(s).ReadToEnd(), bindingContext.ModelType);
 		}
 	}
 }

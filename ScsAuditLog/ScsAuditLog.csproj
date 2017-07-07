@@ -85,6 +85,7 @@
     <Compile Include="AuditLogController.cs" />
     <Compile Include="AuditLogger.cs" />
     <Compile Include="AuditLogRegistration.cs" />
+    <Compile Include="Bootstrap.cs" />
     <Compile Include="ConcurrentHashSet.cs" />
     <Compile Include="Model\ActivityDataModel.cs" />
     <Compile Include="Model\AuditSourceRecord.cs" />

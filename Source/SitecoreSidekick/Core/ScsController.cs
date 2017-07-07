@@ -7,6 +7,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Resources;
 using System.Web;
 using System.Web.Mvc;
 using SitecoreSidekick.Services.Interface;
@@ -20,13 +21,13 @@ namespace SitecoreSidekick.Core
 		private readonly ConcurrentDictionary<string, string> _resourceCache = new ConcurrentDictionary<string, string>();
 		private readonly ConcurrentDictionary<string, byte[]> _imageCache = new ConcurrentDictionary<string, byte[]>();
 		private readonly IScsRegistrationService _registration;
-		private readonly IMainfestResourceStreamService _manifestresourcestreamService;
+		private readonly IMainfestResourceStreamService _manifestResourceStreamService;
 
 		protected ScsController()
 		{
 			_registration = Bootstrap.Container.Resolve<IScsRegistrationService>();
 			_jsonSerializationService = Bootstrap.Container.Resolve<IJsonSerializationService>();
-			_manifestresourcestreamService = Bootstrap.Container.Resolve<IMainfestResourceStreamService>();
+			_manifestResourceStreamService = Bootstrap.Container.Resolve<IMainfestResourceStreamService>();
 		}
 
 		[ScsLoggedIn]
@@ -163,7 +164,7 @@ namespace SitecoreSidekick.Core
 			string result;
 			if (_resourceCache.TryGetValue(filename, out result)) return result;
 
-			result = _manifestresourcestreamService.GetManifestResourceText(_registration.GetScsRegistration(GetType()).ResourcesPath + "." + filename);
+			result = _manifestResourceStreamService.GetManifestResourceText(GetType(), _registration.GetScsRegistration(GetType()).ResourcesPath + "." + filename, ()=>throw new ScsEmbeddedResourceNotFoundException());
 
 			_resourceCache[filename] = result;
 			return result;
@@ -181,7 +182,7 @@ namespace SitecoreSidekick.Core
 			byte[] result;
 			if (_imageCache.TryGetValue(filename, out result)) return result;
 
-			result = _manifestresourcestreamService.GetManifestResourceImage(_registration.GetScsRegistration(GetType()).ResourcesPath + "." + filename, imageFormat);
+			result = _manifestResourceStreamService.GetManifestResourceImage(GetType(), _registration.GetScsRegistration(GetType()).ResourcesPath + "." + filename, imageFormat, () => throw new ScsEmbeddedResourceNotFoundException());
 
 			_imageCache[filename] = result;
 			return result;

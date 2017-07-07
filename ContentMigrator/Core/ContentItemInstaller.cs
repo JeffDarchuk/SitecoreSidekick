@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using SitecoreSidekick.Services.Interface;
 
 namespace ScsContentMigrator.Core
 {
@@ -30,6 +31,7 @@ namespace ScsContentMigrator.Core
 		private readonly IDataStore _scDatastore;
 		private readonly ItemComparer _comparer = new DefaultItemComparer();
 		private readonly ISitecoreAccessService _sitecore;
+		private readonly IJsonSerializationService _jsonSerializationService;
 		private ConcurrentHashSet<Guid> _allowedItems = new ConcurrentHashSet<Guid>();
 		private ConcurrentHashSet<Guid> _errors = new ConcurrentHashSet<Guid>();
 		private ConcurrentHashSet<Guid> _currentlyProcessing = new ConcurrentHashSet<Guid>();
@@ -41,6 +43,7 @@ namespace ScsContentMigrator.Core
 		{
 			_scDatastore = Bootstrap.Container.Resolve<IDataStore>(_logger);
 			_sitecore = Bootstrap.Container.Resolve<ISitecoreAccessService>();
+			_jsonSerializationService = Bootstrap.Container.Resolve<IJsonSerializationService>();
 		}
 
 		public IEnumerable<dynamic> GetItemLogEntries(int lineToStartFrom)
@@ -185,7 +188,7 @@ namespace ScsContentMigrator.Core
 				Date = Status.FinishedTime.ToString("F"),
 				Status.Cancelled
 			});
-			_logger.LoggerOutput.Add(JsonNetWrapper.SerializeObject(_logger.Lines.Last()));
+			_logger.LoggerOutput.Add(_jsonSerializationService.SerializeObject(_logger.Lines.Last()));
 			if (args.RemoveLocalNotInRemote)
 				CleanUnwantedLocalItems();
 		}

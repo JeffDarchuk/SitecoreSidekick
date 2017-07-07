@@ -13,11 +13,14 @@ namespace SitecoreSidekick.Services
 {
 	public class MainfestResourceStreamService : IMainfestResourceStreamService
 	{
-		public string GetManifestResourceText(string fileName)
+		public string GetManifestResourceText(Type callingAssembly, string fileName, Func<string> onNotFound = null)
 		{
-			using (var stream = GetType().Assembly.GetManifestResourceStream(fileName))
+			using (var stream = callingAssembly.Assembly.GetManifestResourceStream(fileName))
 			{
-				if (stream == null) throw new ScsEmbeddedResourceNotFoundException();
+				if (stream == null)
+				{
+					return onNotFound?.Invoke();
+				}
 
 				using (var reader = new StreamReader(stream))
 				{
@@ -26,11 +29,14 @@ namespace SitecoreSidekick.Services
 			}
 		}
 
-		public byte[] GetManifestResourceImage(string fileName, ImageFormat imageFormat)
+		public byte[] GetManifestResourceImage(Type callingAssembly, string fileName, ImageFormat imageFormat, Func<byte[]> onNotFound = null)
 		{
 			using (var stream = GetType().Assembly.GetManifestResourceStream(fileName))
 			{
-				if (stream == null) throw new ScsEmbeddedResourceNotFoundException();
+				if (stream == null)
+				{
+					return onNotFound?.Invoke();
+				}
 
 				using (var ms = new MemoryStream())
 				{
@@ -41,6 +47,11 @@ namespace SitecoreSidekick.Services
 					return ms.ToArray();
 				}
 			}
+		}
+
+		public IEnumerable<string> GetManifestResourceNames(Type callingAssembly)
+		{
+			return callingAssembly.Assembly.GetManifestResourceNames();
 		}
 	}
 }

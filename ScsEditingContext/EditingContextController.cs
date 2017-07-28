@@ -16,13 +16,17 @@ using SitecoreSidekick.Core;
 using SitecoreSidekick.Pipelines.HttpRequestBegin;
 using SitecoreSidekick.Services.Interface;
 using SitecoreSidekick.Shared.IoC;
+using System.Web.Configuration;
+using System.Configuration;
 
 namespace ScsEditingContext
 {
 	public class EditingContextController: ScsController
 	{
 		private readonly IScsRegistrationService _registration;
-		public EditingContextController()
+        private readonly SessionStateSection SessionSettings = (SessionStateSection)ConfigurationManager.GetSection("system.web/sessionState");
+
+        public EditingContextController()
 		{
 			_registration = Container.Resolve<IScsRegistrationService>();
 		}
@@ -61,7 +65,7 @@ namespace ScsEditingContext
 
 		private object GetReferrers()
 		{
-			string key = Request.Cookies["ASP.NET_SessionId"]?.Value ?? "";
+			string key = Request.Cookies[SessionSettings.CookieName]?.Value ?? "";
 			if (EditingContextRegistration.Referrers.ContainsKey(key))
 				return EditingContextRegistration.Referrers[key];
 			return new List<TypeContentTreeNode>();
@@ -69,7 +73,7 @@ namespace ScsEditingContext
 
 		private object GetReferences()
 		{
-			string key = Request.Cookies["ASP.NET_SessionId"]?.Value ?? "";
+			string key = Request.Cookies[SessionSettings.CookieName]?.Value ?? "";
 			if (EditingContextRegistration.Related.ContainsKey(key))
 				return EditingContextRegistration.Related[key];
 			return new List<TypeContentTreeNode>();

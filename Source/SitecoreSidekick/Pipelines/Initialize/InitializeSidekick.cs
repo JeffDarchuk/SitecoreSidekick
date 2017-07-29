@@ -69,7 +69,7 @@ namespace SitecoreSidekick.Pipelines.Initialize
 				return;
 
 			Item sk = core.GetItem(new ID(SidekickButton));
-			if (sk != null)
+			if (sk == null)
 				return;
 			Item right = core.GetItem(new ID(DesktopMenuRight));
 			if (right == null)

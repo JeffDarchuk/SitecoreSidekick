@@ -33,6 +33,7 @@
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Bootstrap.cs" />
     <Compile Include="Models\ContactModel.cs" />
     <Compile Include="Pipelines\Initialize.cs" />
     <Compile Include="ScsContactSearchController.cs" />

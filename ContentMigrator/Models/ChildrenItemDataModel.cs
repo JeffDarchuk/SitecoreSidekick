@@ -11,7 +11,7 @@ namespace ScsContentMigrator.Models
 		private IRemoteContentService _remote;
 		public ChildrenItemDataModel()
 		{
-			_remote = Container.Resolve<IRemoteContentService>();
+			_remote = Bootstrap.Container.Resolve<IRemoteContentService>();
 		}
 
 		public ChildrenItemDataModel(IRemoteContentService remote)

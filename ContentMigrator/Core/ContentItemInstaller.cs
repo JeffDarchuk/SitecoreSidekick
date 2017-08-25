@@ -45,8 +45,8 @@ namespace ScsContentMigrator.Core
 		public ContentItemInstaller()
 		{
 			var deserializer = new DefaultDeserializer(_logger, new DefaultFieldFilter());
-			_scDatastore = new SitecoreDataStore(deserializer);
-			_sitecore = Container.Resolve<ISitecoreAccessService>();
+			_scDatastore = new SitecoreDataStore(deserializer);			
+			_sitecore = Bootstrap.Container.Resolve<ISitecoreAccessService>();
 		}
 		public ContentItemInstaller(ISitecoreAccessService sitecore, IDataStore dataStore)
 		{

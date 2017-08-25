@@ -33,8 +33,7 @@ namespace ScsContentMigrator.Data
 			Comparers.Add(new MultiLineTextComparison());
 			Comparers.Add(new MultilistComparison());
 			Comparers.Add(new XmlComparison());
-			Comparers.Add(new DefaultComparison());
-			Container.Register<IRemoteContentService, RemoteContentService>();
+			Comparers.Add(new DefaultComparison());			
 		}
 
 		public string Data;
@@ -47,7 +46,7 @@ namespace ScsContentMigrator.Data
 
 		public CompareContentTreeNode()
 		{
-			_remoteContent = Container.Resolve<IRemoteContentService>();
+			_remoteContent = Bootstrap.Container.Resolve<IRemoteContentService>();
 		}
 
 		public CompareContentTreeNode(IRemoteContentService remoteContent)
@@ -63,7 +62,7 @@ namespace ScsContentMigrator.Data
 			}
 			Revision = string.Join("", tmp);
 			Checksum = ContentMigrationRegistration.GetChecksum(item.ID.ToString());
-			_remoteContent = Container.Resolve<IRemoteContentService>();
+			_remoteContent = Bootstrap.Container.Resolve<IRemoteContentService>();
 
 		}
 

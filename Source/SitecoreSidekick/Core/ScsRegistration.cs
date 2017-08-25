@@ -29,7 +29,7 @@ namespace SitecoreSidekick.Core
 			AdminOnly = isAdmin == "true";
 			Roles = roles.Split('|').Where(x => !x.IsWhiteSpaceOrNull()).ToList();
 			Users = users.Split('|').Where(x => !x.IsWhiteSpaceOrNull()).ToList();
-			Registration = Container.Resolve<IScsRegistrationService>();
+			Registration = Bootstrap.Container.Resolve<IScsRegistrationService>();
 		}
 		protected ScsRegistration(string roles, string isAdmin, string users, IScsRegistrationService registration)
 		{

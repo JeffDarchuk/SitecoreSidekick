@@ -21,7 +21,7 @@ namespace SitecoreSidekick.Handlers
 		private readonly IScsRegistrationService _registration;
 		public ScsMainController()
 		{
-			_registration = Container.Resolve<IScsRegistrationService>();
+			_registration = Bootstrap.Container.Resolve<IScsRegistrationService>();
 		}
 
 		protected ScsMainController(IScsRegistrationService registration)

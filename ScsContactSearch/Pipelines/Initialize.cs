@@ -16,9 +16,8 @@ namespace ScsContactSearch.Pipelines
 	{
 		private IContactAccessService _contact;
 		public Initialize()
-		{
-			Container.Register<IContactAccessService, ContactAccessService>();
-			_contact = Container.Resolve<IContactAccessService>();
+		{			
+			_contact = Bootstrap.Container.Resolve<IContactAccessService>();
 		}
 		public void Process(PipelineArgs args)
 		{

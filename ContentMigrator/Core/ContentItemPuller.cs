@@ -27,7 +27,7 @@ namespace ScsContentMigrator.Core
 
 		public ContentItemPuller()
 		{
-			_remoteContent = Container.Resolve<IRemoteContentService>();
+			_remoteContent = Bootstrap.Container.Resolve<IRemoteContentService>();
 		}
 		public ContentItemPuller(IRemoteContentService remoteContent)
 		{

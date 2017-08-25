@@ -27,14 +27,10 @@ namespace SitecoreSidekick.Pipelines.Initialize
 		public const string DesktopMenuRight = "{10148DC7-DCA6-4ACA-AC90-46FBF59A1D1F}";
 		public const string SidekickButton = "{3F324240-7645-4C70-A337-64A9D4A91549}";
 		public const string ActionTemplate = "{F58958D2-555B-4F56-946C-589E8866880C}";
-		private readonly IScsRegistrationService _registration;
-		static InitializeSidekick()
-		{
-			Container.Register<IScsRegistrationService, ScsRegistrationService>();
-		}
+		private readonly IScsRegistrationService _registration;		
 		public InitializeSidekick()
 		{
-			_registration = Container.Resolve<IScsRegistrationService>();
+			_registration = Bootstrap.Container.Resolve<IScsRegistrationService>();
 		}
 
 		public InitializeSidekick(IScsRegistrationService registration)

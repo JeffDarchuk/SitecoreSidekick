@@ -18,16 +18,11 @@ namespace SitecoreSidekick.Core
 	{
 		private readonly ConcurrentDictionary<string, string> _resourceCache = new ConcurrentDictionary<string, string>();
 		private readonly ConcurrentDictionary<string, byte[]> _imageCache = new ConcurrentDictionary<string, byte[]>();
-		private IScsRegistrationService _registration;
+		private readonly IScsRegistrationService _registration;
 
 		protected ScsController()
 		{
-			_registration = Container.Resolve<IScsRegistrationService>();
-		}
-
-		protected ScsController(IScsRegistrationService registration)
-		{
-			_registration = registration;
+			_registration = Bootstrap.Container.Resolve<IScsRegistrationService>();
 		}
 
 		[ScsLoggedIn]

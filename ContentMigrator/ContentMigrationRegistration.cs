@@ -53,14 +53,7 @@ namespace ScsContentMigrator
 		public override string Name => "Content Migrator";
 		public override string CssStyle => "width:100%;min-width:800px;";
 		public string AuthenticationSecret { get; set; }
-
-		static ContentMigrationRegistration()
-		{
-			
-			Container.Register<IRemoteContentService, Services.RemoteContentService>();
-			Container.Register<ISitecoreAccessService, SitecoreAccessService>();
-		}
-
+		
 		public ContentMigrationRegistration(string roles, string isAdmin, string users, string remotePullingThreads, string databaseWriterThreads) : base(roles, isAdmin, users)
 		{
 			if (RemoteThreads == 1)

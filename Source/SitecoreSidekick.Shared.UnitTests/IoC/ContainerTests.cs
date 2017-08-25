@@ -5,19 +5,15 @@ using Xunit;
 
 namespace SitecoreSidekick.Shared.UnitTests.IoC
 {
-	public class ContainerTests
+	public class containerTests
 	{
-		public ContainerTests()
-		{
-			Container.Clear();
-		}
-
 		[Fact]
 		public void Register_ValidRegistration_ResolvesNewInstance()
 		{
-			Container.Register<IMyClass, MyClass>();
+			Container container = new Container();
+			container.Register<IMyClass, MyClass>();
 
-			IMyClass myClassInstance = Container.Resolve<IMyClass>();
+			IMyClass myClassInstance = container.Resolve<IMyClass>();
 
 			myClassInstance.IsCreated.Should().BeTrue();
 		}
@@ -25,10 +21,11 @@ namespace SitecoreSidekick.Shared.UnitTests.IoC
 		[Fact]
 		public void Register_MultipleRegistrations_ResolvesLastRegistration()
 		{
-			Container.Register<IMyClass, MyClass>();
-			Container.Register<IMyClass, MyOtherClass>();
+			Container container = new Container();
+			container.Register<IMyClass, MyClass>();
+			container.Register<IMyClass, MyOtherClass>();
 
-			IMyClass myClassInstance = Container.Resolve<IMyClass>();
+			IMyClass myClassInstance = container.Resolve<IMyClass>();
 
 			myClassInstance.GetType().ShouldBeEquivalentTo(typeof(MyOtherClass));
 		}
@@ -36,13 +33,14 @@ namespace SitecoreSidekick.Shared.UnitTests.IoC
 		[Fact]
 		public void Resolve_MultipleResolutions_ReturnsSameInstance()
 		{
+			Container container = new Container();
 			int expectedCounter = 10;
-			Container.Register<IMyClass, MyClass>();
+			container.Register<IMyClass, MyClass>();
 
-			IMyClass myClassInstance = Container.Resolve<IMyClass>();
+			IMyClass myClassInstance = container.Resolve<IMyClass>();
 			myClassInstance.Counter = expectedCounter;
 
-			IMyClass myOtherClassInstance = Container.Resolve<IMyClass>();
+			IMyClass myOtherClassInstance = container.Resolve<IMyClass>();
 
 			myOtherClassInstance.Counter.ShouldBeEquivalentTo(expectedCounter);
 		}
@@ -50,11 +48,12 @@ namespace SitecoreSidekick.Shared.UnitTests.IoC
 		[Fact]
 		public void Resolve_MultipleResolutions_SameObject()
 		{
+			Container container = new Container();
 			int expectedCounter = 10;
-			Container.Register<IMyClass, MyClass>();
+			container.Register<IMyClass, MyClass>();
 
-			IMyClass myClassInstance = Container.Resolve<IMyClass>();
-			IMyClass myOtherClassInstance = Container.Resolve<IMyClass>();
+			IMyClass myClassInstance = container.Resolve<IMyClass>();
+			IMyClass myOtherClassInstance = container.Resolve<IMyClass>();
 			
 			myClassInstance.Counter = expectedCounter;
 			
@@ -63,13 +62,10 @@ namespace SitecoreSidekick.Shared.UnitTests.IoC
 
 		[Fact]
 		public void Resolve_DependencyOnAnotherClass_Resolves()
-		{
-			Container.Register<IMyClass, MyClass>();
-			Container.Register<IMyDependentClass, MyDependentClass>();
-			
-			IMyClass myClassInstance = Container.Resolve<IMyClass>();
+		{			
+			IMyClass myClassInstance = Bootstrap.Container.Resolve<IMyClass>();
 			myClassInstance.Counter++;
-			IMyDependentClass myDependentClassInstance = Container.Resolve<IMyDependentClass>();
+			IMyDependentClass myDependentClassInstance = Bootstrap.Container.Resolve<IMyDependentClass>();
 
 			myDependentClassInstance.MyDoubler.ShouldBeEquivalentTo(2);
 		}
@@ -77,39 +73,80 @@ namespace SitecoreSidekick.Shared.UnitTests.IoC
 		[Fact]
 		public void Resolve_ClassNotRegistered_ThrowsException()
 		{
+			Container container = new Container();
 			Assert.Throws<ArgumentOutOfRangeException>(() =>
 			{
-				Container.Resolve<IMyClass>();
+				container.Resolve<IMyClass>();
 			});
 		}
 
 		[Fact]
 		public void Resolve_ClassFailsToInitialize_ThrowsException()
 		{
+			Container container = new Container();
 			Assert.Throws<NullReferenceException>(() =>
 			{
-				Container.Register<IMyBrokenClass, MyBrokenClass>();
-				Container.Resolve<IMyBrokenClass>();
+				container.Register<IMyBrokenClass, MyBrokenClass>();
+				container.Resolve<IMyBrokenClass>();
 			});
 		}
 
 		[Fact]
 		public void Clear_RegisteredClassHasDispose_InvokesDispose()
 		{
+			Container container = new Container();
 			bool didDispose = false;
-			Container.Register<IMyDisposableClass, MyDisposableClass>();
-			IMyDisposableClass myDisposableClassInstance = Container.Resolve<IMyDisposableClass>();
+			container.Register<IMyDisposableClass, MyDisposableClass>();
+			IMyDisposableClass myDisposableClassInstance = container.Resolve<IMyDisposableClass>();
 			myDisposableClassInstance.OnDispose = () =>
 			{
 				didDispose = true;
 			};
 
-			Container.Clear();
+			container.Clear();
 
 			didDispose.Should().BeTrue();
 		}
 
 		#region Test Interfaces and Classes
+
+		public class Bootstrap
+		{
+			internal static readonly object BootstrapLock = new object();
+			/// <summary>
+			/// Sets the container to use to an existing container
+			/// </summary>
+			/// <param name="container">The container to use</param>
+			public static void SetContainer(Container container)
+			{
+				_container = container;
+			}
+
+			private static Container _container;
+			public static Container Container
+			{
+				get
+				{
+					lock (BootstrapLock)
+					{
+						if (_container != null) return _container;
+						_container = InitializeContainer();
+						return _container;
+					}
+				}
+			}
+
+			private static Container InitializeContainer()
+			{
+				Container container = new Container();
+
+				// Register components here				
+				container.Register<IMyClass, MyClass>();
+				container.Register<IMyDependentClass, MyDependentClass>();
+
+				return container;
+			}
+		}
 
 		public interface IMyClass
 		{
@@ -150,7 +187,7 @@ namespace SitecoreSidekick.Shared.UnitTests.IoC
 			private readonly IMyClass _myClass;
 			public MyDependentClass()
 			{
-				_myClass = Container.Resolve<IMyClass>();
+				_myClass = Bootstrap.Container.Resolve<IMyClass>();
 			}
 
 			public int MyDoubler => _myClass.Counter * 2;

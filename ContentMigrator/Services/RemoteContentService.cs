@@ -28,7 +28,7 @@ namespace ScsContentMigrator.Services
 
 		public RemoteContentService()
 		{
-			_registration = Container.Resolve<IScsRegistrationService>();
+			_registration = Bootstrap.Container.Resolve<IScsRegistrationService>();
 		}
 
 		public RemoteContentService(ISignatureService signature)

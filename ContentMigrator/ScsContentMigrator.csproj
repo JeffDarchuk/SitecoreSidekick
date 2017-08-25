@@ -106,6 +106,7 @@
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Args\RemoteContentTreeArgs.cs" />
+    <Compile Include="Bootstrap.cs" />
     <Compile Include="CMRainbow\DefaultItemComparer.cs" />
     <Compile Include="ConcurrentHashSet.cs" />
     <Compile Include="ContentAgent.cs" />

@@ -17,7 +17,7 @@ namespace ScsContactSearch
 		private IContactAccessService _contact;
 		public ScsContactSearchController()
 		{
-			_contact = Container.Resolve<IContactAccessService>();
+			_contact = Bootstrap.Container.Resolve<IContactAccessService>();
 		}
 		[ActionName("csquery.scsvc")]
 		public ActionResult QueryMongoContacts(string query)

@@ -28,7 +28,7 @@ namespace ScsEditingContext
 
         public EditingContextController()
 		{
-			_registration = Container.Resolve<IScsRegistrationService>();
+			_registration = Bootstrap.Container.Resolve<IScsRegistrationService>();
 		}
 
 		protected EditingContextController(IScsRegistrationService registration)

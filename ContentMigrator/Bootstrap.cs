@@ -9,6 +9,8 @@ using ScsContentMigrator.Services.Interface;
 using SitecoreSidekick.Shared.IoC;
 using System.Linq;
 using MicroCHAP;
+using Rainbow.Diff;
+using ScsContentMigrator.CMRainbow.Interface;
 
 namespace ScsContentMigrator
 {
@@ -54,7 +56,9 @@ namespace ScsContentMigrator
 			});
 			container.RegisterFactory<IContentItemPuller>(args => new ContentItemPuller());
 			container.RegisterFactory<IContentItemInstaller>(args => new ContentItemInstaller());
+			container.RegisterFactory<IDefaultLogger>(args => new DefaultLogger() );
 			container.RegisterFactory<ISignatureService>(args=> new SignatureService((string)args[0]));
+			container.RegisterFactory<IItemComparer>(args => new DefaultItemComparer());			
 
 			return container;
 		}

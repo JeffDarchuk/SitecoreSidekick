@@ -108,6 +108,8 @@
     <Compile Include="Args\RemoteContentTreeArgs.cs" />
     <Compile Include="Bootstrap.cs" />
     <Compile Include="CMRainbow\DefaultItemComparer.cs" />
+    <Compile Include="CMRainbow\Interface\IDefaultLogger.cs" />
+    <Compile Include="CMRainbow\LogStatus.cs" />
     <Compile Include="ConcurrentHashSet.cs" />
     <Compile Include="ContentAgent.cs" />
     <Compile Include="ContentMigrationController.cs" />

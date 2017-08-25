@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26403.3
+VisualStudioVersion = 15.0.26430.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SitecoreSidekick", "Source\SitecoreSidekick\SitecoreSidekick.csproj", "{0DA36C4A-1B13-4891-A263-5F994127051C}"
 EndProject
@@ -18,6 +18,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScsContactSearch", "ScsContactSearch\ScsContactSearch.csproj", "{681701E3-77DD-4053-A0AF-B51AFFB295E8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SitecoreSidekick.UnitTests", "Source\SitecoreSidekick.UnitTests\SitecoreSidekick.UnitTests.csproj", "{23421921-4A34-4FB4-AB8F-1B2CEB204F07}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScsContentMigrator.UnitTests", "ScsContentMigrator.UnitTests\ScsContentMigrator.UnitTests.csproj", "{C15F4B76-FE71-4C1F-8647-B8CF8A8CA546}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -58,6 +60,10 @@ Global
 		{23421921-4A34-4FB4-AB8F-1B2CEB204F07}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{23421921-4A34-4FB4-AB8F-1B2CEB204F07}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{23421921-4A34-4FB4-AB8F-1B2CEB204F07}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C15F4B76-FE71-4C1F-8647-B8CF8A8CA546}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C15F4B76-FE71-4C1F-8647-B8CF8A8CA546}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C15F4B76-FE71-4C1F-8647-B8CF8A8CA546}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C15F4B76-FE71-4C1F-8647-B8CF8A8CA546}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

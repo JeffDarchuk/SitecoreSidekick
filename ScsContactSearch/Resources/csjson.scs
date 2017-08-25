@@ -1,0 +1,33 @@
+﻿<div style="margin-left:10px;" ng-controller="csjsoncontroller as vm" ng-init="init(parent)">
+		<div ng-repeat="(key, value) in vm.data" >
+			<div class="csobject" ng-if="!vm.rawValue(value) && key !== 'displayName' && key !== 'experienceProfileLink'">
+				<span ng-if="!vm.hasProperties(value)">
+					<span class="csspacer">&nbsp;</span>
+					{{key}}
+				</span>
+				<span ng-if="vm[key].open">
+					<img class="csexpander" src="/scs/cs/resources/csexpanded.png" />
+				</span>
+				<span ng-if="vm[key].open">
+					<img class="csexpander" src="/scs/cs/resources/ccollapsed.png" />
+				</span>
+				<span ng-if="vm.hasProperties(value)">
+					<span ng-if="value.displayName">
+						{{value.displayName}}
+						<a target="blank" ng-if ="value.experienceProfileLink" ng-href="{{value.experienceProfileLink}}">Profile</a>
+					</span>
+					<span ng-if="!value.displayName">
+						{{key}}
+					</span>
+				</span>
+				
+
+				<div ng-if="vm[key].open">
+					<csjsondirective parent="value"></csjsondirective>
+				</div>
+			</div>
+			<div class="cscontent" ng-if="vm.rawValue(value) && key !== 'displayName' && key !== 'experienceProfileLink'">
+				<span ng-if="value.displayName">{{value.displayName}}</span><span ng-if="!value.displayName">{{key}}</span> : {{value}}
+			</div>
+		</div>
+</div>

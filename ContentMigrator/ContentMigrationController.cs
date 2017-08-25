@@ -102,14 +102,6 @@ namespace ScsContentMigrator
 			return Content(_migrationManager.StartContentMigration(data));
 		}
 
-
-
-
-
-
-
-
-
 		[MchapOrLoggedIn]
 		[ActionName("cmcontenttree.scsvc")]
 		public ActionResult ContentTree(ContentTreeModel data)
@@ -225,7 +217,7 @@ namespace ScsContentMigrator
 		{
 			Request.InputStream.Seek(0, SeekOrigin.Begin);
 			string payload = new StreamReader(Request.InputStream).ReadToEnd();
-			if (!_registration.GetScsRegistration<ContentMigrationRegistration>().HmacServer.ValidateRequest(new HttpRequestWrapper(System.Web.HttpContext.Current.Request), x => new[] { new SignatureFactor("payload", payload) }))
+			if (!_remoteContent.HmacServer.ValidateRequest(new HttpRequestWrapper(System.Web.HttpContext.Current.Request), x => new[] { new SignatureFactor("payload", payload) }))
 			{
 				System.Web.HttpContext.Current.Response.StatusCode = 403;
 				return null;
@@ -263,7 +255,7 @@ namespace ScsContentMigrator
 			}
 			Request.InputStream.Seek(0, SeekOrigin.Begin);
 			string payload = new StreamReader(Request.InputStream).ReadToEnd();
-			if (!_registration.GetScsRegistration<ContentMigrationRegistration>().HmacServer.ValidateRequest(new HttpRequestWrapper(System.Web.HttpContext.Current.Request), x => new[] { new SignatureFactor("payload", payload) }))
+			if (!_remoteContent.HmacServer.ValidateRequest(new HttpRequestWrapper(System.Web.HttpContext.Current.Request), x => new[] { new SignatureFactor("payload", payload) }))
 			{
 				System.Web.HttpContext.Current.Response.StatusCode = 403;
 				return null;

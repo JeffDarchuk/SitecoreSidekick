@@ -11,6 +11,7 @@ using Rainbow.Storage.Yaml;
 using ScsContentMigrator.Args;
 using ScsContentMigrator.Data;
 using ScsContentMigrator.Models;
+using ScsContentMigrator.Security;
 using ScsContentMigrator.Services.Interface;
 using Sitecore.Diagnostics;
 using SitecoreSidekick;
@@ -55,7 +56,10 @@ namespace ScsContentMigrator.Services
 
 			WebClient wc = new WebClient { Encoding = Encoding.UTF8 };
 			if (_ss == null)
+			{
 				_ss = new SignatureService(_registration.GetScsRegistration<ContentMigrationRegistration>().AuthenticationSecret);
+				HmacServer = new ScsHmacServer(_ss, new UniqueChallengeStore());
+			}
 			var signature = _ss.CreateSignature(nonce, url, new[] { new SignatureFactor("payload", parameters) });
 
 			wc.Headers["X-MC-MAC"] = signature.SignatureHash;
@@ -140,6 +144,8 @@ namespace ScsContentMigrator.Services
 
 			return node;
 		}
+
+		public ScsHmacServer HmacServer { get; private set; }
 	}
 }
 

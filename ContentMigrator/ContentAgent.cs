@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using ScsContentMigrator.Args;
 using ScsContentMigrator.Models;
+using ScsContentMigrator.Services;
 using ScsContentMigrator.Services.Interface;
 using SitecoreSidekick.Shared.IoC;
 
@@ -10,6 +11,11 @@ namespace ScsContentMigrator
 	{
 		private readonly PullItemModel _args;
 		private readonly IContentMigrationManagerService _migrationManager;
+
+		static ContentAgent()
+		{
+			Container.Register<IContentMigrationManagerService, ContentMigrationManagerService>();
+		}
 		public ContentAgent(string remoteServer, string rootIds, string database, string bulkUpdate, string children, string overwrite, string eventDisabler, string pullParent, string removeLocalNotInRemote) : this(remoteServer, rootIds, database, bulkUpdate, children, overwrite, eventDisabler, pullParent, removeLocalNotInRemote, Container.Resolve<IContentMigrationManagerService>())
 		{
 		}

@@ -44,7 +44,6 @@ namespace ScsContentMigrator
 		public int RemoteThreads { get; }= 1;
 		public int WriterThreads { get; }= 1;
 		public List<string> ServerList { get; } = new List<string>();
-		public ScsHmacServer HmacServer { get; set; }
 		public override string Directive => "cmmasterdirective";
 		public override NameValueCollection DirectiveAttributes { get; set; }
 		public override string ResourcesPath => "ScsContentMigrator.Resources";
@@ -57,7 +56,7 @@ namespace ScsContentMigrator
 
 		static ContentMigrationRegistration()
 		{
-			Container.Register<IContentMigrationManagerService, ContentMigrationManagerService>();
+			
 			Container.Register<IRemoteContentService, Services.RemoteContentService>();
 			Container.Register<ISitecoreAccessService, SitecoreAccessService>();
 		}
@@ -102,7 +101,6 @@ namespace ScsContentMigrator
 			{
 				throw new InvalidOperationException("Sitecore Sidekick Content Migrator was initialized with an insecure shared secret. Please use a shared secret of 32 or more characters.");
 			}
-
 			base.Process(args);
 		}
 

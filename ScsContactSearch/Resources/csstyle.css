@@ -1,0 +1,16 @@
+﻿.cscontent {
+	color: darkgreen;
+	padding-left: 13px;
+}
+.csobject {
+	color: darkmagenta;
+	cursor: pointer;
+}
+.csexpander {
+	vertical-align: middle;
+}
+.csspacer {
+	width: 16px;
+	height: 16px;
+	display: inline-block;
+}

@@ -7,6 +7,7 @@ using Rainbow.Model;
 using ScsContentMigrator.Args;
 using ScsContentMigrator.Data;
 using ScsContentMigrator.Models;
+using ScsContentMigrator.Security;
 
 namespace ScsContentMigrator.Services.Interface
 {
@@ -16,5 +17,6 @@ namespace ScsContentMigrator.Services.Interface
 		ChildrenItemDataModel GetRemoteItemDataWithChildren(Guid id, string server);
 		IItemData DeserializeYaml(string yaml, string id);
 		CompareContentTreeNode GetContentTreeNode(RemoteContentTreeArgs args);
+		ScsHmacServer HmacServer { get; }
 	}
 }

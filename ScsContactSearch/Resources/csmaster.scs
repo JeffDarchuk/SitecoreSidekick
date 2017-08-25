@@ -1,0 +1,7 @@
+﻿<div ng-controller="csmastercontroller as vm">
+	<input ng-model="vm.query" value="san" ng-keyup="$event.keyCode == 13 && vm.getResults(vm.query)"/><a class="btn" ng-click="vm.getResults(vm.query)">Search</a>
+	<img ng-if="vm.spinner" class="cmspinner" src="/scs/platform/resources/scsspinner.gif" />
+	<div ng-if="vm.data">
+		<csjsondirective parent="vm.data"></csjsondirective>
+	</div>
+</div>

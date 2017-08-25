@@ -93,6 +93,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Bootstrap.cs" />
     <Compile Include="Commands\OpenScs.cs" />
     <Compile Include="ContentTree\ContentTreeNode.cs" />
     <Compile Include="Core\IScsRegistration.cs" />

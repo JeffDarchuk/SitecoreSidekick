@@ -38,10 +38,10 @@ namespace ScsContentMigrator
 
 		public ContentMigrationController()
 		{
-			_sitecore = Container.Resolve<ISitecoreAccessService>();
-			_registration = Container.Resolve<IScsRegistrationService>();
-			_migrationManager = Container.Resolve<IContentMigrationManagerService>();
-			_remoteContent = Container.Resolve<IRemoteContentService>();
+			_sitecore = Bootstrap.Container.Resolve<ISitecoreAccessService>();
+			_registration = Bootstrap.Container.Resolve<IScsRegistrationService>();
+			_migrationManager = Bootstrap.Container.Resolve<IContentMigrationManagerService>();
+			_remoteContent = Bootstrap.Container.Resolve<IRemoteContentService>();
 		}
 
 		protected ContentMigrationController(ISitecoreAccessService sitecore, IScsRegistrationService registration, IContentMigrationManagerService migrationManager, IRemoteContentService remoteContent)

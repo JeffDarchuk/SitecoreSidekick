@@ -11,12 +11,8 @@ namespace ScsContentMigrator
 	{
 		private readonly PullItemModel _args;
 		private readonly IContentMigrationManagerService _migrationManager;
-
-		static ContentAgent()
-		{
-			Container.Register<IContentMigrationManagerService, ContentMigrationManagerService>();
-		}
-		public ContentAgent(string remoteServer, string rootIds, string database, string bulkUpdate, string children, string overwrite, string eventDisabler, string pullParent, string removeLocalNotInRemote) : this(remoteServer, rootIds, database, bulkUpdate, children, overwrite, eventDisabler, pullParent, removeLocalNotInRemote, Container.Resolve<IContentMigrationManagerService>())
+		
+		public ContentAgent(string remoteServer, string rootIds, string database, string bulkUpdate, string children, string overwrite, string eventDisabler, string pullParent, string removeLocalNotInRemote) : this(remoteServer, rootIds, database, bulkUpdate, children, overwrite, eventDisabler, pullParent, removeLocalNotInRemote, Bootstrap.Container.Resolve<IContentMigrationManagerService>())
 		{
 		}
 		public ContentAgent(string remoteServer, string rootIds, string database, string bulkUpdate, string children, string overwrite, string eventDisabler, string pullParent, string removeLocalNotInRemote, IContentMigrationManagerService migrationManager)

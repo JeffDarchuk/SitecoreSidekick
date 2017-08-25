@@ -24,9 +24,9 @@ namespace ScsContentMigrator.Core
 		public ContentMigrationOperationStatus Status => _installer.Status;
 		public ContentMigration()
 		{
-			_remoteContent = Container.Resolve<IRemoteContentService>();
-			_sitecoreAccess = Container.Resolve<ISitecoreAccessService>();
-			_registration = Container.Resolve<IScsRegistrationService>();
+			_remoteContent = Bootstrap.Container.Resolve<IRemoteContentService>();
+			_sitecoreAccess = Bootstrap.Container.Resolve<ISitecoreAccessService>();
+			_registration = Bootstrap.Container.Resolve<IScsRegistrationService>();
 			_puller = new ContentItemPuller();
 			_installer = new ContentItemInstaller();
 		}

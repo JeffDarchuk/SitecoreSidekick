@@ -42,4 +42,4 @@ window.onload = function () {
 };
 
 
-document.write("<div id='scs' style='display:none;height:100%;width:100%;position:absolute;z-index:9999;left:0;top:0;'></div>");
+document.innerHTML += "<div id='scs' style='display:none;height:100%;width:100%;position:absolute;z-index:9999;left:0;top:0;'></div>";

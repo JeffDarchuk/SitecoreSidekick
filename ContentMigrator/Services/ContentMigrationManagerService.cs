@@ -10,6 +10,7 @@ using ScsContentMigrator.Core;
 using ScsContentMigrator.Core.Interface;
 using ScsContentMigrator.Models;
 using ScsContentMigrator.Services.Interface;
+using Sitecore.Diagnostics;
 
 namespace ScsContentMigrator.Services
 {
@@ -19,6 +20,7 @@ namespace ScsContentMigrator.Services
 		private readonly Dictionary<string, IContentMigration> _migrations = new Dictionary<string, IContentMigration>();
 		public string StartContentMigration(PullItemModel model)
 		{
+			Log.Info($"Starting Content Migration...\n{model.Server}\n{string.Join(", ", model.Ids)}", this);
 			string id = Guid.NewGuid().ToString();
 			ContentMigration newMigration = new ContentMigration();
 			newMigration.Status.OperationId = id;

@@ -10,10 +10,10 @@ namespace SitecoreSidekick.Services
 {
 	public class ScsRegistrationService : IScsRegistrationService
 	{
-		private Dictionary<Type, IScsRegistration> _registration = new Dictionary<Type, IScsRegistration>();
-		private HashSet<string> _processed = new HashSet<string>();
-		private readonly StringBuilder _js = new StringBuilder();
-		private readonly StringBuilder _css = new StringBuilder();
+		private static Dictionary<Type, IScsRegistration> _registration = new Dictionary<Type, IScsRegistration>();
+		private static HashSet<string> _processed = new HashSet<string>();
+		private static readonly StringBuilder _js = new StringBuilder();
+		private static readonly StringBuilder _css = new StringBuilder();
 		public void RegisterSidekick(IScsRegistration sidekick)
 		{
 			_registration.Add(sidekick.GetType(), sidekick);

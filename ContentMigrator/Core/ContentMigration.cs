@@ -34,15 +34,15 @@ namespace ScsContentMigrator.Core
 			_model = model;
 			if (model.PullParent)
 			{
-				foreach (var id in model.Ids.Select(Guid.Parse).Where(x => _sitecoreAccess.GetItem(x) == null))
+				foreach (var id in model.Ids.Select(Guid.Parse).Where(x => _sitecoreAccess.GetItemData(x) == null))
 				{
 					var item = _remoteContent.GetRemoteItemData(id, model.Server);
-					var parent = _sitecoreAccess.GetItem(item.ParentId);
+					var parent = _sitecoreAccess.GetItemData(item.ParentId);
 					while (parent == null)
 					{
 						item = _remoteContent.GetRemoteItemData(item.ParentId, model.Server);
 						_puller.ItemsToInstall.Add(item);
-						parent = _sitecoreAccess.GetItem(item.ParentId);
+						parent = _sitecoreAccess.GetItemData(item.ParentId);
 					}
 				}
 			}
@@ -50,8 +50,8 @@ namespace ScsContentMigrator.Core
 			{
 				_installer.SetupTrackerForUnwantedLocalItems(model.Ids.Select(Guid.Parse));
 			}
-			_puller.StartGatheringItems(model.Ids.Select(Guid.Parse), _registration.GetScsRegistration<ContentMigrationRegistration>().RemoteThreads, model.Children, model.Server, _cancellation);
-			_installer.StartInstallingItems(model, _puller.ItemsToInstall, _registration.GetScsRegistration<ContentMigrationRegistration>().WriterThreads, _cancellation);
+			_puller.StartGatheringItems(model.Ids.Select(Guid.Parse), _registration.GetScsRegistration<ContentMigrationRegistration>().RemoteThreads, model.Children, model.Server, _cancellation.Token);
+			_installer.StartInstallingItems(model, _puller.ItemsToInstall, _registration.GetScsRegistration<ContentMigrationRegistration>().WriterThreads, _cancellation.Token);
 		}
 
 		public void CancelMigration()

@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using FluentAssertions;
 using NSubstitute;
 using SitecoreSidekick.Shared.IoC;
 
@@ -45,6 +47,25 @@ namespace ScsContentMigrator.UnitTests
 				return (T)Activator.CreateInstance(typeof(T), args);
 
 			return Activator.CreateInstance<T>();
+		}
+
+		/// <summary>
+		/// Creates an instance of the provided type with all constructor parameters defaulted.
+		/// </summary>
+		/// <typeparam name="T">The type of instance to create</typeparam>
+		/// <returns>An instance of the provided type with all constructor parameters defaulted.</returns>
+		protected T CreateDefaultedInstance<T>()
+		{
+			var ctor = typeof(T).GetConstructors(BindingFlags.Instance | BindingFlags.Public).OrderBy(c => c.GetParameters().Length).FirstOrDefault();
+			if (ctor == null)
+				throw new NullReferenceException("Could not find a constructor");
+
+			object[] parameters = ctor.GetParameters()
+				.Select(p => 
+					typeof(TestBase).GetMethod("Default", BindingFlags.Static | BindingFlags.NonPublic)
+					.MakeGenericMethod(p.ParameterType).Invoke(null, new object[] { })).ToArray();
+
+			return (T)ctor.Invoke(parameters);			
 		}
 
 		/// <summary>
@@ -110,6 +131,17 @@ namespace ScsContentMigrator.UnitTests
 			ControllerContext controllerContext = Substitute.For<ControllerContext>();
 			controllerContext.HttpContext.Returns(httpContext);
 			return controllerContext;
+		}
+
+		/// <summary>
+		/// Casts the provided object to the supplied type.
+		/// </summary>
+		/// <typeparam name="T">The type to cast to</typeparam>
+		/// <param name="obj">The object to cast</param>
+		/// <returns>An object of the supplied type</returns>
+		private static T Default<T>()
+		{
+			return default(T);
 		}
 
 		public void Dispose()

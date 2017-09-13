@@ -17,12 +17,27 @@ namespace ScsContentMigrator.Services
 	public class SitecoreAccessService : ISitecoreAccessService
 	{
 		private Database db = Factory.GetDatabase("master", false);
+		private readonly IYamlSerializationService _yamlSerializationService;
+
+		public SitecoreAccessService()
+		{
+			_yamlSerializationService = Bootstrap.Container.Resolve<IYamlSerializationService>();
+		}
+
 		public IItemData GetItemData(Guid idataId)
 		{
 			var item = GetItem(idataId);
 			if (item == null)
 				return null;
 			return new ItemData(item);
+		}
+
+		public string GetItemYaml(Guid idataId)
+		{
+			var item = GetItem(idataId);
+			if (item == null)
+				return null;
+			return _yamlSerializationService.SerializeYaml(item);
 		}
 
 		public string GetItemIconSrc(IItemData localData)
@@ -51,7 +66,7 @@ namespace ScsContentMigrator.Services
 			Item i = GetItem(itemId);
 			i.Recycle();
 		}
-		public Item GetItem(Guid id)
+		private Item GetItem(Guid id)
 		{
 			using (new SecurityDisabler())
 			{

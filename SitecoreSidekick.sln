@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SitecoreSidekick.UnitTests"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScsContentMigrator.UnitTests", "ScsContentMigrator.UnitTests\ScsContentMigrator.UnitTests.csproj", "{C15F4B76-FE71-4C1F-8647-B8CF8A8CA546}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{8F4C28DB-BD0A-4BB8-A068-EE822E8881CF}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Source\SitecoreSidekick.Shared\SitecoreSidekick.Shared.projitems*{0da36c4a-1b13-4891-a263-5f994127051c}*SharedItemsImports = 4
@@ -67,5 +69,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{3BF608D1-CF04-4A9C-A098-B5455492F6FD} = {8F4C28DB-BD0A-4BB8-A068-EE822E8881CF}
+		{23421921-4A34-4FB4-AB8F-1B2CEB204F07} = {8F4C28DB-BD0A-4BB8-A068-EE822E8881CF}
+		{C15F4B76-FE71-4C1F-8647-B8CF8A8CA546} = {8F4C28DB-BD0A-4BB8-A068-EE822E8881CF}
 	EndGlobalSection
 EndGlobal

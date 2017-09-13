@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace SitecoreSidekick.Shared.IoC
 {
-	public class Container
+	public class Container : IContainer
 	{
 		private readonly ConcurrentDictionary<Type, RegistrationObject> _registrations = new ConcurrentDictionary<Type, RegistrationObject>();
 

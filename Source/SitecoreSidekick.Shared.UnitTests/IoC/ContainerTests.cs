@@ -279,11 +279,6 @@ namespace SitecoreSidekick.Shared.UnitTests.IoC
 			int MyDoubler { get; }
 		}
 
-		public class Bootstrap
-		{
-			public static Container Container { get; } = new Container();
-		}
-
 		public class MyDependentClass : IMyDependentClass
 		{
 			private readonly IMyClass _myClass;

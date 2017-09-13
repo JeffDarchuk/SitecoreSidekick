@@ -27,8 +27,8 @@ namespace SitecoreSidekick.Core
 		protected ScsRegistration(string roles, string isAdmin, string users)
 		{
 			AdminOnly = isAdmin == "true";
-			Roles = roles.Split('|').Where(x => !x.IsWhiteSpaceOrNull()).ToList();
-			Users = users.Split('|').Where(x => !x.IsWhiteSpaceOrNull()).ToList();
+			Roles = new List<string>(roles?.Split('|').Where(x => !x.IsWhiteSpaceOrNull()) ?? new string[] { });
+			Users = new List<string>(users?.Split('|').Where(x => !x.IsWhiteSpaceOrNull()) ?? new string[] { });
 			_scsRegistrationService = Bootstrap.Container.Resolve<IScsRegistrationService>();
 			_authorizationService = Bootstrap.Container.Resolve<IAuthorizationService>();
 			_manifestResourceStreamService = Bootstrap.Container.Resolve<IMainfestResourceStreamService>();

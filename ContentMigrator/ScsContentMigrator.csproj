@@ -131,6 +131,7 @@
     <Compile Include="Core\Interface\IContentItemInstaller.cs" />
     <Compile Include="Core\Interface\IContentItemPuller.cs" />
     <Compile Include="Core\Interface\IContentMigration.cs" />
+    <Compile Include="Services\Interface\ILoggingService.cs" />
     <Compile Include="Services\Interface\IRemoteContentService.cs" />
     <Compile Include="Services\Interface\ISitecoreAccessService.cs" />
     <Compile Include="ItemExtensions.cs" />
@@ -141,8 +142,11 @@
     <Compile Include="Security\UniqueChallengeStore.cs" />
     <Compile Include="Services\ContentMigrationManagerService.cs" />
     <Compile Include="Services\Interface\IContentMigrationManagerService.cs" />
+    <Compile Include="Services\Interface\IYamlSerializationService.cs" />
+    <Compile Include="Services\LoggingService.cs" />
     <Compile Include="Services\RemoteContentService.cs" />
     <Compile Include="Services\SitecoreAccessService.cs" />
+    <Compile Include="Services\YamlSerializationService.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Source\SitecoreSidekick\SitecoreSidekick.csproj">

@@ -51,11 +51,6 @@ namespace ScsContentMigrator.Services
 			string nonce = Guid.NewGuid().ToString();
 
 			WebClient wc = new WebClient { Encoding = Encoding.UTF8 };
-			if (_ss == null)
-			{
-				_ss = new SignatureService(_registration.GetScsRegistration<ContentMigrationRegistration>().AuthenticationSecret);
-				HmacServer = new ScsHmacServer(_ss, new UniqueChallengeStore());
-			}
 			var signature = _ss.CreateSignature(nonce, url, new[] { new SignatureFactor("payload", parameters) });
 
 			wc.Headers["X-MC-MAC"] = signature.SignatureHash;

@@ -183,8 +183,8 @@ namespace ScsContentMigrator
 		private object ItemDataWithChildren(string id)
 		{
 			var ret = new ChildrenItemDataModel();
-			Guid guid = Guid.Parse(id);
-			ret.Item = _sitecore.GetItem(guid).GetYaml();
+			Guid guid = Guid.Parse(id);			
+			ret.Item = _sitecore.GetItemYaml(guid);
 			ret.Children = _sitecore.GetChildrenIds(guid);
 			return ret;
 		}

@@ -47,7 +47,8 @@ namespace ScsContentMigrator
 			// Register components here
 			container.Register<IContentMigrationManagerService, ContentMigrationManagerService>();
 			container.Register<IRemoteContentService, RemoteContentService>();
-			container.Register<ISitecoreAccessService, SitecoreAccessService>();
+			container.Register<ISitecoreAccessService, SitecoreAccessService>();			
+			container.Register<ILoggingService, LoggingService>();
 			container.RegisterFactory<IDataStore>(args =>
 			{
 				IDefaultDeserializerLogger logger = (IDefaultDeserializerLogger)args.FirstOrDefault(a => a is IDefaultDeserializerLogger);
@@ -58,7 +59,8 @@ namespace ScsContentMigrator
 			container.RegisterFactory<IContentItemInstaller>(args => new ContentItemInstaller());
 			container.RegisterFactory<IDefaultLogger>(args => new DefaultLogger() );
 			container.RegisterFactory<ISignatureService>(args=> new SignatureService((string)args[0]));
-			container.RegisterFactory<IItemComparer>(args => new DefaultItemComparer());			
+			container.RegisterFactory<IItemComparer>(args => new DefaultItemComparer());
+			container.RegisterFactory<IYamlSerializationService>(args => new YamlSerializationService());
 
 			return container;
 		}

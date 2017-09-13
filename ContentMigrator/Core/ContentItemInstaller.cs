@@ -89,7 +89,7 @@ namespace ScsContentMigrator.Core
 
 		private int ItemsInstalled { get; set; } = 0;
 
-		public void StartInstallingItems(PullItemModel args, BlockingCollection<IItemData> itemsToInstall, int threads, CancellationTokenSource cancellation)
+		public void StartInstallingItems(PullItemModel args, BlockingCollection<IItemData> itemsToInstall, int threads, CancellationToken cancellationToken)
 		{
 			Status.StartedTime = DateTime.Now;
 			Status.RootNodes = args.Ids.Select(x => new ContentTreeNode(x));
@@ -99,12 +99,12 @@ namespace ScsContentMigrator.Core
 			{
 				Task.Run(async () =>
 				{
-					await ItemInstaller(args, itemsToInstall, cancellation).ConfigureAwait(false);
+					await ItemInstaller(args, itemsToInstall, cancellationToken).ConfigureAwait(false);
 				});
 			}
 		}
 
-		private async Task ItemInstaller(PullItemModel args, BlockingCollection<IItemData> itemsToInstall, CancellationTokenSource cancellation)
+		private async Task ItemInstaller(PullItemModel args, BlockingCollection<IItemData> itemsToInstall, CancellationToken cancellationToken)
 		{
 			Thread.CurrentThread.Priority = ThreadPriority.Lowest;
 			BulkUpdateContext bu = null;
@@ -124,7 +124,7 @@ namespace ScsContentMigrator.Core
 					while (!Completed)
 					{
 						IItemData remoteData;
-						if (!itemsToInstall.TryTake(out remoteData, int.MaxValue, cancellation.Token))
+						if (!itemsToInstall.TryTake(out remoteData, int.MaxValue, cancellationToken))
 						{
 							lock (_locker)
 							{
@@ -135,9 +135,8 @@ namespace ScsContentMigrator.Core
 							}
 							break;
 						}
-						CurrentlyProcessing.Add(remoteData.Id);
-						Item localItem = _sitecore.GetItem(remoteData.Id);
-						IItemData localData = localItem == null ? null : new Rainbow.Storage.Sc.ItemData(localItem);
+						CurrentlyProcessing.Add(remoteData.Id);						
+						IItemData localData = _sitecore.GetItemData(remoteData.Id);
 						await ProcessItem(args, localData, remoteData).ConfigureAwait(false);
 						lock (_locker)
 						{

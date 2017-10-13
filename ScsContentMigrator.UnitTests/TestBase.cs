@@ -55,7 +55,7 @@ namespace ScsContentMigrator.UnitTests
 		/// <typeparam name="T">The type of instance to create</typeparam>
 		/// <returns>An instance of the provided type with all constructor parameters defaulted.</returns>
 		protected T CreateDefaultedInstance<T>()
-		{
+		{			
 			var ctor = typeof(T).GetConstructors(BindingFlags.Instance | BindingFlags.Public).OrderBy(c => c.GetParameters().Length).FirstOrDefault();
 			if (ctor == null)
 				throw new NullReferenceException("Could not find a constructor");
@@ -65,7 +65,7 @@ namespace ScsContentMigrator.UnitTests
 					typeof(TestBase).GetMethod("Default", BindingFlags.Static | BindingFlags.NonPublic)
 					.MakeGenericMethod(p.ParameterType).Invoke(null, new object[] { })).ToArray();
 
-			return (T)ctor.Invoke(parameters);			
+			return CreateInstance<T>(parameters);
 		}
 
 		/// <summary>

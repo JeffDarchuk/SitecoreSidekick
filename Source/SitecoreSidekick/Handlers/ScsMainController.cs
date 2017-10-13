@@ -100,7 +100,7 @@ namespace SitecoreSidekick.Handlers
 		{
 			using (new SecurityDisabler())
 			{
-				ScsSitecoreItem i = _sitecoreDataAccessService.GetItem(selectedId).Parent;					
+				ScsSitecoreItem i = _sitecoreDataAccessService.GetScsSitecoreItem(selectedId).Parent;					
 				while (i != null)
 				{
 					if (!ret.ContainsKey(i.Id))

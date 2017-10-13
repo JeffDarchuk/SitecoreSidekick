@@ -13,11 +13,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Xml;
+using SitecoreSidekick.Services.Interface;
 
 namespace ScsContentMigrator
 {
 	public class ContentMigrationRegistration : ScsRegistration
 	{
+		private readonly ISitecoreDataAccessService _sitecoreDataAccessService;
+
 		private static Checksum _checksum;
 		public static CompareContentTreeNode Root { get; } = new CompareContentTreeNode { DatabaseName = "master", DisplayName = "Root", Icon = "/~/icon/Applications/32x32/media_stop.png", Open = true, Nodes = new List<ContentTreeNode>() };
 		public int RemoteThreads { get; } = 1;
@@ -35,6 +38,7 @@ namespace ScsContentMigrator
 
 		public ContentMigrationRegistration(string roles, string isAdmin, string users, string remotePullingThreads, string databaseWriterThreads) : base(roles, isAdmin, users)
 		{
+			_sitecoreDataAccessService = Bootstrap.Container.Resolve<ISitecoreDataAccessService>();
 			if (RemoteThreads == 1)
 			{
 				int remoteTmp;
@@ -92,14 +96,11 @@ namespace ScsContentMigrator
 			{
 				dbName = node.Attributes["database"].Value;
 			}
-			var db = Factory.GetDatabase(dbName, false);
-			using (new SecurityDisabler())
+
+			var item = _sitecoreDataAccessService.GetItemData(node.InnerText, dbName);
+			if (item != null)
 			{
-				var item = db.GetItem(node.InnerText);
-				if (item != null)
-				{
-					Root.Nodes.Add(new CompareContentTreeNode(item, false));
-				}
+				Root.Nodes.Add(new CompareContentTreeNode(item, false));
 			}
 		}
 	}

@@ -11,6 +11,8 @@ using System.Linq;
 using MicroCHAP;
 using Rainbow.Diff;
 using ScsContentMigrator.CMRainbow.Interface;
+using SitecoreSidekick.Services;
+using SitecoreSidekick.Services.Interface;
 
 namespace ScsContentMigrator
 {
@@ -47,7 +49,7 @@ namespace ScsContentMigrator
 			// Register components here
 			container.Register<IContentMigrationManagerService, ContentMigrationManagerService>();
 			container.Register<IRemoteContentService, RemoteContentService>();
-			container.Register<ISitecoreAccessService, SitecoreAccessService>();			
+			container.Register<ISitecoreDataAccessService, SitecoreDataAccessService>();			
 			container.Register<ILoggingService, LoggingService>();
 			container.RegisterFactory<IDataStore>(args =>
 			{

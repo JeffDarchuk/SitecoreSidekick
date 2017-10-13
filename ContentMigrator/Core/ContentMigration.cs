@@ -14,7 +14,7 @@ namespace ScsContentMigrator.Core
 		private readonly IContentItemPuller _puller;
 		private readonly IContentItemInstaller _installer;
 		private readonly IRemoteContentService _remoteContent;
-		private readonly ISitecoreAccessService _sitecoreAccess;
+		private readonly ISitecoreDataAccessService _sitecoreAccess;
 		private readonly IScsRegistrationService _registration;
 		private readonly CancellationTokenSource _cancellation = new CancellationTokenSource();
 		private PullItemModel _model;
@@ -22,7 +22,7 @@ namespace ScsContentMigrator.Core
 		public ContentMigration()
 		{
 			_remoteContent = Bootstrap.Container.Resolve<IRemoteContentService>();
-			_sitecoreAccess = Bootstrap.Container.Resolve<ISitecoreAccessService>();
+			_sitecoreAccess = Bootstrap.Container.Resolve<ISitecoreDataAccessService>();
 			_registration = Bootstrap.Container.Resolve<IScsRegistrationService>();
 			_puller = Bootstrap.Container.Resolve<IContentItemPuller>();
 			_installer = Bootstrap.Container.Resolve<IContentItemInstaller>();
@@ -50,8 +50,8 @@ namespace ScsContentMigrator.Core
 			{
 				_installer.SetupTrackerForUnwantedLocalItems(model.Ids.Select(Guid.Parse));
 			}
-			_puller.StartGatheringItems(model.Ids.Select(Guid.Parse), _registration.GetScsRegistration<ContentMigrationRegistration>().RemoteThreads, model.Children, model.Server, _cancellation.Token);
-			_installer.StartInstallingItems(model, _puller.ItemsToInstall, _registration.GetScsRegistration<ContentMigrationRegistration>().WriterThreads, _cancellation.Token);
+			_puller.StartGatheringItems(model.Ids.Select(Guid.Parse), _registration.GetScsRegistration<ContentMigrationRegistration>()?.RemoteThreads ?? 1, model.Children, model.Server, _cancellation.Token);
+			_installer.StartInstallingItems(model, _puller.ItemsToInstall, _registration.GetScsRegistration<ContentMigrationRegistration>()?.WriterThreads ?? 1, _cancellation.Token);
 		}
 
 		public void CancelMigration()

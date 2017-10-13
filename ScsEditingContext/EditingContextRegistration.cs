@@ -9,6 +9,7 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.Security;
 using System.Xml;
+using ScsEditingContext.Services.Interface;
 using Sitecore.Configuration;
 using Sitecore.Data;
 using Sitecore.Data.Managers;
@@ -23,6 +24,8 @@ namespace ScsEditingContext
 {
 	public class EditingContextRegistration : ScsRegistration
 	{
+		private readonly ISitecoreDataAccessService _sitecoreDataAccessService;
+
 		public List<dynamic> CoreLocations { get; } = new List<dynamic>();
 		public List<dynamic> MasterLocations { get; } = new List<dynamic>();
 		public List<dynamic> EditorLocations { get; } = new List<dynamic>();
@@ -44,11 +47,12 @@ namespace ScsEditingContext
 		static EditingContextRegistration()
 		{
 			Related = new ConcurrentDictionary<string, List<TypeContentTreeNode>>();
-			Referrers = new ConcurrentDictionary<string, List<TypeContentTreeNode>>();
+			Referrers = new ConcurrentDictionary<string, List<TypeContentTreeNode>>();			
 		}
 
 		public EditingContextRegistration(string roles, string isAdmin, string users) : base(roles, isAdmin, users)
 		{
+			_sitecoreDataAccessService = Bootstrap.Container.Resolve<ISitecoreDataAccessService>();
 		}
 		public void AddCoreLocation(XmlNode arg)
 		{
@@ -67,7 +71,7 @@ namespace ScsEditingContext
 
 		public dynamic GetLocationFromXml(XmlNode arg, Database db)
 		{
-			var node = new ContentTreeNode(db.DataManager.DataEngine.GetItem(new ID(arg.Attributes?["id"]?.InnerText), LanguageManager.DefaultLanguage, Sitecore.Data.Version.Latest));
+			var node = new ContentTreeNode(_sitecoreDataAccessService.GetLatestItemData(arg.Attributes?["id"]?.InnerText));
 			dynamic location = new ExpandoObject();
 			location.item = node;
 			location.description = arg.Attributes?["description"]?.InnerText;

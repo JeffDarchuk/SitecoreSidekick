@@ -114,11 +114,11 @@ namespace SitecoreSidekick.UnitTests.Handlers
 		public async Task SelectRelated_ServerNotDefined_GetsFromSitecoreDatabase()
 		{			
 			var scsMainController = CreateInstance<ScsMainController>();
-			GetSubstitute<ISitecoreDataAccessService>().GetItem(Arg.Any<string>()).Returns(new ScsSitecoreItem());
+			GetSubstitute<ISitecoreDataAccessService>().GetScsSitecoreItem(Arg.Any<string>()).Returns(new ScsSitecoreItem());
 
 			await scsMainController.SelectedRelated(new ContentSelectedRelatedModel { SelectedIds = new List<string> { "Id" } });
 
-			GetSubstitute<ISitecoreDataAccessService>().Received(1).GetItem(Arg.Any<string>());
+			GetSubstitute<ISitecoreDataAccessService>().Received(1).GetScsSitecoreItem(Arg.Any<string>());
 		}
 
 		[Fact]
@@ -126,7 +126,7 @@ namespace SitecoreSidekick.UnitTests.Handlers
 		{
 			string server = "http://google.com";
 			var scsMainController = CreateInstance<ScsMainController>();			
-			GetSubstitute<ISitecoreDataAccessService>().GetItem(Arg.Any<string>()).Returns(new ScsSitecoreItem());
+			GetSubstitute<ISitecoreDataAccessService>().GetScsSitecoreItem(Arg.Any<string>()).Returns(new ScsSitecoreItem());
 
 			await scsMainController.SelectedRelated(new ContentSelectedRelatedModel { SelectedIds = new List<string> { "Id" }, Server = server});
 

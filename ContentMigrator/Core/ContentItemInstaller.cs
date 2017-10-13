@@ -31,7 +31,7 @@ namespace ScsContentMigrator.Core
 		private readonly IDefaultLogger _logger;
 		private readonly IDataStore _scDatastore;
 		private readonly IItemComparer _comparer;
-		private readonly ISitecoreAccessService _sitecore;
+		private readonly ISitecoreDataAccessService _sitecore;
 		private readonly IJsonSerializationService _jsonSerializationService;
 		internal ConcurrentHashSet<Guid> AllowedItems = new ConcurrentHashSet<Guid>();
 		internal ConcurrentHashSet<Guid> Errors = new ConcurrentHashSet<Guid>();
@@ -45,7 +45,7 @@ namespace ScsContentMigrator.Core
 		{
 			_logger = Bootstrap.Container.Resolve<IDefaultLogger>();
 			_scDatastore = Bootstrap.Container.Resolve<IDataStore>(_logger);
-			_sitecore = Bootstrap.Container.Resolve<ISitecoreAccessService>();
+			_sitecore = Bootstrap.Container.Resolve<ISitecoreDataAccessService>();
 			_jsonSerializationService = Bootstrap.Container.Resolve<IJsonSerializationService>();
 			_comparer = Bootstrap.Container.Resolve<IItemComparer>();
 		}
@@ -70,7 +70,7 @@ namespace ScsContentMigrator.Core
 				{
 					_sitecore.RecycleItem(id);
 					var data = _sitecore.GetItemData(id);
-					_logger.BeginEvent(data, LogStatus.Recycle, _sitecore.GetItemIconSrc(data), false);
+					_logger.BeginEvent(data, LogStatus.Recycle, _sitecore.GetIconSrc(data), false);
 				}
 				catch (Exception e)
 				{
@@ -82,7 +82,7 @@ namespace ScsContentMigrator.Core
 
 		public void SetupTrackerForUnwantedLocalItems(IEnumerable<Guid> rootIds)
 		{
-			AllowedItems = _sitecore.GetSubtreeOfGuids(rootIds);
+			AllowedItems = new ConcurrentHashSet<Guid>(_sitecore.GetSubtreeOfGuids(rootIds));
 		}
 
 		public bool Completed { get; private set; }
@@ -211,18 +211,18 @@ namespace ScsContentMigrator.Core
 					var results = _comparer.Compare(remoteData, localData);
 					if (results.AreEqual)
 					{
-						_logger.BeginEvent(remoteData, LogStatus.Skipped, _sitecore.GetItemIconSrc(localData), false);
+						_logger.BeginEvent(remoteData, LogStatus.Skipped, GetSrc(_sitecore.GetIconSrc(localData)), false);
 					}
 					else if (results.IsMoved)
-						_logger.BeginEvent(remoteData, LogStatus.Moved, _sitecore.GetItemIconSrc(localData), false);
+						_logger.BeginEvent(remoteData, LogStatus.Moved, GetSrc(_sitecore.GetIconSrc(localData)), false);
 					else if (results.IsRenamed)
-						_logger.BeginEvent(remoteData, LogStatus.Renamed, _sitecore.GetItemIconSrc(localData), false);
+						_logger.BeginEvent(remoteData, LogStatus.Renamed, GetSrc(_sitecore.GetIconSrc(localData)), false);
 					else if (results.IsTemplateChanged)
-						_logger.BeginEvent(remoteData, LogStatus.TemplateChange, _sitecore.GetItemIconSrc(localData), false);
+						_logger.BeginEvent(remoteData, LogStatus.TemplateChange, GetSrc(_sitecore.GetIconSrc(localData)), false);
 					else if (args.Overwrite)
-						_logger.BeginEvent(remoteData, LogStatus.Changed, _sitecore.GetItemIconSrc(localData), false);
+						_logger.BeginEvent(remoteData, LogStatus.Changed, GetSrc(_sitecore.GetIconSrc(localData)), false);
 					else
-						_logger.BeginEvent(remoteData, LogStatus.Skipped, _sitecore.GetItemIconSrc(localData), false);
+						_logger.BeginEvent(remoteData, LogStatus.Skipped, GetSrc(_sitecore.GetIconSrc(localData)), false);
 				}
 				else
 					_logger.BeginEvent(remoteData, LogStatus.Created, "", false);
@@ -232,7 +232,7 @@ namespace ScsContentMigrator.Core
 				bool skip = false;
 				if (!args.Overwrite && localData != null)
 				{
-					_logger.BeginEvent(remoteData, LogStatus.Skipped, _sitecore.GetItemIconSrc(localData), false);
+					_logger.BeginEvent(remoteData, LogStatus.Skipped, GetSrc(_sitecore.GetIconSrc(localData)), false);
 					skip = true;
 				}
 				if (!skip && localData != null)
@@ -240,7 +240,7 @@ namespace ScsContentMigrator.Core
 					var results = _comparer.Compare(remoteData, localData);
 					if (results.AreEqual)
 					{
-						_logger.BeginEvent(remoteData, LogStatus.Skipped, _sitecore.GetItemIconSrc(localData), false);
+						_logger.BeginEvent(remoteData, LogStatus.Skipped, GetSrc(_sitecore.GetIconSrc(localData)), false);
 						skip = true;
 					}
 				}
@@ -264,7 +264,7 @@ namespace ScsContentMigrator.Core
 					{
 						if (localData != null)
 						{							
-							_logger.BeginEvent(remoteData, LogStatus.Changed, _logger.GetSrc(_sitecore.GetItemIconSrc(localData)), true);
+							_logger.BeginEvent(remoteData, LogStatus.Changed, _logger.GetSrc(GetSrc(_sitecore.GetIconSrc(localData))), true);
 						}
 						_scDatastore.Save(remoteData);
 					}
@@ -290,11 +290,19 @@ namespace ScsContentMigrator.Core
 						}
 						else
 						{
-							_logger.BeginEvent(localData, LogStatus.Skipped, _logger.GetSrc(_sitecore.GetItemIconSrc(localData)), false);
+							_logger.BeginEvent(localData, LogStatus.Skipped, _logger.GetSrc(GetSrc(_sitecore.GetIconSrc(localData))), false);
 						}
 					}
 				}
 			}
+		}
+
+		private string GetSrc(string imgTag)
+		{
+			if (string.IsNullOrWhiteSpace(imgTag)) return imgTag;
+			int i1 = imgTag.IndexOf("src=\"", StringComparison.Ordinal) + 5;
+			int i2 = imgTag.IndexOf("\"", i1, StringComparison.Ordinal);
+			return imgTag.Substring(i1, i2 - i1);
 		}
 	}
 }

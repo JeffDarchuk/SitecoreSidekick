@@ -30,12 +30,11 @@ namespace ScsContentMigrator.UnitTests.Core
 			ContentMigration contentMigration = CreateInstance<ContentMigration>();
 			GetSubstitute<IRemoteContentService>().GetRemoteItemData(Arg.Any<Guid>(), Arg.Any<string>()).Returns(Substitute.For<IItemData>());
 			GetSubstitute<IContentItemPuller>().ItemsToInstall.Returns(new BlockingCollection<IItemData>());
-			GetSubstitute<ISitecoreAccessService>().GetItemData(parent).Returns(Substitute.For<IItemData>());
-			GetSubstitute<IScsRegistrationService>().GetScsRegistration<ContentMigrationRegistration>().Returns(CreateDefaultedInstance<ContentMigrationRegistration>());			
+			GetSubstitute<ISitecoreDataAccessService>().GetItemData(parent).Returns(Substitute.For<IItemData>());			
 
 			contentMigration.StartContentMigration(new PullItemModel {PullParent = true, Ids = new List<string> { initialTarget.ToString()}});
 
-			GetSubstitute<ISitecoreAccessService>().Received(1).GetItemData(initialTarget);
+			GetSubstitute<ISitecoreDataAccessService>().Received(1).GetItemData(initialTarget);
 		}
 
 		[Fact]
@@ -53,36 +52,33 @@ namespace ScsContentMigrator.UnitTests.Core
 			GetSubstitute<IRemoteContentService>().GetRemoteItemData(firstParent, Arg.Any<string>()).Returns(parentItem);
 			GetSubstitute<IRemoteContentService>().GetRemoteItemData(secondParent, Arg.Any<string>()).Returns(Substitute.For<IItemData>());
 			GetSubstitute<IContentItemPuller>().ItemsToInstall.Returns(new BlockingCollection<IItemData>());
-			GetSubstitute<ISitecoreAccessService>().GetItemData(initialTarget).Returns((IItemData)null);
-			GetSubstitute<ISitecoreAccessService>().GetItemData(firstParent).Returns((IItemData)null);
-			GetSubstitute<ISitecoreAccessService>().GetItemData(secondParent).Returns(item);
-			GetSubstitute<IScsRegistrationService>().GetScsRegistration<ContentMigrationRegistration>().Returns(CreateDefaultedInstance<ContentMigrationRegistration>());
+			GetSubstitute<ISitecoreDataAccessService>().GetItemData(initialTarget).Returns((IItemData)null);
+			GetSubstitute<ISitecoreDataAccessService>().GetItemData(firstParent).Returns((IItemData)null);
+			GetSubstitute<ISitecoreDataAccessService>().GetItemData(secondParent).Returns(item);			
 
 			contentMigration.StartContentMigration(new PullItemModel { PullParent = true, Ids = new List<string> { initialTarget.ToString() } });
 
-			GetSubstitute<ISitecoreAccessService>().Received(1).GetItemData(initialTarget);
-			GetSubstitute<ISitecoreAccessService>().Received(1).GetItemData(firstParent);
-			GetSubstitute<ISitecoreAccessService>().Received(1).GetItemData(secondParent);
+			GetSubstitute<ISitecoreDataAccessService>().Received(1).GetItemData(initialTarget);
+			GetSubstitute<ISitecoreDataAccessService>().Received(1).GetItemData(firstParent);
+			GetSubstitute<ISitecoreDataAccessService>().Received(1).GetItemData(secondParent);
 		}
 
 		[Fact]
 		public void StartContentMigration_NotPullingParent_DoesNotPullFromSitecoreOrRemote()
 		{
-			ContentMigration contentMigration = CreateInstance<ContentMigration>();
-			GetSubstitute<IScsRegistrationService>().GetScsRegistration<ContentMigrationRegistration>().Returns(CreateDefaultedInstance<ContentMigrationRegistration>());
+			ContentMigration contentMigration = CreateInstance<ContentMigration>();			
 			GetSubstitute<IContentItemPuller>().ItemsToInstall.Returns(new BlockingCollection<IItemData>());
 
 			contentMigration.StartContentMigration(new PullItemModel {PullParent = false, Ids = new List<string>{Guid.NewGuid().ToString()}});
 
 			GetSubstitute<IRemoteContentService>().Received(0).GetRemoteItemData(Arg.Any<Guid>(), Arg.Any<string>());
-			GetSubstitute<ISitecoreAccessService>().Received(0).GetItemData(Arg.Any<Guid>());
+			GetSubstitute<ISitecoreDataAccessService>().Received(0).GetItemData(Arg.Any<Guid>());
 		}
 
 		[Fact]
 		public void StartContentMigration_RemoveLocalNotInRemote_SetsUpTrackerForUnwantedLocalItems()
 		{
-			ContentMigration contentMigration = CreateInstance<ContentMigration>();
-			GetSubstitute<IScsRegistrationService>().GetScsRegistration<ContentMigrationRegistration>().Returns(CreateDefaultedInstance<ContentMigrationRegistration>());
+			ContentMigration contentMigration = CreateInstance<ContentMigration>();			
 			GetSubstitute<IContentItemPuller>().ItemsToInstall.Returns(new BlockingCollection<IItemData>());
 
 			contentMigration.StartContentMigration(new PullItemModel { PullParent = false, RemoveLocalNotInRemote = true, Ids = new List<string> { Guid.NewGuid().ToString() } });
@@ -93,8 +89,7 @@ namespace ScsContentMigrator.UnitTests.Core
 		[Fact]
 		public void StartContentMigration_PullerStartsGatheringItems()
 		{
-			ContentMigration contentMigration = CreateInstance<ContentMigration>();
-			GetSubstitute<IScsRegistrationService>().GetScsRegistration<ContentMigrationRegistration>().Returns(CreateDefaultedInstance<ContentMigrationRegistration>());
+			ContentMigration contentMigration = CreateInstance<ContentMigration>();			
 			GetSubstitute<IContentItemPuller>().ItemsToInstall.Returns(new BlockingCollection<IItemData>());
 
 			contentMigration.StartContentMigration(new PullItemModel { PullParent = false, Ids = new List<string> { Guid.NewGuid().ToString() } });
@@ -104,9 +99,9 @@ namespace ScsContentMigrator.UnitTests.Core
 
 		[Fact]
 		public void StartContentMigration_InstallerStartsInstallingItems()
-		{
+		{			
 			ContentMigration contentMigration = CreateInstance<ContentMigration>();
-			GetSubstitute<IScsRegistrationService>().GetScsRegistration<ContentMigrationRegistration>().Returns(CreateDefaultedInstance<ContentMigrationRegistration>());
+			GetSubstitute<ISitecoreDataAccessService>();			
 			GetSubstitute<IContentItemPuller>().ItemsToInstall.Returns(new BlockingCollection<IItemData>());
 
 			contentMigration.StartContentMigration(new PullItemModel { PullParent = false, Ids = new List<string> { Guid.NewGuid().ToString() } });

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ScsEditingContext.Services;
+using ScsEditingContext.Services.Interface;
 using SitecoreSidekick.Shared.IoC;
 
 namespace ScsEditingContext
@@ -38,8 +40,8 @@ namespace ScsEditingContext
 			Container container = SitecoreSidekick.Bootstrap.Container;
 
 			// Register components here
-
-
+			container.Register<ISitecoreDataAccessService, SitecoreDataAccessService>();
+			
 			return container;
 		}
 	}

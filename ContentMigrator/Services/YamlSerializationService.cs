@@ -43,13 +43,12 @@ namespace ScsContentMigrator.Services
 			}
 			return null;
 		}
-
-		public string SerializeYaml(Item item)
-		{			
+		
+		public string SerializeYaml(IItemData item)
+		{
 			using (var stream = new MemoryStream())
-			{
-				ItemData data = new ItemData(item);
-				_formatter.WriteSerializedItem(data, stream);
+			{				
+				_formatter.WriteSerializedItem(item, stream);
 				stream.Seek(0, SeekOrigin.Begin);
 
 				using (var reader = new StreamReader(stream))
@@ -57,6 +56,11 @@ namespace ScsContentMigrator.Services
 					return reader.ReadToEnd();
 				}
 			}
+		}
+
+		public void WriteSerializedItem(IItemData item, Stream stream)
+		{
+			_formatter.WriteSerializedItem(item, stream);
 		}
 	}
 }

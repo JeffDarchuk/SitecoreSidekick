@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Web.Mvc;
 using System.Xml;
 using Lucene.Net.Search;
+using Rainbow.Model;
 using ScsAuditLog.Model;
 using ScsAuditLog.Model.Interface;
 using Sitecore.Configuration;
@@ -18,11 +19,13 @@ using Sitecore.SecurityModel;
 using SitecoreSidekick;
 using SitecoreSidekick.ContentTree;
 using SitecoreSidekick.Core;
+using SitecoreSidekick.Services.Interface;
 
 namespace ScsAuditLog
 {
 	public class AuditLogController : ScsController
 	{
+		private static readonly ISitecoreDataAccessService _sitecoreDataAccessSerivce = Bootstrap.Container.Resolve<ISitecoreDataAccessService>();	
 		private static readonly ContentTreeNode _root = new ContentTreeNode() { DatabaseName = "master", DisplayName = "Root", Icon = "/~/icon/Applications/32x32/media_stop.png", Open = true, Nodes = new List<ContentTreeNode>() };
 		private static object _locker = new object();
 		public static ContentTreeNode Root
@@ -35,16 +38,9 @@ namespace ScsAuditLog
 					{
 						if (!_root.Nodes.Any())
 						{
-							using (new SecurityDisabler())
+							foreach (IItemData child in _sitecoreDataAccessSerivce.GetRootItemData(_root.DatabaseName).GetChildren())
 							{
-								Database db = Factory.GetDatabase(_root.DatabaseName, false);
-								if (db != null)
-								{
-									foreach (Item child in db.GetRootItem().Children)
-									{
-										_root.Nodes.Add(new ContentTreeNode(child, false));
-									}
-								}
+								_root.Nodes.Add(new ContentTreeNode(child, false));
 							}
 						}
 					}
@@ -182,7 +178,10 @@ namespace ScsAuditLog
 
 		private object GetContentTree(ContentTreeModel data)
 		{
-			return string.IsNullOrWhiteSpace(data.Id.ToString()) ? Root : new ContentTreeNode(Factory.GetDatabase(data.Database.ToString()).GetItem(new ID(data.Id)));
+			if (string.IsNullOrWhiteSpace(data.Id)) return Root;
+
+			IItemData item = _sitecoreDataAccessSerivce.GetItemData(data.Id, data.Database);
+			return new ContentTreeNode(item);			
 		}
 
 		private object GetUserActivity(ActivityDataModel data)

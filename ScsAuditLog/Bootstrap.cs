@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Sitecore.DependencyInjection;
+using SitecoreSidekick.Services;
+using SitecoreSidekick.Services.Interface;
 using SitecoreSidekick.Shared.IoC;
 
 namespace ScsAuditLog
@@ -36,6 +39,9 @@ namespace ScsAuditLog
 		private static Container InitializeContainer()
 		{
 			Container container = SitecoreSidekick.Bootstrap.Container;
+
+			// Register components here
+			container.Register<ISitecoreDataAccessService, SitecoreDataAccessService>();
 
 			return container;
 		}

@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using SitecoreSidekick.Services.Interface;
 using Version = Sitecore.Data.Version;
 
 namespace ScsContentMigrator.Data
@@ -23,6 +24,7 @@ namespace ScsContentMigrator.Data
 	{
 		private static readonly List<IFieldComparer> Comparers = new List<IFieldComparer>();
 		private readonly IRemoteContentService _remoteContent;
+		private readonly ISitecoreDataAccessService _sitecoreAccessService;
 		static CompareContentTreeNode()
 		{
 			Comparers.Add(new CheckboxComparison());
@@ -43,19 +45,15 @@ namespace ScsContentMigrator.Data
 		public CompareContentTreeNode()
 		{
 			_remoteContent = Bootstrap.Container.Resolve<IRemoteContentService>();
+			_sitecoreAccessService = Bootstrap.Container.Resolve<ISitecoreDataAccessService>();
 		}
 
-		public CompareContentTreeNode(Item item, bool open = true) : base(item, open)
+		public CompareContentTreeNode(IItemData item, bool open = true) : base(item, open)
 		{
-			SortedSet<string> tmp = new SortedSet<string>();
-			foreach (Item version in item.Versions.GetVersions(true))
-			{
-				tmp.Add(version[FieldIDs.Revision]);
-			}
+			SortedSet<string> tmp = new SortedSet<string>(_sitecoreAccessService.GetVersions(item));
 			Revision = string.Join("", tmp);
-			Checksum = ContentMigrationRegistration.GetChecksum(item.ID.ToString());
+			Checksum = ContentMigrationRegistration.GetChecksum(item.Id.ToString());
 			_remoteContent = Bootstrap.Container.Resolve<IRemoteContentService>();
-
 		}
 
 		private bool AreFieldsEqual(Field local, IItemFieldValue remote)
@@ -178,14 +176,14 @@ namespace ScsContentMigrator.Data
 				using (new SecurityDisabler())
 				{
 					Status = new List<Tuple<string, string>>();
-					var localItem = Factory.GetDatabase(database, true).DataManager.DataEngine.GetItem(new ID(itemId), LanguageManager.DefaultLanguage, Sitecore.Data.Version.Latest);
+					var localItem = _sitecoreAccessService.GetLatestItemData(itemId, database);					
 					if (localItem == null)
 					{
 						Status.Add(new Tuple<string, string>("cmmissing", "This content item only exists on the remote server."));
 						return;
 					}
 
-					ChildChanged = Checksum != ContentMigrationRegistration.GetChecksum(localItem.ID.ToString());
+					ChildChanged = Checksum != ContentMigrationRegistration.GetChecksum(localItem.Id.ToString());
 					CompareContentTreeNode local = new CompareContentTreeNode(localItem);
 					if (Revision != local.Revision)
 					{
@@ -206,9 +204,9 @@ namespace ScsContentMigrator.Data
 						tracker.Add(child.Id);
 					}
 
-					foreach (Item child in localItem.Children)
+					foreach (IItemData child in localItem.GetChildren())
 					{
-						if (tracker.Contains(child.ID.ToString())) continue;
+						if (tracker.Contains(child.Id.ToString())) continue;
 						var newnode = new CompareContentTreeNode(child, false)
 						{
 							Status = new List<Tuple<string, string>>

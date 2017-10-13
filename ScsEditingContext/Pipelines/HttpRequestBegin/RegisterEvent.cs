@@ -10,11 +10,19 @@ using SitecoreSidekick.ContentTree;
 using Sitecore.Diagnostics;
 using System.Web.Configuration;
 using System.Configuration;
+using Rainbow.Model;
+using ScsEditingContext.Services.Interface;
 
 namespace ScsEditingContext.Pipelines.HttpRequestBegin
 {
 	public class RegisterEvent : HttpRequestProcessor
 	{
+		private readonly ISitecoreDataAccessService _sitecoreDataAccessService;
+		public RegisterEvent()
+		{
+			_sitecoreDataAccessService = Bootstrap.Container.Resolve<ISitecoreDataAccessService>();
+		}
+
 		public override void Process(HttpRequestArgs args)
 		{
 			try
@@ -28,23 +36,16 @@ namespace ScsEditingContext.Pipelines.HttpRequestBegin
 					{
 						guidString = guidString.Substring(guidStart, guidStop - guidStart);
 						HttpCookie myCookie = args.Context.Request.Cookies["scseditorcontext" + Context.GetUserName()];
-						var database = Context.ContentDatabase ?? Context.Database ?? Factory.GetDatabase("master");
-						ID tmp;
-						try
-						{
-							tmp = new ID(guidString);
-						}
-						catch (Exception)
-						{
+
+						if (!_sitecoreDataAccessService.TryGetItemData(guidString, out IItemData item))
 							return;
-						}
-						Item item = database.GetItem(tmp);
+
 						if (item != null)
 						{
                             SessionStateSection SessionSettings = (SessionStateSection)ConfigurationManager.GetSection("system.web/sessionState");
 
-                            EditingContextRegistration.Related[HttpContext.Current.Request.Cookies[SessionSettings.CookieName]?.Value ?? ""] = Globals.LinkDatabase.GetItemReferences(item, true).Select(x => new TypeContentTreeNode(x.GetTargetItem())).OrderBy(x => x.DisplayName).ToList();
-							EditingContextRegistration.Referrers[HttpContext.Current.Request.Cookies[SessionSettings.CookieName]?.Value ?? ""] = Globals.LinkDatabase.GetItemReferrers(item, true).Select(x => new TypeContentTreeNode(x.GetSourceItem())).OrderBy(x => x.DisplayName).ToList();
+                            EditingContextRegistration.Related[HttpContext.Current.Request.Cookies[SessionSettings.CookieName]?.Value ?? ""] = _sitecoreDataAccessService.GetItemReferences(item).Select(x=> new TypeContentTreeNode(x)).OrderBy(x => x.DisplayName).ToList();
+							EditingContextRegistration.Referrers[HttpContext.Current.Request.Cookies[SessionSettings.CookieName]?.Value ?? ""] = _sitecoreDataAccessService.GetItemReferrers(item).Select(x => new TypeContentTreeNode(x)).OrderBy(x => x.DisplayName).ToList();
 						}
 						ContentTreeNode current = new ContentTreeNode(item, false);
 						if (string.IsNullOrWhiteSpace(current.DisplayName))

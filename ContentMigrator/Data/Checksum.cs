@@ -11,11 +11,11 @@ namespace ScsContentMigrator.Data
 {
 	public class Checksum
 	{
-		private readonly Dictionary<string, SortedSet<string>> _checksumTracker = new Dictionary<string, SortedSet<string>>();
-		private readonly Dictionary<string, List<string>> _childTracker = new Dictionary<string, List<string>>();
-		private readonly Dictionary<string,string> _parentTracker = new Dictionary<string, string>();
-		private readonly HashSet<string> _leafTracker = new HashSet<string>();
-		private readonly Dictionary<string, int> _checksum = new Dictionary<string, int>();
+		internal readonly Dictionary<string, SortedSet<string>> _checksumTracker = new Dictionary<string, SortedSet<string>>();
+		internal readonly Dictionary<string, List<string>> _childTracker = new Dictionary<string, List<string>>();
+		internal readonly Dictionary<string,string> _parentTracker = new Dictionary<string, string>();
+		internal readonly HashSet<string> _leafTracker = new HashSet<string>();
+		internal readonly Dictionary<string, int> _checksum = new Dictionary<string, int>();
 		//t.ID, t.Name, t.TemplateID, t.MasterID, t.ParentID, v.Value
 		public void LoadRow(string id, string parentId, string value)
 		{
@@ -37,7 +37,8 @@ namespace ScsContentMigrator.Data
 
 		public int GetChecksum(string id)
 		{
-			string key = Guid.Parse(id).ToString();
+			if (!Guid.TryParse(id, out Guid result)) return -1;
+			string key = result.ToString();
 			if (_checksum.ContainsKey(key))
 				return _checksum[key];
 			return -1;

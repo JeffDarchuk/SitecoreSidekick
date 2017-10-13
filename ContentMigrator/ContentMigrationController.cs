@@ -30,26 +30,19 @@ namespace ScsContentMigrator
 {
 	public class ContentMigrationController : ScsController
 	{
-		private readonly ISitecoreAccessService _sitecore;
+		private readonly ISitecoreDataAccessService _sitecore;
 		private readonly IScsRegistrationService _registration;
 		private readonly IContentMigrationManagerService _migrationManager;
 		private readonly IRemoteContentService _remoteContent;
-		public static YamlSerializationFormatter Formatter = new YamlSerializationFormatter(null, null);
+		private readonly IYamlSerializationService _yamlSerializationService;		
 
 		public ContentMigrationController()
 		{
-			_sitecore = Bootstrap.Container.Resolve<ISitecoreAccessService>();
+			_sitecore = Bootstrap.Container.Resolve<ISitecoreDataAccessService>();
 			_registration = Bootstrap.Container.Resolve<IScsRegistrationService>();
 			_migrationManager = Bootstrap.Container.Resolve<IContentMigrationManagerService>();
 			_remoteContent = Bootstrap.Container.Resolve<IRemoteContentService>();
-		}
-
-		protected ContentMigrationController(ISitecoreAccessService sitecore, IScsRegistrationService registration, IContentMigrationManagerService migrationManager, IRemoteContentService remoteContent)
-		{
-			_sitecore = sitecore;
-			_registration = registration;
-			_migrationManager = migrationManager;
-			_remoteContent = remoteContent;
+			_yamlSerializationService = Bootstrap.Container.Resolve<IYamlSerializationService>();
 		}
 
 		[MchapOrLoggedIn]
@@ -59,7 +52,7 @@ namespace ScsContentMigrator
 			Assert.ArgumentNotNullOrEmpty(id, "id");
 			using (var stream = new MemoryStream())
 			{
-				Formatter.WriteSerializedItem(_sitecore.GetItemData(Guid.Parse(id)), stream);
+				_yamlSerializationService.WriteSerializedItem(_sitecore.GetItemData(Guid.Parse(id)), stream);
 				stream.Seek(0, SeekOrigin.Begin);
 
 				using (var reader = new StreamReader(stream))
@@ -80,7 +73,7 @@ namespace ScsContentMigrator
 				using (new SecurityDisabler())
 				{
 					IItemData item = _sitecore.GetItemData(Guid.Parse(id));
-					Formatter.WriteSerializedItem(item, stream);
+					_yamlSerializationService.WriteSerializedItem(item, stream);
 					stream.Seek(0, SeekOrigin.Begin);
 
 					using (var reader = new StreamReader(stream))
@@ -182,7 +175,7 @@ namespace ScsContentMigrator
 		{
 			using (new SecurityDisabler())
 			{
-				CompareContentTreeNode ret = new CompareContentTreeNode(Factory.GetDatabase("master").GetItem(model.Id), false);
+				CompareContentTreeNode ret = new CompareContentTreeNode(_sitecore.GetItemData(model.Id), false);
 				ret.BuildDiff(model.Server);
 				return ScsJson(ret);
 			}
@@ -191,8 +184,8 @@ namespace ScsContentMigrator
 		private object ItemDataWithChildren(string id)
 		{
 			var ret = new ChildrenItemDataModel();
-			Guid guid = Guid.Parse(id);
-			ret.Item = _sitecore.GetItem(guid).GetYaml();
+			Guid guid = Guid.Parse(id);			
+			ret.Item = _yamlSerializationService.SerializeYaml(_sitecore.GetItemData(guid));
 			ret.Children = _sitecore.GetChildrenIds(guid);
 			return ret;
 		}
@@ -261,14 +254,7 @@ namespace ScsContentMigrator
 				return null;
 			}
 
-			using (new SecurityDisabler())
-			{
-				if (data.Id == "")
-					return ContentMigrationRegistration.Root;
-				Database db = Factory.GetDatabase(data.Database);
-				Item i = db.GetItem(new ID(data.Id));
-				return new CompareContentTreeNode(i);
-			}
+			return data.Id == "" ? ContentMigrationRegistration.Root : new CompareContentTreeNode(_sitecore.GetItemData(data.Id));
 		}
 	}
 }

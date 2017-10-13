@@ -15,10 +15,6 @@ namespace ScsContactSearch
 		{
 		}
 
-		public ScsContactSearchRegistration(string roles, string isAdmin, string users, IScsRegistrationService registration) : base(roles, isAdmin, users, registration)
-		{
-		}
-
 		public override string Identifier => "cs";
 		public override string Directive => "csmasterdirective";
 		public override NameValueCollection DirectiveAttributes { get; set; }

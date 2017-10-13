@@ -1,41 +1,43 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web.Mvc;
-using Microsoft.CSharp.RuntimeBinder;
+﻿using Microsoft.CSharp.RuntimeBinder;
 using Sitecore.Configuration;
 using Sitecore.Data.Items;
 using Sitecore.SecurityModel;
 using SitecoreSidekick.Core;
 using SitecoreSidekick.Models;
 using SitecoreSidekick.Services.Interface;
-using SitecoreSidekick.Shared.IoC;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Text;
+using System.Threading.Tasks;
+using System.Web.Mvc;
 
 namespace SitecoreSidekick.Handlers
 {
 	public class ScsMainController : ScsController
 	{
 		private readonly IScsRegistrationService _registration;
+		private readonly IAuthenticationService _authenticationService;
+		private readonly IJsonSerializationService _jsonSerializationService;
+		private readonly IHttpClientService _httpClientService;
+		private readonly ISitecoreDataAccessService _sitecoreDataAccessService;
+
 		public ScsMainController()
 		{
 			_registration = Bootstrap.Container.Resolve<IScsRegistrationService>();
+			_authenticationService = Bootstrap.Container.Resolve<IAuthenticationService>();
+			_jsonSerializationService = Bootstrap.Container.Resolve<IJsonSerializationService>();
+			_httpClientService = Bootstrap.Container.Resolve<IHttpClientService>();
+			_sitecoreDataAccessService = Bootstrap.Container.Resolve<ISitecoreDataAccessService>();
 		}
 
-		protected ScsMainController(IScsRegistrationService registration)
-		{
-			_registration = registration;
-		}
 		[ActionName("scsvalid.scsvc")]
 		public ActionResult Valid()
 		{
-			string ticket = Sitecore.Web.Authentication.TicketManager.GetCurrentTicketId();
+			string ticket = _authenticationService.GetCurrentTicketId();
 			if (!string.IsNullOrWhiteSpace(ticket))
-				Sitecore.Web.Authentication.TicketManager.Relogin(ticket);
-			var user = Sitecore.Context.User;
-			if (!user.IsAuthenticated)
+				_authenticationService.Relogin(ticket);
+			if (!_authenticationService.IsAuthenticated)
 			{
 				return ScsJson(false);
 			}
@@ -54,9 +56,9 @@ namespace SitecoreSidekick.Handlers
 			return Content(html, "text/html");
 		}
 		[ActionName("contenttreeselectedrelated.scsvc")]
-		public ActionResult SelectedRelated(ContentSelectedRelatedModel model)
+		public async Task<ActionResult> SelectedRelated(ContentSelectedRelatedModel model)
 		{
-			return ScsJson(GetContentSelectedRelated(model));
+			return ScsJson(await GetContentSelectedRelated(model));
 		}
 
 		public override ActionResult Resources(string filename)
@@ -70,16 +72,15 @@ namespace SitecoreSidekick.Handlers
 			return base.Resources(filename);
 		}
 
-		private Dictionary<string, string> GetContentSelectedRelated(ContentSelectedRelatedModel data)
+		private async Task<Dictionary<string, string>> GetContentSelectedRelated(ContentSelectedRelatedModel data)
 		{
 			try
 			{
 				if (data.Server != null)
 				{
-					WebClient wc = new WebClient { Encoding = Encoding.UTF8 };
-					var node = JsonNetWrapper.DeserializeObject<Dictionary<string, string>>(wc.UploadString($"{data.Server}/scs/platform/contenttreeselectedrelated.scsvc", "POST",
-									$@"{{ ""selectedIds"": {JsonNetWrapper.SerializeObject(data.SelectedIds)}, ""server"": null}}"));
-
+					var node = _jsonSerializationService.DeserializeObject<Dictionary<string, string>>(
+						await _httpClientService.Post($"{data.Server}/scs/platform/contenttreeselectedrelated.scsvc",
+							$@"{{ ""selectedIds"": {_jsonSerializationService.SerializeObject(data.SelectedIds)}, ""server"": null}}").ConfigureAwait(false));
 					return node;
 				}
 			}
@@ -99,14 +100,11 @@ namespace SitecoreSidekick.Handlers
 		{
 			using (new SecurityDisabler())
 			{
-				var db = Factory.GetDatabase("master", false);
-				if (db == null)
-					return;
-				Item i = db.GetItem(selectedId).Parent;
+				ScsSitecoreItem i = _sitecoreDataAccessService.GetScsSitecoreItem(selectedId).Parent;					
 				while (i != null)
 				{
-					if (!ret.ContainsKey(i.ID.ToString()))
-						ret.Add(i.ID.ToString(), "1");
+					if (!ret.ContainsKey(i.Id))
+						ret.Add(i.Id, "1");
 					i = i.Parent;
 				}
 			}
@@ -137,24 +135,24 @@ body{
 }
 #desktopSidekickHeader {
 	display: block;
-    padding: 5px;
-    background: url(""/sitecore/shell/client/Speak/Assets/img/Speak/Layouts/breadcrumb_red_bg.png"")
+	padding: 5px;
+	background: url(""/sitecore/shell/client/Speak/Assets/img/Speak/Layouts/breadcrumb_red_bg.png"")
 }
 .back{
 	font-weight:bold;
 }
 .subheader-logo{
-    margin-left: 100px;
-    color: white;
-    font-size: 20px;
-    font-weight: bold;
+	margin-left: 100px;
+	color: white;
+	font-size: 20px;
+	font-weight: bold;
 }
 	";
 		}
 
 		private string GetAllSidekickDirectives()
 		{
-			ScsMainRegistration sidekick = _registration.GetScsRegistration<ScsMainRegistration>();
+			IScsRegistration sidekick = _registration.GetScsRegistration<ScsMainRegistration>();
 			var basicAngularIf = $"!vm.sidekick || ({"vm.sidekick != '" + string.Join("' && vm.sidekick != '", _registration.GetAllSidekicks().Select(x => x.Name).ToArray())}')";
 			var sb = new StringBuilder($"<div ng-style=\"({basicAngularIf}) && {{'width':'{sidekick.CssStyle}', 'background-color':'white'}}\"><h3 id=\"sidekickHeader\" ng-if=\"{basicAngularIf}\">{sidekick.Name}<span class='close' onclick='window.top.document.getElementById(\"scs\").style.display=\"none\";'></span></h3>");
 			foreach (var sk in _registration.GetAllSidekicks().Where(x => x.ApplicableSidekick() && x.Name != "Sitecore Sidekick"))

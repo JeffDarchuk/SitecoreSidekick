@@ -29,9 +29,6 @@ namespace SitecoreSidekick.Handlers
 	/// </summary>
 	public class ScsMainRegistration : ScsRegistration
 	{
-
-		private static bool _addedSelf = false;
-
 		public override string Directive => string.Empty;
 		public override NameValueCollection DirectiveAttributes { get; set; }
 		public override string Icon => "";

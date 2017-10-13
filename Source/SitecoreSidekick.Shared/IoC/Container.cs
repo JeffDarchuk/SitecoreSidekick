@@ -116,8 +116,8 @@ namespace SitecoreSidekick.Shared.IoC
 			}
 			try
 			{
-				registrationObject = registration.IsSingleton
-					? registration.RegisteredObject
+				registrationObject = registration.IsSingleton 
+					? registration.RegisteredObject 
 					: registration.RegisteredObjectInstance(args);
 
 				if (registrationObject == null)
@@ -168,7 +168,7 @@ namespace SitecoreSidekick.Shared.IoC
 			public object RegisteredObject
 			{
 				get
-				{
+				{					
 					if (_registeredObject != null) return _registeredObject;
 					_registeredObject = _constructor.Invoke(null);
 					return _registeredObject;
@@ -220,7 +220,7 @@ namespace SitecoreSidekick.Shared.IoC
 			{
 				_factory = factory;
 			}
-
+			
 			/// <summary>
 			/// Invokes the dispose method of the registered object (if it implements IDisposable) and sets the registered
 			/// object to null.

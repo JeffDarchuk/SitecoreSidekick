@@ -1,12 +1,13 @@
-﻿using System;
+﻿using SitecoreSidekick.Services;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Net;
+using System.Resources;
 using System.Web;
 using System.Web.Mvc;
 using SitecoreSidekick.Services.Interface;
@@ -16,13 +17,17 @@ namespace SitecoreSidekick.Core
 {
 	public abstract class ScsController : Controller
 	{
+		private readonly IJsonSerializationService _jsonSerializationService;
 		private readonly ConcurrentDictionary<string, string> _resourceCache = new ConcurrentDictionary<string, string>();
 		private readonly ConcurrentDictionary<string, byte[]> _imageCache = new ConcurrentDictionary<string, byte[]>();
 		private readonly IScsRegistrationService _registration;
+		private readonly IMainfestResourceStreamService _manifestResourceStreamService;
 
 		protected ScsController()
 		{
 			_registration = Bootstrap.Container.Resolve<IScsRegistrationService>();
+			_jsonSerializationService = Bootstrap.Container.Resolve<IJsonSerializationService>();
+			_manifestResourceStreamService = Bootstrap.Container.Resolve<IMainfestResourceStreamService>();
 		}
 
 		[ScsLoggedIn]
@@ -54,7 +59,8 @@ namespace SitecoreSidekick.Core
 					return Content(GetResource(filename), "image/svg+xml");
 				if (filename.EndsWith(".js"))
 					return Content(GetResource(filename), "text/javascript");
-			}catch(ScsEmbeddedResourceNotFoundException){}
+			}
+			catch (ScsEmbeddedResourceNotFoundException) { }
 			Response.StatusCode = 404;
 			return Content("Requested resource not found");
 
@@ -136,7 +142,7 @@ namespace SitecoreSidekick.Core
 		{
 			if (o == null) return;
 			context.Response.StatusCode = 200;
-			var json = JsonNetWrapper.SerializeObject(o);
+			var json = _jsonSerializationService.SerializeObject(o);
 			context.Response.AppendHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1.
 			context.Response.AppendHeader("Pragma", "no-cache"); // HTTP 1.0.
 			context.Response.AppendHeader("Expires", "0"); // Proxies.
@@ -145,7 +151,7 @@ namespace SitecoreSidekick.Core
 
 		public virtual ActionResult ScsJson(object o)
 		{
-			return Content(JsonNetWrapper.SerializeObject(o), "application/json");
+			return Content(_jsonSerializationService.SerializeObject(o), "application/json");
 		}
 		/// <summary>
 		/// extracts the resource out of the binary
@@ -157,16 +163,8 @@ namespace SitecoreSidekick.Core
 			filename = filename.ToLowerInvariant();
 			string result;
 			if (_resourceCache.TryGetValue(filename, out result)) return result;
-			using (var stream = GetType().Assembly.GetManifestResourceStream(_registration.GetScsRegistration(GetType()).ResourcesPath + "." + filename))
-			{
-				if (stream != null)
-				{
-					using (var reader = new StreamReader(stream))
-					{
-						result = reader.ReadToEnd();
-					}
-				}else throw new ScsEmbeddedResourceNotFoundException();
-			}
+
+			result = _manifestResourceStreamService.GetManifestResourceText(GetType(), _registration.GetScsRegistration(GetType()).ResourcesPath + "." + filename, ()=>throw new ScsEmbeddedResourceNotFoundException());
 
 			_resourceCache[filename] = result;
 			return result;
@@ -183,19 +181,8 @@ namespace SitecoreSidekick.Core
 			filename = filename.ToLowerInvariant();
 			byte[] result;
 			if (_imageCache.TryGetValue(filename, out result)) return result;
-			using (var stream = GetType().Assembly.GetManifestResourceStream(_registration.GetScsRegistration(GetType()).ResourcesPath + "." + filename))
-			{
-				if (stream != null)
-				{
-					using (var ms = new MemoryStream())
-					{
-						var bmp = new Bitmap(stream);
-						bmp.Save(ms, imageFormat);
-						result = ms.ToArray();
-					}
-				}
-				else throw new ScsEmbeddedResourceNotFoundException();
-			}
+
+			result = _manifestResourceStreamService.GetManifestResourceImage(GetType(), _registration.GetScsRegistration(GetType()).ResourcesPath + "." + filename, imageFormat, () => throw new ScsEmbeddedResourceNotFoundException());
 
 			_imageCache[filename] = result;
 			return result;

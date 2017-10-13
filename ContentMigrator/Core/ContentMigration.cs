@@ -14,8 +14,8 @@ namespace ScsContentMigrator.Core
 {
 	public class ContentMigration : IContentMigration
 	{
-		private readonly IContentItemPuller _puller;
-		private readonly IContentItemInstaller _installer;
+		private IContentItemPuller _puller;
+		private IContentItemInstaller _installer;
 		private readonly IRemoteContentService _remoteContent;
 		private readonly ISitecoreAccessService _sitecoreAccess;
 		private readonly IScsRegistrationService _registration;
@@ -88,6 +88,8 @@ namespace ScsContentMigrator.Core
 				throw new ArgumentNullException("Cannot start an operation as a preview if it hasn't been started as a preview.");
 			}
 			_model.Preview = false;
+			_puller = new ContentItemPuller();
+			_installer = new ContentItemInstaller();
 			StartContentMigration(_model);
 		}
 	}

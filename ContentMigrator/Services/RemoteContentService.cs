@@ -25,7 +25,20 @@ namespace ScsContentMigrator.Services
 	{
 		private ISignatureService _ss;
 		private readonly IScsRegistrationService _registration;
-
+		private ScsHmacServer _hmacServer;
+		public ScsHmacServer HmacServer
+		{
+			get
+			{
+				if (_ss == null)
+				{
+					_ss = new SignatureService(_registration.GetScsRegistration<ContentMigrationRegistration>().AuthenticationSecret);
+					_hmacServer = new ScsHmacServer(_ss, new UniqueChallengeStore());
+				}
+				return _hmacServer;
+			}
+			private set { _hmacServer = value; }
+		}
 		public RemoteContentService()
 		{
 			_registration = Bootstrap.Container.Resolve<IScsRegistrationService>();
@@ -144,8 +157,6 @@ namespace ScsContentMigrator.Services
 
 			return node;
 		}
-
-		public ScsHmacServer HmacServer { get; private set; }
 	}
 }
 

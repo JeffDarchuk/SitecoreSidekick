@@ -19,7 +19,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>C:\inetpub\wwwroot\Debut\Source\Debut.Web\bin\</OutputPath>
+    <OutputPath>..\bin\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -108,6 +108,8 @@
     <Compile Include="Args\RemoteContentTreeArgs.cs" />
     <Compile Include="Bootstrap.cs" />
     <Compile Include="CMRainbow\DefaultItemComparer.cs" />
+    <Compile Include="CMRainbow\Interface\IDefaultLogger.cs" />
+    <Compile Include="CMRainbow\LogStatus.cs" />
     <Compile Include="ConcurrentHashSet.cs" />
     <Compile Include="ContentAgent.cs" />
     <Compile Include="ContentMigrationController.cs" />
@@ -129,8 +131,8 @@
     <Compile Include="Core\Interface\IContentItemInstaller.cs" />
     <Compile Include="Core\Interface\IContentItemPuller.cs" />
     <Compile Include="Core\Interface\IContentMigration.cs" />
+    <Compile Include="Services\Interface\ILoggingService.cs" />
     <Compile Include="Services\Interface\IRemoteContentService.cs" />
-    <Compile Include="Services\Interface\ISitecoreAccessService.cs" />
     <Compile Include="ItemExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CMRainbow\DefaultFieldFilter.cs" />
@@ -139,8 +141,10 @@
     <Compile Include="Security\UniqueChallengeStore.cs" />
     <Compile Include="Services\ContentMigrationManagerService.cs" />
     <Compile Include="Services\Interface\IContentMigrationManagerService.cs" />
+    <Compile Include="Services\Interface\IYamlSerializationService.cs" />
+    <Compile Include="Services\LoggingService.cs" />
     <Compile Include="Services\RemoteContentService.cs" />
-    <Compile Include="Services\SitecoreAccessService.cs" />
+    <Compile Include="Services\YamlSerializationService.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Source\SitecoreSidekick\SitecoreSidekick.csproj">

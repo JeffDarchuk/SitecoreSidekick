@@ -8,16 +8,12 @@ namespace ScsContentMigrator.Models
 {
 	public class ChildrenItemDataModel
 	{
-		private IRemoteContentService _remote;
+		private readonly IRemoteContentService _remote;
 		public ChildrenItemDataModel()
 		{
 			_remote = Bootstrap.Container.Resolve<IRemoteContentService>();
 		}
 
-		public ChildrenItemDataModel(IRemoteContentService remote)
-		{
-			_remote = remote;
-		}
 		public List<Guid> Children { get; set; }
 		public string Item { get; set; }
 

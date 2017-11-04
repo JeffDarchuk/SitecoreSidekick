@@ -202,6 +202,8 @@
 								if (vm.response.lineNumber > -1) {
 									var ending = null;
 									for (var i = 0; i < response.data.length; i++) {
+										if (!response.data[i])
+											continue;
 										vm.response.lineNumber++;
 										if (typeof (response.data[i].Time) !== "undefined") {
 											ending = response.data[i];

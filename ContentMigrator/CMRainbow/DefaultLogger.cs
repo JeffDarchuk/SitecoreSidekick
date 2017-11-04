@@ -5,6 +5,7 @@ using System.Dynamic;
 using System.Web;
 using Rainbow.Model;
 using Rainbow.Storage.Sc.Deserialization;
+using ScsContentMigrator.CMRainbow.Interface;
 using Sitecore.Data;
 using Sitecore.Data.Fields;
 using Sitecore.Data.Items;
@@ -13,10 +14,11 @@ using Sitecore.Diagnostics;
 
 namespace ScsContentMigrator.CMRainbow
 {
-	public class DefaultLogger : IDefaultDeserializerLogger
+	public class DefaultLogger : IDefaultLogger
 	{
-		public List<dynamic> Lines = new List<dynamic>();
+		public List<dynamic> Lines { get; set; } = new List<dynamic>();
 		public ConcurrentDictionary<string, dynamic> LinesSupport { get; } = new ConcurrentDictionary<string, dynamic>();
+		public bool HasLinesSupportEvents(string key) => LinesSupport[key].Events.Count > 0;
 		public List<string> LoggerOutput { get; } = new List<string>();
 		private readonly object _listLocker = new object();
 		public void BeginEvent(Item data, string status, string icon, bool keepOpen)

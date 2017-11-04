@@ -16,7 +16,7 @@ namespace ScsAuditLog.Model
 		public string EventId { get; set; }
 		public string User { get; set; }
 		public List<string> Role { get; set; }
-		public ID Id { get; set; }
+		public string Id { get; set; }
 		public string Database { get; set; }
 		public string Path { get; set; }
 		public DateTime TimeStamp { get; set; }
@@ -31,7 +31,7 @@ namespace ScsAuditLog.Model
 
 		public ItemAuditEntry(string eventId, string label, string color)
 		{
-			Id = ID.Null;
+			Id = ID.Null.ToString();
 			EventId = eventId;
 			Label = label;
 			Color = color;
@@ -44,7 +44,7 @@ namespace ScsAuditLog.Model
 			Role = Context.User.Roles.Select(x => x.Name).ToList();
 			if (item != null)
 			{
-				Id = item.ID;
+				Id = item.ID.ToString();
 				Path = item.Paths.FullPath;
 				Database = item.Database.Name;
 			}
@@ -69,7 +69,7 @@ namespace ScsAuditLog.Model
 				if (entries.Length > 4)
 					EventId = entries[4];
 				if (entries.Length > 5)
-					Id = new ID(entries[5]);
+					Id = entries[5];
 				if (entries.Length > 6)
 					Note = entries[6];
 				if (entries.Length > 7)
@@ -95,7 +95,7 @@ namespace ScsAuditLog.Model
 					sb.Append("|");
 				sb.Append(DateUtil.ToIsoDate(TimeStamp)).Append("|");
 				sb.Append(EventId).Append("|");
-				sb.Append(Id.ToShortID()).Append("|");
+				sb.Append(Id).Append("|");
 				sb.Append(Note).Append("|");
 				sb.Append(Path).Append("|");
 				sb.Append(Database);

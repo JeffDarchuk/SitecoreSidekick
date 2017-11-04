@@ -15,8 +15,9 @@ window.onload = function () {
 
 		var keyChar = String.fromCharCode(keyCode).toLowerCase();
 
-		var scs = window.top.document.getElementById("scs");
 		if (keyChar === "s" && event.shiftKey && event.altKey) {
+			var scs = window.top.document.getElementById("scs");
+
 			if (typeof (scForm) !== "undefined" && typeof(scForm.postEvent) !== "undefined")
 				return scForm.postEvent(this, event, 'scs:open');
 
@@ -43,3 +44,4 @@ window.onload = function () {
 
 
 document.innerHTML += "<div id='scs' style='display:none;height:100%;width:100%;position:absolute;z-index:9999;left:0;top:0;'></div>";
+document.write("<div id='scs' style='display:none;height:100%;width:100%;position:absolute;z-index:9999;left:0;top:0;'></div>");

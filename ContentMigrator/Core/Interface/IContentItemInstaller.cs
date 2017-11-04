@@ -11,7 +11,7 @@ namespace ScsContentMigrator.Core.Interface
 {
 	public interface IContentItemInstaller
 	{
-		void StartInstallingItems(PullItemModel args, BlockingCollection<IItemData> itemsToInstall, int threads, CancellationTokenSource cancellation);
+		void StartInstallingItems(PullItemModel args, BlockingCollection<IItemData> itemsToInstall, int threads, CancellationToken cancellation);
 		void CleanUnwantedLocalItems();
 		void SetupTrackerForUnwantedLocalItems(IEnumerable<Guid> rootIds);
 		bool Completed { get; }

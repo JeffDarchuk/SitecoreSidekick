@@ -12,7 +12,7 @@ namespace ScsAuditLog.Model
 		public string Uid { get; set; }
 		public string User { get; set; }
 		public List<string> Role { get; set; }
-		public ID Id { get; set; }
+		public string Id { get; set; }
 		public string Database { get; set; }
 		public string Path { get; set; }
 		public DateTime TimeStamp { get; set; }
@@ -25,7 +25,7 @@ namespace ScsAuditLog.Model
 		{
 			User = doc.Get("user");
 			Role = doc.GetValues("role").ToList();
-			Id = new ID(doc.Get("id"));
+			Id = new ID(doc.Get("id")).ToString();
 			Path = doc.Get("path");
 			DateTime tmp;
 			DateTime.TryParse(doc.Get("timestamp"), out tmp);

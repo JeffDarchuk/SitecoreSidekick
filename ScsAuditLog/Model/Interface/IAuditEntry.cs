@@ -9,7 +9,7 @@ namespace ScsAuditLog.Model.Interface
 		string Uid { get; set; }
 		string User { get; set; }
 		List<string> Role { get; set; }
-		ID Id { get; set; }
+		string Id { get; set; }
 		string Database { get; set; }
 		string Path { get; set; }
 		DateTime TimeStamp { get; set; }

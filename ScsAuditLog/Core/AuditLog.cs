@@ -19,7 +19,7 @@ using Sitecore.Data.Items;
 using Lucene.Net.QueryParsers;
 using Lucene.Net.Search;
 using Lucene.Net.Store;
-using SitecoreSidekick;
+using SitecoreSidekick.Services.Interface;
 using Directory = Lucene.Net.Store.Directory;
 using Version = Lucene.Net.Util.Version;
 
@@ -27,6 +27,7 @@ namespace ScsAuditLog.Core
 {
 	public class AuditLog
 	{
+		private readonly IJsonSerializationService _jsonSerializationService;
 		private readonly Dictionary<string, AuditStorage> _storage = new Dictionary<string, AuditStorage>();
 		private readonly Dictionary<string, IEventType> _types = new Dictionary<string, IEventType>();
 		readonly AuditTrie<string> _trie = new AuditTrie<string>();
@@ -51,6 +52,7 @@ namespace ScsAuditLog.Core
 
 		public AuditLog(int daysToKeepLog, int daysToKeepRecords)
 		{
+			_jsonSerializationService = Bootstrap.Container.Resolve<IJsonSerializationService>();
 			string dir = GetDataDirectory();
 			_logDays = daysToKeepLog;
 			_recordDays = daysToKeepRecords;
@@ -162,7 +164,7 @@ namespace ScsAuditLog.Core
 			if (!_users.Contains(entry.User.ToLower()))
 				_users.Add(entry.User.ToLower());
 			AddField(doc, "path", entry.Path, Field.Index.ANALYZED);
-			AddField(doc, "id", entry.Id.ToShortID().ToString().ToLower(), Field.Index.ANALYZED);
+			AddField(doc, "id", entry.Id.ToLower(), Field.Index.ANALYZED);
 			AddField(doc, "date", entry.TimeStamp.ToString("yyyyMMdd"), Field.Index.ANALYZED);
 			AddField(doc, "timestamp", entry.TimeStamp.ToString("yyyy-MM-ddTHH:mm:ss.fff"), Field.Index.ANALYZED);
 			AddField(doc, "note", entry.Note, Field.Index.ANALYZED);
@@ -181,7 +183,7 @@ namespace ScsAuditLog.Core
 		private void WriteSource(AuditSourceRecord record, StringBuilder sb)
 		{
 			if (record.Entry == null) return;
-			sb.Append("<|||>" + JsonNetWrapper.SerializeObject(record) + "<|||>");
+			sb.Append("<|||>" + _jsonSerializationService.SerializeObject(record) + "<|||>");
 		}
 
 		public void Rebuild()
@@ -208,7 +210,7 @@ namespace ScsAuditLog.Core
 						byte[] txt = File.ReadAllBytes(file);
 						foreach (string entry in StringZipper.Unzip(txt).Split(new[] {"<|||>"}, StringSplitOptions.RemoveEmptyEntries))
 						{
-							AuditSourceRecord record = JsonNetWrapper.DeserializeObject<AuditSourceRecord>(entry);
+							AuditSourceRecord record = _jsonSerializationService.DeserializeObject<AuditSourceRecord>(entry);
 							Task.Delay(1000).Wait();
 							Log(record.Entry, record.Content, false);
 							Rebuilt++;

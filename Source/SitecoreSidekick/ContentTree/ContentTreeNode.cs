@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Rainbow.Model;
 using Sitecore.Configuration;
 using Sitecore.Data.Items;
 using Sitecore.Data.Managers;
+using SitecoreSidekick.Services.Interface;
 
 namespace SitecoreSidekick.ContentTree
 {
 	public class ContentTreeNode
 	{
+		private readonly ISitecoreDataAccessService _sitecoreDataAccessService;
 		public string Icon = "";
 		public string AltIcon = "";
 		public string FallbackIcon = "/scs/platform/resources/scsphoto_scenery.png";
@@ -21,38 +24,38 @@ namespace SitecoreSidekick.ContentTree
 
 		public ContentTreeNode()
 		{
+			_sitecoreDataAccessService = Bootstrap.Container.Resolve<ISitecoreDataAccessService>();
 		}
 
-		public ContentTreeNode(string id) : this(Factory.GetDatabase("master", false)?.GetItem(id), false)
+		public ContentTreeNode(string id) : this()
 		{
-		}
-		public ContentTreeNode(Item item, bool open = true)
-		{
-			if (item != null)
-			{
-				DatabaseName = item.Database.Name;
-				Open = open;
-				SetIcon(item);
-				DisplayName = item.DisplayName;
-				Id = item.ID.ToString();
-				if (Open)
-					Nodes = item.Children.Select(c => new ContentTreeNode(c, false)).ToList();
-			}
+			Initialize(_sitecoreDataAccessService.GetItemData(id), false);			
 		}
 
-		public void SetIcon(Item item)
-		{
-			if (item != null)
-			{
-				Icon = GetSrc(ThemeManager.GetIconImage(item, 32, 32, "", ""));
-				AltIcon = Icon.Replace("/sitecore/shell/themes/standard/-/media/", "/-/media/");
-			}
-			//if (!string.IsNullOrWhiteSpace(Icon))
-			//{
-			//	string[] parts = Icon.Split('/');
-			//	Icon = string.Join("/", parts.Skip(parts.Length - 3));
-			//}
+		public ContentTreeNode(IItemData item, bool open = true) : this()
+		{			
+			Initialize(item, open);
 		}
+	
+		private void Initialize(IItemData item, bool open)
+		{
+			if (item == null) return;
+			DatabaseName = item.DatabaseName;
+			Open = open;
+			SetIcon(item);
+			DisplayName = item.Name;
+			Id = item.Id.ToString();
+			if (Open)
+				Nodes = item.GetChildren().Select(c => new ContentTreeNode(c, false)).ToList();
+		}
+
+		public void SetIcon(IItemData item)
+		{
+			if (item == null) return;
+			Icon = GetSrc(_sitecoreDataAccessService.GetIconSrc(item));
+			AltIcon = Icon.Replace("/sitecore/shell/themes/standard/-/media/", "/-/media/");
+		}
+
 		private string GetSrc(string imgTag)
 		{
 			int i1 = imgTag.IndexOf("src=\"", StringComparison.Ordinal) + 5;

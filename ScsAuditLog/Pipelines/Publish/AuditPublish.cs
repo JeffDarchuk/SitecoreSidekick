@@ -30,7 +30,7 @@ namespace ScsAuditLog.Pipelines.Publish
 						Note = $"{publishInfo}{statistics}",
 						User = context.User.Name,
 						Role = context.User.Roles.Select(x => x.Name).ToList(),
-						Id = ID.Null,
+						Id = ID.Null.ToString(),
 						TimeStamp = DateTime.Now,
 						Path = context.PublishOptions.RootItem != null ? context.PublishOptions.RootItem.Paths.FullPath : "full site"
 					});

@@ -1,6 +1,8 @@
-﻿using System;
-using FluentAssertions;
+﻿using FluentAssertions;
 using SitecoreSidekick.Shared.IoC;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace SitecoreSidekick.Shared.UnitTests.IoC
@@ -8,7 +10,7 @@ namespace SitecoreSidekick.Shared.UnitTests.IoC
 	public class containerTests
 	{
 		[Fact]
-		public void Register_ValidRegistration_ResolvesNewInstance()
+		public void Register_ValidRegistrationViaTypes_ResolvesNewInstance()
 		{
 			Container container = new Container();
 			container.Register<IMyClass, MyClass>();
@@ -16,6 +18,34 @@ namespace SitecoreSidekick.Shared.UnitTests.IoC
 			IMyClass myClassInstance = container.Resolve<IMyClass>();
 
 			myClassInstance.IsCreated.Should().BeTrue();
+		}
+
+		[Fact]
+		public void Register_ValidRegistrationWithTypeAndConcreteImplementation_ResolvesInstance()
+		{
+			int expectedCounter = 42;
+			Container container = new Container();
+			MyClass myConcreteClass = new MyClass { Counter = expectedCounter };
+
+			container.Register(typeof(IMyClass), myConcreteClass);
+
+			IMyClass myResolvedClass = container.Resolve<IMyClass>();
+
+			myResolvedClass.Counter.Should().Be(expectedCounter);
+		}
+
+		[Fact]
+		public void Register_ValidRegistrationWithConcreteImplementation_ResolvesInstance()
+		{
+			int expectedCounter = 42;
+			Container container = new Container();
+			MyClass myConcreteClass = new MyClass { Counter = expectedCounter };
+
+			container.Register<IMyClass>(myConcreteClass);
+
+			IMyClass myResolvedClass = container.Resolve<IMyClass>();
+
+			myResolvedClass.Counter.Should().Be(expectedCounter);
 		}
 
 		[Fact]
@@ -28,6 +58,31 @@ namespace SitecoreSidekick.Shared.UnitTests.IoC
 			IMyClass myClassInstance = container.Resolve<IMyClass>();
 
 			myClassInstance.GetType().ShouldBeEquivalentTo(typeof(MyOtherClass));
+		}
+
+		[Fact]
+		public void RegisterFactory_ResolvesDifferentInstances()
+		{
+			int instanceCount = 5;
+			Container container = new Container();
+
+			container.RegisterFactory<IMyClass>(args => new MyClass());
+
+			List<IMyClass> myClassInstances = new List<IMyClass>();
+
+			for (int idx = 0; idx < instanceCount; idx++)
+			{
+				IMyClass myClassInstance = container.Resolve<IMyClass>();
+				myClassInstance.Counter = idx;
+				myClassInstances.Add(myClassInstance);
+			}
+
+			myClassInstances.Count.Should().Be(instanceCount);
+
+			for (int idx = 0; idx < instanceCount; idx++)
+			{
+				myClassInstances.Any(mci => mci.Counter == idx).Should().BeTrue();
+			}
 		}
 
 		[Fact]
@@ -56,7 +111,7 @@ namespace SitecoreSidekick.Shared.UnitTests.IoC
 			IMyClass myOtherClassInstance = container.Resolve<IMyClass>();
 			
 			myClassInstance.Counter = expectedCounter;
-			
+
 			myOtherClassInstance.Counter.ShouldBeEquivalentTo(expectedCounter);
 		}
 
@@ -106,6 +161,48 @@ namespace SitecoreSidekick.Shared.UnitTests.IoC
 			container.Clear();
 
 			didDispose.Should().BeTrue();
+		}
+
+		[Fact]
+		public void ContainsRegistration_ContainsRegistration_ReturnsTrue()
+		{
+			Container container = new Container();
+			container.Register<IMyClass, MyClass>();
+
+			var result = container.ContainsRegistration<IMyClass>();
+
+			result.Should().Be(true);
+		}
+
+		[Fact]
+		public void ContainsRegistration_ContainsRegistrationViaType_ReturnsTrue()
+		{
+			Container container = new Container();
+			container.Register<IMyClass, MyClass>();
+
+			var result = container.ContainsRegistration(typeof(IMyClass));
+
+			result.Should().Be(true);
+		}
+
+		[Fact]
+		public void ContainsRegistration_DoesNotContainsRegistration_ReturnsFalse()
+		{
+			Container container = new Container();
+
+			var result = container.ContainsRegistration<IMyClass>();
+
+			result.Should().Be(false);
+		}
+
+		[Fact]
+		public void ContainsRegistration_DoesNotContainsRegistrationViaType_ReturnsFalse()
+		{
+			Container container = new Container();
+
+			var result = container.ContainsRegistration(typeof(IMyClass));
+
+			result.Should().Be(false);
 		}
 
 		#region Test Interfaces and Classes

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using SitecoreSidekick.Services;
 using SitecoreSidekick.Services.Interface;
 using SitecoreSidekick.Shared.IoC;
@@ -12,9 +8,17 @@ namespace SitecoreSidekick
 	public class Bootstrap
 	{
 		internal static readonly object BootstrapLock = new object();
+		/// <summary>
+		/// Sets the container to use to an existing container
+		/// </summary>
+		/// <param name="container">The container to use</param>
+		public static void SetContainer(Container container)
+		{
+			_container = container;
+		}
 
-		private static IContainer _container;
-		public static IContainer Container
+		private static Container _container;
+		public static Container Container
 		{
 			get
 			{
@@ -27,12 +31,18 @@ namespace SitecoreSidekick
 			}
 		}
 
-		private static IContainer InitializeContainer()
+		private static Container InitializeContainer()
 		{
 			Container container = new Container();
 
 			// Register components here
-			container.Register<IScsRegistrationService, ScsRegistrationService>();			
+			container.Register<IAuthenticationService, AuthenticationService>();
+			container.Register<IAuthorizationService, AuthorizationService>();
+			container.Register<IJsonSerializationService, JsonSerializationService>();
+			container.Register<IScsRegistrationService, ScsRegistrationService>();
+			container.Register<IMainfestResourceStreamService, MainfestResourceStreamService>();
+			container.RegisterFactory<IHttpClientService>(args => args.Any() ? new HttpClientService(args[0].ToString()) : new HttpClientService());
+			container.Register<ISitecoreDataAccessService, SitecoreDataAccessService>();
 
 			return container;
 		}

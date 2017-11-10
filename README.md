@@ -15,6 +15,10 @@ There are two main packages to choose from:
 
 Installation is as simple as installing the NuGet packages you want from within Visual Studio.
 
+## Extending Sidekick
+
+Implementing a new Sidekick app is easy by following [this](https://github.com/JeffDarchuk/SitecoreSidekick/blob/master/doc/SidekickTemplate.md) tutorial.
+
 ## Using Sidekick
 
 It's very easy to use Sidekick. To open the Sidekick panel, you may choose between either:
@@ -132,7 +136,3 @@ There are considerations to be made when deploying Sidekick to a production envi
 
 * For _Content Editing_ (CE or CM depending on who you ask), if using the Content Migrator module it may be appropriate to alter the allowed remote servers list. For example, production should not be allowed to pull from dev or QA.
 * For _Content Delivery_ (CD) environments, all Sidekick configuration files (`App_Config\Include\Sidekick\*`) and assemblies (`Scs*.dll`) should be removed, as Sidekick has no function on a CD server.
-
-## Extending Sidekick
-
-It is possible to build your own Sidekick modules. For a tutorial on building an example Job Viewer module, [see this blog post](https://jeffdarchuk.com/2016/11/06/sitecore-sidekick-app-tutorial-log-viewer/)

@@ -1,4 +1,4 @@
-Function Copy-Content {
+Function Copy-SKContent {
 	Param(
 		[Parameter(Mandatory=$True)]
 		[string]$LocalUrl,
@@ -51,7 +51,7 @@ Function Copy-Content {
 	$paramz[0] = New-Object MicroCHAP.SignatureFactor -ArgumentList "payload", $requestPayload
 	$signature = $signatureService.CreateSignature($challenge, $url, $paramz)
 
-	Write-Host "Copy-Content - Initializing transfer from $RemoteUrl to $LocalUrl"
+	Write-Host "Copy-SKContent - Initializing transfer from $RemoteUrl to $LocalUrl"
 
 	# USING THE SIGNATURE, EXECUTE CONTENT MIGRATOR
 	[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -59,8 +59,8 @@ Function Copy-Content {
 
 	if($result.TrimEnd().EndsWith('****ERROR OCCURRED****')) {
 		throw "Content migration from $ServerUrl to $LocalUrl returned an error. See the preceding log for details."
-		Write-Host "Copy-Content - Completed with errors"
+		Write-Host "Copy-SKContent - Completed with errors"
 	}else{
-		Write-Host "Copy-Content - Initialized, to view progress visit $LocalUrl and open Sitecore Sidekick's content migrator."
+		Write-Host "Copy-SKContent - Initialized, to view progress visit $LocalUrl and open Sitecore Sidekick's content migrator."
 	}
 }

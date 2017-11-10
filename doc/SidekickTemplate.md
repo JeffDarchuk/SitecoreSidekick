@@ -6,7 +6,7 @@ It's now easier than ever with powershell and the Sidekick template
 1. Pull down the template zip from [here](https://github.com/JeffDarchuk/SitecoreSidekick/raw/master/doc/SidekickTemplate.zip).
 1. Extract it into your Sitecore solution.
 1. Navigate to the project in the file system and run the file **RunMeToStart.cmd**
-1. ![Console Window](doc/console.png)
+1. ![Console Window](console.png)
 1. Enter the project namespace
 1. Enter the project name camel case and without any spaces or non-word characters
 1. Enter a human readable name that users will see when they open sidekick

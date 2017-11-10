@@ -1,0 +1,7 @@
+﻿<div ng-controller="emmastercontroller as vm">
+	<div class="emcontent">A SIDEKICK APP!</div>
+	<div><input ng-model="vm.userInputContent" />
+		<a class="btn" ng-click="vm.addContent()">Add Content</a>
+	</div>
+	<div>{{vm.output}}</div>
+</div>

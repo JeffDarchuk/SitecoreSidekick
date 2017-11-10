@@ -61,6 +61,12 @@ namespace SitecoreSidekick.Handlers
 			return ScsJson(await GetContentSelectedRelated(model));
 		}
 
+		[ActionName("scscommand.js")]
+		public ActionResult GetCommand()
+		{
+			return Resources("scscommand.js");
+		}
+
 		public override ActionResult Resources(string filename)
 		{
 			if (filename.Equals("scsangular.js") || filename.Equals("scscommand.js"))

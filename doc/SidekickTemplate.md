@@ -17,6 +17,11 @@ It's now easier than ever with powershell and the Sidekick template
 
 You will now have a new demo app.  here i've named mine "Event Manager"
 
+![New App Project](NewAppProject.png)
+
+You have all the basic Angular peices as well as the registration and controller.  Everything you need for your Sidekick app.
+
+
 ![New App](NewApp.png)
 
 ![New App Running](NewAppRunning.png)

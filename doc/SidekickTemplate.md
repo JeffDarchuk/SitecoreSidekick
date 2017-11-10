@@ -23,3 +23,31 @@ You will now have a new demo app.  here i've named mine "Event Manager"
 
 In this simple app you can click a button to have the angularjs factory call to the backend controller to get some content from the backend and append it to the front end.
 Take this idea and expand uppon it to create whatever you want.  Feel like sharing your app?  Turn it into a nuget package with the binaries and configs and people can install it via nuget.
+
+## Bootstrap
+By default this Sidekick app comes with a bootstrapper which acts as a primitive IOC container.  The reason this exists is to have a way to make service based code in a module environment where you can't be certain any IOC containers exist.  If you're making a new module, feel free to use it, however if you're adding an app to a website that has an IOC container you should definately use that.
+
+The bootstrap treats everything like a singleton
+```csharp
+		private static Container InitializeContainer()
+		{
+			Container container = SitecoreSidekick.Bootstrap.Container;
+
+			// Register components here
+			// This assumes a parameterless constructor
+			container.Register<IContentMigrationManagerService, ContentMigrationManagerService>();
+			// This you can controll how the object is constructed
+			container.RegisterFactory<IRemoteContentService>(args =>
+			{
+				var registration = container.Resolve<IScsRegistrationService>();
+				return new RemoteContentService(registration);
+			});
+			return container;
+		}
+```
+
+Then pull it out like this.
+
+```csharp
+_migrationManager = Bootstrap.Container.Resolve<IContentMigrationManagerService>();
+```

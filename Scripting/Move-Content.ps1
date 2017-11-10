@@ -1,8 +1,3 @@
-$ErrorActionPreference = 'Stop'
-$ScriptPath = Split-Path $MyInvocation.MyCommand.Path
-$MicroCHAP = $ScriptPath + '\MicroCHAP.dll'
-Add-Type -Path $MicroCHAP
-
 Function Move-Content {
 	Param(
 		[Parameter(Mandatory=$True)]
@@ -15,7 +10,7 @@ Function Move-Content {
 		[string]$SharedSecret,
 
 		[Parameter(Mandatory=$True)]
-		[string[]]$RootIds,
+		[string[]]$RootId,
 		
 		[string]$Database = 'master',
 
@@ -31,22 +26,20 @@ Function Move-Content {
 		
 		[switch]$BulkUpdate
 	)
-	$idsJson = [string]::Join('"]["', $RootIds)
-	$requestPayload = @"
-	{
-		"Ids" : ["$idsJson"],
-		"Database" : "$Database",
-		"Server" : "$RemoteUrl",
-		"Children" : $Children,
-		"Overwrite" : $Overwrite,
-		"PullParent" : $PullParent,
-		"RemoveLocalNotInRemote" : $RemoveLocalNotInRemote,
-		"EventDisabler" : $EventDisabler,
-		"BulkUpdate" : $BulkUpdate
-	}
-"@
-	$requestPayload = $requestPayload -replace "True", "true" 
-	$requestPayload = $requestPayload -replace "False", "false"
+	$idsJson = [string]::Join('"]["', $RootId)
+	
+    $requestPayload = @{
+		"Ids" = @(,$idsJson)
+		"Database" = "$Database"
+		"Server" = "$RemoteUrl"
+		"Children" = $Children.ToBool()
+		"Overwrite" = $Overwrite.ToBool()
+		"PullParent" = $PullParent.ToBool()
+		"RemoveLocalNotInRemote" = $RemoveLocalNotInRemote.ToBool()
+		"EventDisabler" = $EventDisabler.ToBool()
+		"BulkUpdate" = $BulkUpdate.ToBool()
+	} | ConvertTo-Json
+
 	$url = "{0}/scs/cm/cmstartoperation.scsvc" -f $LocalUrl
 
 	# GET AN AUTH CHALLENGE
@@ -71,22 +64,3 @@ Function Move-Content {
 		Write-Host "Move-Content - Initialized, to view progress visit $LocalUrl and open Sitecore Sidekick's content migrator."
 	}
 }
-
-Function Invoke-StreamingWebRequest($Uri, $MAC, $Nonce, $Parameters) {
-	$responseText = new-object -TypeName "System.Text.StringBuilder"
-	$request = [System.Net.WebRequest]::Create($Uri)
-	$request.Method = "POST"
-	$request.Headers["X-MC-MAC"] = $MAC
-	$request.Headers["X-MC-Nonce"] = $Nonce
-	$request.Timeout = 10800000
-	$stream = $request.GetRequestStream()
-	$stream.Write([System.Text.Encoding]::ASCII.GetBytes($Parameters), 0, $Parameters.Length)
-	$stream.Close()
-
-	$response = $request.GetResponse()
-	$responseStream = $response.GetResponseStream()
-	$responseStreamReader = new-object System.IO.StreamReader $responseStream
-	return $responseText.ToString()
-}
-
-Export-ModuleMember -Function Move-Content

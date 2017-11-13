@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using Sitecore;
@@ -10,8 +11,10 @@ using SitecoreSidekick.ContentTree;
 using Sitecore.Diagnostics;
 using System.Web.Configuration;
 using System.Configuration;
+using System.Text;
 using Rainbow.Model;
 using ScsEditingContext.Services.Interface;
+using Sitecore.Pipelines.RenderField;
 
 namespace ScsEditingContext.Pipelines.HttpRequestBegin
 {
@@ -52,17 +55,17 @@ namespace ScsEditingContext.Pipelines.HttpRequestBegin
 							return;
 						if (myCookie?.Value != null)
 						{
-							var list = myCookie.Value.Split(',').Where(x => !x.StartsWith(current.Id)).ToList();
+							var list = GetValue(myCookie, current.Id);
 							list.Add($"{current.Id}|{current.DatabaseName}|{current.DisplayName}|{current.Icon}");
 							if (list.Count > 20)
 								list.RemoveAt(0);
-							myCookie.Value = string.Join(",", list);
+							SetValue(myCookie, string.Join(",", list));
 							args.Context.Response.Cookies.Add(myCookie);
 						}
 						else
 						{
 							myCookie = new HttpCookie("scseditorcontext" + Context.GetUserName());
-							myCookie.Value = HttpUtility.UrlEncode($"{current.Id}|{current.DatabaseName}|{current.DisplayName}|{current.Icon}");
+							SetValue(myCookie, $"{current.Id}|{current.DatabaseName}|{current.DisplayName}|{current.Icon}");
 							myCookie.Expires = DateTime.Now.AddDays(1d);
 							args.Context.Response.Cookies.Add(myCookie);
 						}
@@ -73,6 +76,24 @@ namespace ScsEditingContext.Pipelines.HttpRequestBegin
 			{
 				Log.Warn("unable to register action for SCS Editing Context", e, this);
 			}
+		}
+
+		private List<string> GetValue(HttpCookie cookie, string currentId)
+		{
+			try
+			{
+				string txt = Encoding.UTF8.GetString(System.Convert.FromBase64String(cookie.Value));
+				return txt.Split(',').Where(x => !x.StartsWith(currentId)).ToList();
+			}
+			catch (Exception)
+			{
+				return new List<string>(); //cookie not base64
+			}
+		}
+
+		private void SetValue(HttpCookie cookie, string value)
+		{
+			cookie.Value = System.Convert.ToBase64String(Encoding.UTF8.GetBytes(value));
 		}
 	}
 }

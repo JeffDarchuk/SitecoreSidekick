@@ -16,7 +16,14 @@ namespace ScsEditingContext
 			}
 
 			string tmp = item.Path;
-			Type = tmp.Substring(10, tmp.IndexOf("/", 10, StringComparison.Ordinal) - 10);
+			try
+			{
+				Type = tmp.Substring(10, tmp.IndexOf("/", 10, StringComparison.Ordinal) - 10);
+			}
+			catch (ArgumentOutOfRangeException)
+			{
+				Type = tmp.Substring(10, tmp.Length - 10);
+			}
 		}
 	}
 }

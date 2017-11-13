@@ -59,7 +59,9 @@ namespace ScsContentMigrator.CMRainbow
 		{
 			int i1 = imgTag.IndexOf("src=\"", StringComparison.Ordinal) + 5;
 			int i2 = imgTag.IndexOf("\"", i1, StringComparison.Ordinal);
-			return imgTag.Substring(i1, i2 - i1);
+			if (i2 > i1)
+				return imgTag.Substring(i1, i2 - i1);
+			return string.Empty;
 		}
 		public void CreatedNewItem(Item targetItem)
 		{

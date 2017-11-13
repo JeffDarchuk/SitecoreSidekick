@@ -70,7 +70,7 @@ namespace SitecoreSidekick.Pipelines.Initialize
 				using (new EditContext(sk))
 				{
 					sk["Display name"] = "Sitecore Sidekick";
-					if (IsSc8())
+					if (IsGreaterThanSc7())
 						sk["Icon"] = "office/32x32/sword.png";
 					else
 						sk["Icon"] = "Network/32x32/knight.png";
@@ -80,12 +80,12 @@ namespace SitecoreSidekick.Pipelines.Initialize
 			}
 		}
 
-		private static bool IsSc8()
+		private static bool IsGreaterThanSc7()
 		{
 			XmlDocument doc = new XmlDocument();
 			doc.Load(HttpRuntime.AppDomainAppPath + "/sitecore/shell/sitecore.version.xml");
 			var selectSingleNode = doc.SelectSingleNode("/information/version/major");
-			return selectSingleNode != null && selectSingleNode.InnerText == "8";
+			return selectSingleNode != null && (selectSingleNode.InnerText == "8" || selectSingleNode.InnerText == "9");
 		}
 
 		public void RegisterRoutes(string route)

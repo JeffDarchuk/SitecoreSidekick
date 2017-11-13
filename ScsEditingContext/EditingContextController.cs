@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Text;
@@ -18,6 +19,7 @@ using SitecoreSidekick.Services.Interface;
 using SitecoreSidekick.Shared.IoC;
 using System.Web.Configuration;
 using System.Configuration;
+using Sitecore.Diagnostics;
 
 namespace ScsEditingContext
 {
@@ -93,9 +95,16 @@ namespace ScsEditingContext
 					if (httpCookie?.Value != null)
 						using (new SecurityDisabler())
 						{
-							var urlDecode = HttpUtility.UrlDecode(httpCookie.Value);
-							if (urlDecode != null)
-								ret.items = urlDecode.Split(',').Select(FindItem).Where(x => x != null);
+							try
+							{
+								var urlDecode = Encoding.UTF8.GetString(System.Convert.FromBase64String(httpCookie.Value));
+								if (urlDecode != null)
+									ret.items = urlDecode.Split(',').Select(FindItem).Where(x => x != null);
+							}
+							catch (Exception e)
+							{
+								Log.Error("Unable to get item history.", e, this);
+							}
 						}
 				}
 			}

@@ -22,6 +22,11 @@ Implementing a new Sidekick app is easy by following [this](https://github.com/J
 ## Scripting Sidekick
 
 Visit [here](https://github.com/JeffDarchuk/SitecoreSidekick/tree/master/Scripting) to see the powershell module.  Right now content migration operations are supported, more to come!
+
+Make sure your shared secret matches what's on both the local and remote servers.  Like always with microchap the shared secret is never transfered over the wire in any way.
+
+Use these tools to automate the content syncronization based on your build process with all the configuration options for pulling content that you would use in content migrator.
+
 ```powershell
 Import-Module -Name SitecoreSidekick -Force -Verbose
 $params = @{

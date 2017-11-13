@@ -12,6 +12,7 @@ using Sitecore.Diagnostics;
 using System.Web.Configuration;
 using System.Configuration;
 using System.Text;
+using System.Text.RegularExpressions;
 using Rainbow.Model;
 using ScsEditingContext.Services.Interface;
 using Sitecore.Pipelines.RenderField;
@@ -38,7 +39,7 @@ namespace ScsEditingContext.Pipelines.HttpRequestBegin
 					if (guidStart != -1 && guidStop > guidStart)
 					{
 						guidString = guidString.Substring(guidStart, guidStop - guidStart);
-						HttpCookie myCookie = args.Context.Request.Cookies["scseditorcontext" + Context.GetUserName()];
+						HttpCookie myCookie = args.Context.Request.Cookies["scseditorcontext" + Regex.Replace(Context.GetUserName(), "[^a-zA-Z0-9 -]", string.Empty)];
 
 						if (!_sitecoreDataAccessService.TryGetItemData(guidString, out IItemData item))
 							return;
@@ -64,7 +65,7 @@ namespace ScsEditingContext.Pipelines.HttpRequestBegin
 						}
 						else
 						{
-							myCookie = new HttpCookie("scseditorcontext" + Context.GetUserName());
+							myCookie = new HttpCookie("scseditorcontext" + Regex.Replace(Context.GetUserName(), "[^a-zA-Z0-9 -]", string.Empty));
 							SetValue(myCookie, $"{current.Id}|{current.DatabaseName}|{current.DisplayName}|{current.Icon}");
 							myCookie.Expires = DateTime.Now.AddDays(1d);
 							args.Context.Response.Cookies.Add(myCookie);

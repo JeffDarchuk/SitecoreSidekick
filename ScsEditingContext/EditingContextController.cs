@@ -19,6 +19,7 @@ using SitecoreSidekick.Services.Interface;
 using SitecoreSidekick.Shared.IoC;
 using System.Web.Configuration;
 using System.Configuration;
+using System.Text.RegularExpressions;
 using Sitecore.Diagnostics;
 
 namespace ScsEditingContext
@@ -90,7 +91,7 @@ namespace ScsEditingContext
 				FormsAuthenticationTicket ticket = FormsAuthentication.Decrypt(authCookie.Value);
 				if (ticket != null)
 				{
-					string u = ticket.Name;
+					string u = Regex.Replace(ticket.Name, "[^a-zA-Z0-9 -]", string.Empty);
 					var httpCookie = Request.Cookies["scseditorcontext" + u];
 					if (httpCookie?.Value != null)
 						using (new SecurityDisabler())

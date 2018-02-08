@@ -56,7 +56,7 @@ namespace ScsContentMigrator.Security
 			SignatureFactor[] factors = null;
 			if (factorParser != null) factors = factorParser(request);
 
-			return ValidateToken(challenge, authorize, request.Url.AbsoluteUri, logger, factors);
+			return ValidateToken(challenge, authorize, request.Url.AbsoluteUri.TrimEnd(new[] { '/' }), logger, factors);
 		}
 
 		public virtual bool ValidateToken(string challenge, string response, string url, params SignatureFactor[] additionalFactors)

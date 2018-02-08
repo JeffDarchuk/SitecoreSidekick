@@ -23,7 +23,8 @@ namespace SitecoreSidekick.Pipelines.Initialize
 		public const string DesktopMenuRight = "{10148DC7-DCA6-4ACA-AC90-46FBF59A1D1F}";
 		public const string SidekickButton = "{3F324240-7645-4C70-A337-64A9D4A91549}";
 		public const string ActionTemplate = "{F58958D2-555B-4F56-946C-589E8866880C}";
-		private readonly IScsRegistrationService _registration;		
+		private readonly IScsRegistrationService _registration;
+		public string DisableItemGeneration { get; set; }
 		public InitializeSidekick()
 		{
 			_registration = Bootstrap.Container.Resolve<IScsRegistrationService>();
@@ -37,7 +38,10 @@ namespace SitecoreSidekick.Pipelines.Initialize
 		{
 
 			Assert.ArgumentNotNull(args, "args");
-			EnsureDesktopButton();
+			if (DisableItemGeneration?.ToLower() != "true")
+			{
+				EnsureDesktopButton();
+			}
 			if (Factory.GetDatabase("master", false) != null)
 			{
 				ScsMainRegistration maintmp = new ScsMainRegistration("", "", "");

@@ -1,0 +1,48 @@
+﻿<div ng-controller="hgmastercontroller as vm">
+	<div ng-if="vm.setup">
+		<div ng-class="{hgselected: template == vm.selectedTemplate}" class="hghorizontallist" ng-click="vm.selectedTemplate = template" ng-repeat="template in vm.templates">
+			<h4>
+				{{template}}
+			</h4>
+		</div>
+		<a ng-if="vm.selectedTemplate" class="btn" ng-click="vm.downloadTemplate()">Download</a>
+		<a ng-if="vm.selectedTemplate" class="btn" ng-click="vm.removeTemplate()">Delete</a>
+		<iframe width="0" height="0" id="downloadframe" />
+		<div>
+			<h4>Upload New Template</h4>
+			<input type="file" name="templateUpload" id="templateUpload" />
+			<input type="button" ng-click="vm.uploadTemplate()" value="Upload" />
+		</div>
+		<div ng-if="vm.selectedTemplate">
+			<a ng-click ="vm.setup = false;vm.configure=true;vm.getTargets();vm.getProperties()" class="btn">Generate Helix Layer</a>
+		</div>
+	</div>
+	<div ng-if="vm.configure">
+		<a class="btn" ng-click="vm.reset()" >Reset Form</a>
+		<h4>Select a target:</h4>
+		<div ng-class="{hgselected: target == vm.selectedTarget}" class="hghorizontallist" ng-click="vm.selectedTarget = target;vm.selectedTargetKey=key" ng-repeat="(key, target) in vm.targets">
+			<h4>
+				{{key}}
+			</h4>
+		</div>
+		<div ng-repeat="(key,value) in vm.selectedTarget">
+			<div ng-if="value=='???' || vm.targetProps[key]">
+				Define {{key}}<input ng-init="vm.targetProps[key] = true" ng-model="vm.selectedTarget[key]" />
+			</div>
+		</div>
+		<h4>Enter parameters:</h4>
+		<div ng-if="vm.selectedTarget">
+			<div class="hgproperty" ng-repeat="property in vm.properties">
+				<div bind-html-compile="property.AngularMarkup"></div>
+			</div>
+			<a class="btn" ng-click="vm.execute()">Execute</a>
+		</div>
+	</div>
+	<div style="height:100px;width:10x"></div>
+	<div ng-if="vm.executing">
+		<h3> Please Wait...</h3>
+	</div>
+	<div ng-if="vm.finalize">
+		FINALIZE
+	</div>
+</div>

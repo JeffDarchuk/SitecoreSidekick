@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ScsHelixLayerGenerator.Services
+namespace ScsSitecoreResourceManager.Services
 {
 	interface ISavedPropertiesService
 	{

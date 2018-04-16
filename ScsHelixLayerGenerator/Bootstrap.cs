@@ -1,10 +1,10 @@
 
-using ScsHelixLayerGenerator.Services;
+using ScsSitecoreResourceManager.Services;
 using SitecoreSidekick.Services;
 using SitecoreSidekick.Services.Interface;
 using SitecoreSidekick.Shared.IoC;
 
-namespace ScsHelixLayerGenerator
+namespace ScsSitecoreResourceManager
 {
 	public class Bootstrap
 	{
@@ -31,6 +31,7 @@ namespace ScsHelixLayerGenerator
 			container.Register<IScsRegistrationService, ScsRegistrationService>();
 			container.Register<IAssemblyScannerService, AssemblyScannerService>();
 			container.Register<ISavedPropertiesService, SavedPropertiesService>();
+			container.Register<ISitecoreDataAccessService, SitecoreDataAccessService>();
 			return container;
 		}
 	}

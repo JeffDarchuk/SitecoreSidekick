@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ScsHelixLayerGenerator.Data.Properties.Collectors
+namespace ScsSitecoreResourceManager.Data.Properties.Collectors
 {
-	public class UserInputSelectCollector : IPropertyCollector
+	public class StringInputCollector : IPropertyCollector
 	{
 		public string Id { get; set; }
 		public string Name { get; set; }
@@ -14,19 +14,7 @@ namespace ScsHelixLayerGenerator.Data.Properties.Collectors
 		public string Value { get; set; }
 		public string Values { get; set; }
 
-		public string AngularMarkup { get
-			{
-				var options = Values.Split(',').Aggregate(new StringBuilder(), (current, next) => current.Append($" <option value='{next}' >{next}</option> ")).ToString();
-				return @"
-<div>
-	<h4>
-		{{property.Name}}
-	</h4>
-	<a ng-mouseover=""property.showdescription = true"" ng-mouseleave=""property.showdescription = false"">?</a>
-	<select ng-model=""property.Value"">"+options+ @"</select>
-	<div ng-if=""property.showdescription"">{{property.Description}}</div>
-</div>";
-			} }
+		public string AngularMarkup { get; set; }
 
 		
 
@@ -34,6 +22,6 @@ namespace ScsHelixLayerGenerator.Data.Properties.Collectors
 		{
 			return true;
 		}
-		public string Processor { get; set; } = "UserInputSelect";
+		public string Processor { get; set; } = "String";
 	}
 }

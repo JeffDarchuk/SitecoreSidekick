@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ScsHelixLayerGenerator.Data.Properties
+namespace ScsSitecoreResourceManager.Data.Properties
 {
 	public interface IPropertyCollector
 	{

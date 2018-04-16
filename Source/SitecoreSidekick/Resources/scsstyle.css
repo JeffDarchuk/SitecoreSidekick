@@ -318,7 +318,8 @@ a.scContentTreeNodeNormal:hover {
 }
 
 .scsbtn {
-	width: 100px;
+	width: 200px;
+	height: 60px;
 	white-space: normal;
 }
 #desktopSidekickHeader {

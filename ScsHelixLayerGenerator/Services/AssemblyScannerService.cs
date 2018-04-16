@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ScsHelixLayerGenerator.Services
+namespace ScsSitecoreResourceManager.Services
 {
 	public class AssemblyScannerService : IAssemblyScannerService
 	{

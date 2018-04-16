@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ScsHelixLayerGenerator.Data.Properties.Processors
+namespace ScsSitecoreResourceManager.Data.Properties.Processors
 {
 	public class UserInputProcessor : PropertyProcessor
 	{

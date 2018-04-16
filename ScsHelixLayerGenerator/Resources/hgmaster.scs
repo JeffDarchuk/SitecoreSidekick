@@ -1,48 +1,71 @@
 ﻿<div ng-controller="hgmastercontroller as vm">
+	<div ng-if="!vm.setup">
+		<a class="btn" ng-click="vm.reset()" >Reset Form</a>
+	</div>
 	<div ng-if="vm.setup">
+		<h4>Select a template to utilize.</h4>
 		<div ng-class="{hgselected: template == vm.selectedTemplate}" class="hghorizontallist" ng-click="vm.selectedTemplate = template" ng-repeat="template in vm.templates">
 			<h4>
 				{{template}}
 			</h4>
 		</div>
-		<a ng-if="vm.selectedTemplate" class="btn" ng-click="vm.downloadTemplate()">Download</a>
-		<a ng-if="vm.selectedTemplate" class="btn" ng-click="vm.removeTemplate()">Delete</a>
-		<iframe width="0" height="0" id="downloadframe" />
-		<div>
-			<h4>Upload New Template</h4>
-			<input type="file" name="templateUpload" id="templateUpload" />
-			<input type="button" ng-click="vm.uploadTemplate()" value="Upload" />
+		<div class="hgtemplateframe">
+			<a ng-if="vm.selectedTemplate" class="btn" ng-click="vm.downloadTemplate()">Download</a>
+			<a ng-if="vm.selectedTemplate" class="btn" ng-click="vm.removeTemplate()">Delete</a>
+			<div>
+				<h4>Upload New Template</h4>
+				<input type="file" onchange="angular.element(this).scope().vm.uploadTemplate()" name="templateUpload" id="templateUpload" />
+			</div>
+			<iframe style="visibility:hidden" width="0" height="0" id="downloadframe" />
 		</div>
 		<div ng-if="vm.selectedTemplate">
-			<a ng-click ="vm.setup = false;vm.configure=true;vm.getTargets();vm.getProperties()" class="btn">Generate Helix Layer</a>
+			<a ng-click ="vm.setup = false;vm.configure=true;vm.getTargets()" class="btn">Begin</a>
 		</div>
 	</div>
 	<div ng-if="vm.configure">
-		<a class="btn" ng-click="vm.reset()" >Reset Form</a>
 		<h4>Select a target:</h4>
-		<div ng-class="{hgselected: target == vm.selectedTarget}" class="hghorizontallist" ng-click="vm.selectedTarget = target;vm.selectedTargetKey=key" ng-repeat="(key, target) in vm.targets">
+		<div ng-class="{hgselected: target == vm.selectedTarget}" class="hghorizontallist" ng-click="vm.resetTarget(key, target)" ng-repeat="(key, target) in vm.targets">
 			<h4>
 				{{key}}
 			</h4>
 		</div>
-		<div ng-repeat="(key,value) in vm.selectedTarget">
-			<div ng-if="value=='???' || vm.targetProps[key]">
-				Define {{key}}<input ng-init="vm.targetProps[key] = true" ng-model="vm.selectedTarget[key]" />
+		<div ng-if="!vm.editTarget">
+			<div ng-if="!key.endsWith('-o')" ng-repeat="(key,value) in vm.selectedTarget"  ng-init="vm.targetProps[key] = false">
+				<div ng-if="value=='???' || vm.targetProps[key]">
+					Define {{key}} <input width="100px" ng-init="vm.targetProps[key] = true" ng-model="vm.selectedTarget[key]" />
+					<a class="btn" ng-click="vm.targetProps[key]=false;vm.submitTargetProp(key, vm.selectedTarget[key])">Submit</a>
+				</div>
 			</div>
 		</div>
-		<h4>Enter parameters:</h4>
-		<div ng-if="vm.selectedTarget">
+
+		<div ng-if="key.endsWith('-o')" ng-repeat="(key,value) in vm.selectedTarget">
+			<div ng-if="vm.editTarget">
+				Define {{key.substring(0, key.length-2)}} <input width="100px" ng-init="vm.targetProps[key.substring(0, key.length-2)] = true" ng-model="vm.selectedTarget[key.substring(0, key.length-2)]" />
+				<a class="btn" ng-click="vm.targetProps[key.substring(0, key.length-2)]=false;vm.submitTargetProp(key.substring(0, key.length-2), vm.selectedTarget[key.substring(0, key.length-2)])">Submit</a>
+			</div>
+		</div>
+		
+		<div ng-if="vm.allPropsFalse(vm.targetProps)">
+			<a class="btn" ng-click="vm.editTarget = true">Edit Target</a>
+			<h4>Enter parameters:</h4>
 			<div class="hgproperty" ng-repeat="property in vm.properties">
 				<div bind-html-compile="property.AngularMarkup"></div>
 			</div>
 			<a class="btn" ng-click="vm.execute()">Execute</a>
 		</div>
 	</div>
-	<div style="height:100px;width:10x"></div>
 	<div ng-if="vm.executing">
 		<h3> Please Wait...</h3>
 	</div>
 	<div ng-if="vm.finalize">
-		FINALIZE
+		<h3>Finished</h3>
+		<h4>Edit your template or rendering.  Note clicking the link won't navigate you from this page.</h4>
+		<a href="/sitecore/shell/Applications/Content%20Editor.aspx?sc_content=master&fo={{vm.finalize.template}}" class="btn scContentTreeNodeNormal fancybox fancybox.iframe">Edit Template</a>
+		<a href="/sitecore/shell/Applications/Content%20Editor.aspx?sc_content=master&fo={{vm.finalize.rendering}}" class="btn scContentTreeNodeNormal fancybox fancybox.iframe">Edit Rendering</a>
+		<h4> What happened here?  Below is a log of events that took place from this tool:</h4>
+		<input type="checkbox" ng-model ="vm.showTokenReplacement" />Show Tokens replaced
+		<div ng-if ="event.indexOf('Replaced token') === -1 || vm.showTokenReplacement" ng-style="event.indexOf('Replaced token') !== -1 && {'background-color':'#99ffcc'}" class="hgevent" ng-repeat="event in vm.finalize.events">
+			<span>{{event}}</span>
+		</div>
 	</div>
 </div>

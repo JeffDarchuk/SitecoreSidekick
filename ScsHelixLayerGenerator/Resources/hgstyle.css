@@ -35,7 +35,7 @@
 		margin-top:-15px;
 		font-size: 9px;
 	}
-	.hgproperty a {
+	.hgquestion {
 		padding-right: 5px;
 		background-color: lightskyblue;
 		border-radius: 8px;
@@ -63,4 +63,27 @@
 	}
 .hgiconradio {
 	display: none;
+}
+.hgtemplateframe {
+	border: thin solid grey;
+	width: 200px;
+	padding: 10px;
+	background-color: #eee;
+	float: right;
+	margin-right: 100px;
+}
+.hgcollectordescription {
+	position: absolute;
+	background-color: white;
+	padding: 10px;
+	border: thin solid black;
+	border-radius: 3px;
+	box-shadow: 5px 5px rgba(0, 0, 0, 0.3);
+}
+.hgevent {
+	padding: 5px;
+	margin: 3px;
+	border: thin solid #ccc;
+	box-shadow: 1px 1px #bbb;
+	background-color: #eee;
 }

@@ -1,16 +1,14 @@
-﻿using ScsHelixLayerGenerator.Data.Properties.Collectors;
+﻿using ScsSitecoreResourceManager.Data.Properties.Collectors;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ScsHelixLayerGenerator.Models
+namespace ScsSitecoreResourceManager.Models
 {
-	public class ExecuteModel
+	public class ExecuteModel : TargetModel
 	{
 		public List<DefaultCollector> Properties;
-		public string Template;
-		public string Target;
 	}
 }

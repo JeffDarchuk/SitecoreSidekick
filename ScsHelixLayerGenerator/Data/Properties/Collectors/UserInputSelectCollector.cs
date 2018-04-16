@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ScsHelixLayerGenerator.Data.Properties.Collectors
+namespace ScsSitecoreResourceManager.Data.Properties.Collectors
 {
 	public class UserInputSelectCollector : IPropertyCollector
 	{
@@ -22,9 +22,9 @@ namespace ScsHelixLayerGenerator.Data.Properties.Collectors
 	<h4>
 		{{property.Name}}
 	</h4>
-	<a ng-mouseover=""property.showdescription = true"" ng-mouseleave=""property.showdescription = false"">?</a>
-	<select ng-model=""property.Value"">"+options+ @"</select>
-	<div ng-if=""property.showdescription"">{{property.Description}}</div>
+	<a class=""hgquestion"" ng-mouseover=""property.showdescription = true"" ng-mouseleave=""property.showdescription = false"">?</a>
+	<div class=""hgcollectordescription"" ng-if=""property.showdescription"">{{property.Description}}</div>
+	<select ng-model=""property.Value"">" + options+ @"</select>
 </div>";
 			} }
 

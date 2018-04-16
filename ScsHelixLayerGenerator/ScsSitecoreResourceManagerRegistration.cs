@@ -8,17 +8,17 @@ using SitecoreSidekick.Core;
 using SitecoreSidekick.Services.Interface;
 using Sitecore.Configuration;
 using System.Web;
-using ScsHelixLayerGenerator.Data;
+using ScsSitecoreResourceManager.Data;
 using System.IO;
 using System.IO.Compression;
-using ScsHelixLayerGenerator.Data.Properties;
+using ScsSitecoreResourceManager.Data.Properties;
 
-namespace ScsHelixLayerGenerator
+namespace ScsSitecoreResourceManager
 {
-	public class ScsHelixLayerGeneratorRegistration : ScsRegistration
+	public class ScsSitecoreResourceManagerRegistration : ScsRegistration
 	{
 		private IJsonSerializationService _json;
-		public ScsHelixLayerGeneratorRegistration(string roles, string isAdmin, string users) : base(roles, isAdmin, users)
+		public ScsSitecoreResourceManagerRegistration(string roles, string isAdmin, string users) : base(roles, isAdmin, users)
 		{
 			_json = Bootstrap.Container.Resolve<IJsonSerializationService>();
 		}
@@ -26,20 +26,20 @@ namespace ScsHelixLayerGenerator
 		public override string Identifier => "hg";
 		public override string Directive => "hgmasterdirective";
 		public override NameValueCollection DirectiveAttributes { get; set; }
-		public override string ResourcesPath => "ScsHelixLayerGenerator.Resources";
-		public override Type Controller => typeof(ScsHelixLayerGeneratorController);
+		public override string ResourcesPath => "ScsSitecoreResourceManager.Resources";
+		public override Type Controller => typeof(ScsSitecoreResourceManagerController);
 		public override string Icon => "/scs/hg/resources/hgicon.png";
-		public override string Name => "Helix Layer Generator";
+		public override string Name => "Resource Manager";
 		public override string CssStyle => "min-width:600px;";
 		public string GetDataDirectory()
 		{
 			string filepath;
 			if (System.Text.RegularExpressions.Regex.IsMatch(Settings.DataFolder, @"^(([a-zA-Z]:\\)|(//)).*")) //if we have an absolute path, rather than relative to the site root
 				filepath = Settings.DataFolder +
-						   @"\HelixLayerGenerator";
+						   @"\SitecoreResourceManager";
 			else
 				filepath = HttpRuntime.AppDomainAppPath + Settings.DataFolder.Substring(1) +
-						   @"\HelixLayerGenerator";
+						   @"\SitecoreResourceManager";
 			if (!System.IO.Directory.Exists(filepath))
 				System.IO.Directory.CreateDirectory(filepath);
 			return filepath;

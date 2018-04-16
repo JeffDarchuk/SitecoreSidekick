@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ScsHelixLayerGenerator.Data.Properties.Collectors
+namespace ScsSitecoreResourceManager.Data.Properties.Collectors
 {
 	public class UserInputCheckboxCollector : IPropertyCollector
 	{
@@ -20,9 +20,9 @@ namespace ScsHelixLayerGenerator.Data.Properties.Collectors
 	<h4>
 		{{property.Name}}
 	</h4>
-	<a ng-mouseover=""property.showdescription = true"" ng-mouseleave=""property.showdescription = false"">?</a>
+	<a class=""hgquestion"" ng-mouseover=""property.showdescription = true"" ng-mouseleave=""property.showdescription = false"">?</a>
+	<div class=""hgcollectordescription"" ng-if=""property.showdescription"">{{property.Description}}</div>
 	<input type=""checkbox"" ng-model=""property.Value""/>
-	<div ng-if=""property.showdescription"">{{property.Description}}</div>
 </div>";
 
 

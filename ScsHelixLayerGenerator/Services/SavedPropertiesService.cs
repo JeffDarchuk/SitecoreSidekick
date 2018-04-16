@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ScsHelixLayerGenerator.Services
+namespace ScsSitecoreResourceManager.Services
 {
 	public class SavedPropertiesService : ISavedPropertiesService
 	{
@@ -18,7 +18,7 @@ namespace ScsHelixLayerGenerator.Services
 		{
 			_json = Bootstrap.Container.Resolve<IJsonSerializationService>();
 			_registration = Bootstrap.Container.Resolve<IScsRegistrationService>();
-			_properties = _registration.GetScsRegistration<ScsHelixLayerGeneratorRegistration>().GetDataDirectory();
+			_properties = _registration.GetScsRegistration<ScsSitecoreResourceManagerRegistration>().GetDataDirectory();
 		}
 		public string GetPropertiesFilePath(string template)
 		{

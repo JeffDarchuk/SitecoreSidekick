@@ -11,6 +11,7 @@ namespace SitecoreSidekick
 	{
 		public override void OnActionExecuting(ActionExecutingContext filterContext)
 		{
+			if (Sitecore.Context.User.IsAuthenticated) return;
 			string ticket = Sitecore.Web.Authentication.TicketManager.GetCurrentTicketId();
 
 			if (!string.IsNullOrWhiteSpace(ticket))

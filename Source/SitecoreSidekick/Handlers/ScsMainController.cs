@@ -160,7 +160,7 @@ body{
 		{
 			IScsRegistration sidekick = _registration.GetScsRegistration<ScsMainRegistration>();
 			var basicAngularIf = $"!vm.sidekick || ({"vm.sidekick != '" + string.Join("' && vm.sidekick != '", _registration.GetAllSidekicks().Select(x => x.Name).ToArray())}')";
-			var sb = new StringBuilder($"<div ng-style=\"({basicAngularIf}) && {{'width':'{sidekick.CssStyle}', 'background-color':'white'}}\"><h3 id=\"sidekickHeader\" ng-if=\"{basicAngularIf}\">{sidekick.Name}<span class='close' onclick='window.top.document.getElementById(\"scs\").style.display=\"none\";'></span></h3>");
+			var sb = new StringBuilder($"<div ng-style=\"({basicAngularIf}) \"><h3 id=\"sidekickHeader\" ng-if=\"{basicAngularIf}\">{sidekick.Name}<span class='close' onclick='window.top.document.getElementById(\"scs\").style.display=\"none\";'></span></h3>");
 			foreach (var sk in _registration.GetAllSidekicks().Where(x => x.ApplicableSidekick() && x.Name != "Sitecore Sidekick"))
 			{
 				sb.Append(

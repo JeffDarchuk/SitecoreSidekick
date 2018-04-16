@@ -7,8 +7,8 @@
     <ProjectGuid>{960AA8F3-60FF-4D9D-B885-BFAB98B892C7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ScsHelixLayerGenerator</RootNamespace>
-    <AssemblyName>ScsHelixLayerGenerator</AssemblyName>
+    <RootNamespace>ScsSitecoreResourceManager</RootNamespace>
+    <AssemblyName>ScsSitecoreResourceManager</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -104,13 +104,28 @@
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Data\Properties\Collectors\CachingCollector.cs" />
+    <Compile Include="Data\Properties\Collectors\ProjectCollector.cs" />
+    <Compile Include="Data\Properties\Collectors\ControllerCollector.cs" />
     <Compile Include="Data\Properties\Collectors\DefaultCollector.cs" />
     <Compile Include="Data\Properties\Collectors\GuidCollector.cs" />
+    <Compile Include="Data\Properties\Collectors\ScTreeCollector.cs" />
     <Compile Include="Data\Properties\Collectors\IconCollector.cs" />
     <Compile Include="Data\Properties\Collectors\UnicornConfigurationDependencyCollector.cs" />
     <Compile Include="Data\Properties\Collectors\UserInputCheckboxCollector.cs" />
+    <Compile Include="Data\Properties\Collectors\StringInputCollector.cs" />
     <Compile Include="Data\Properties\Collectors\UserInputSelectCollector.cs" />
-    <Compile Include="Pipelines\HelixLayerGenerator\ApplyProjectsToSolution.cs" />
+    <Compile Include="Data\Properties\DefaultProperties.cs" />
+    <Compile Include="Models\ContentTreeModel.cs" />
+    <Compile Include="Models\SubmitTargetPropertyModel.cs" />
+    <Compile Include="Models\TargetModel.cs" />
+    <Compile Include="Pipelines\SitecoreResourceManager\AddToExistingController.cs" />
+    <Compile Include="Pipelines\SitecoreResourceManager\ApplyFilesToProject.cs" />
+    <Compile Include="Pipelines\SitecoreResourceManager\ApplyProjectsToSolution.cs" />
+    <Compile Include="Pipelines\SitecoreResourceManager\ApplyToPlaceholderSettings.cs" />
+    <Compile Include="Pipelines\SitecoreResourceManager\CreateTemplate.cs" />
+    <Compile Include="Pipelines\SitecoreResourceManager\CreateRendering.cs" />
+    <Compile Include="Pipelines\PropertyProcessorPostGather\ExtrapolateFromTargetFiles.cs" />
+    <Compile Include="Pipelines\PropertyProcessorPostGather\PropertyLayeredTokenReplacer.cs" />
     <Compile Include="Services\AssemblyScannerService.cs" />
     <Compile Include="Services\IAssemblyScannerService.cs" />
     <Compile Include="Services\ISavedPropertiesService.cs" />
@@ -127,17 +142,18 @@
     <Compile Include="Data\Properties\PropertyProcessor.cs" />
     <Compile Include="Data\Targets\TargetNode.cs" />
     <Compile Include="Models\ExecuteModel.cs" />
-    <Compile Include="Pipelines\HelixLayerGenerator\ReplaceAllTokens.cs" />
-    <Compile Include="Pipelines\HelixLayerGenerator\OverlayTemplate.cs" />
-    <Compile Include="Pipelines\HelixLayerGenerator\HelixLayerGeneratorArgs.cs" />
+    <Compile Include="Pipelines\SitecoreResourceManager\ReplaceAllTokens.cs" />
+    <Compile Include="Pipelines\SitecoreResourceManager\OverlayTemplate.cs" />
+    <Compile Include="Pipelines\SitecoreResourceManager\SitecoreResourceManagerArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ScsHelixLayerGeneratorController.cs" />
-    <Compile Include="ScsHelixLayerGeneratorRegistration.cs" />
+    <Compile Include="ScsSitecoreResourceManagerController.cs" />
+    <Compile Include="ScsSitecoreResourceManagerRegistration.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
     <EmbeddedResource Include="Resources\hgmaster.scs" />
-    <None Include="zScsHelixLayerGenerator.config" />
+    <EmbeddedResource Include="Resources\hgcontenttree.scs" />
+    <None Include="zScsSitecoreResourceManager.config" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\hgicon.png" />
@@ -152,7 +168,21 @@
       <Name>SitecoreSidekick</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\hgcollapsed.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\hgcontenttreecontroller.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\hgcontenttreedirective.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\hgspinner.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\hgexpanded.png" />
+  </ItemGroup>
   <Import Project="..\Source\SitecoreSidekick.Shared\SitecoreSidekick.Shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

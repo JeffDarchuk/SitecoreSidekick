@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 
-namespace ScsHelixLayerGenerator.Data.Properties.Collectors
+namespace ScsSitecoreResourceManager.Data.Properties.Collectors
 {
 	public class IconCollector : IPropertyCollector
 	{
@@ -37,13 +37,14 @@ namespace ScsHelixLayerGenerator.Data.Properties.Collectors
 		public string AngularMarkup { get
 			{
 				var options = Images.Keys.Aggregate(new StringBuilder(), (running, x) => running.Append($"'{x}',"));
-				var arr = $"[{(options.Remove(options.Length - 1, 1).ToString())}]";
+				var arr = $"[{options.Remove(options.Length - 1, 1)}]";
 				return @"
 <div ng-init=""property.list="+arr+ @""">
 	<h4 ng-init=""property.search = 'gear'"" >
 		{{property.Name}}
 	</h4>
-	<a ng-mouseover=""property.showdescription = true"" ng-mouseleave=""property.showdescription = false"">?</a>
+	<a class=""hgquestion"" ng-mouseover=""property.showdescription = true"" ng-mouseleave=""property.showdescription = false"">?</a>
+	<div class=""hgcollectordescription"" ng-if=""property.showdescription"">{{property.Description}}</div>
 	<div><span>Search</span><input style=""width:100px"" ng-model=""property.search"" /></div>
 	<div class=""hgicon""  ng-repeat=""icon in property.list | filter:property.search| limitTo:200"">
 		<label>
@@ -52,7 +53,6 @@ namespace ScsHelixLayerGenerator.Data.Properties.Collectors
 		</label>
 	</div> 
 	<input ng-model=""property.Value"" />
-	<div ng-if=""property.showdescription"">{{property.Description}}</div>
 </div>";
 			} }
 

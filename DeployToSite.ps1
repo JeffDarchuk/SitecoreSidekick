@@ -1,4 +1,4 @@
-$Webroot = "C:\inetpub\wwwroot\sc90.local"
+$Webroot = "C:\inetpub\wwwroot\sc901.local"
 
 Get-ChildItem "$PSScriptRoot\" -recurse -filter *.config -File | Foreach-Object{
 	$fileName = Split-Path $_.FullName -leaf

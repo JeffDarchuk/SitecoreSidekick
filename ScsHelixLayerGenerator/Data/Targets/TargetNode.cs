@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ScsHelixLayerGenerator.Data.Targets
+namespace ScsSitecoreResourceManager.Data.Targets
 {
 	public class TargetNode
 	{

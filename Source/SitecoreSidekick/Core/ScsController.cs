@@ -22,7 +22,7 @@ namespace SitecoreSidekick.Core
 		private readonly ConcurrentDictionary<string, byte[]> _imageCache = new ConcurrentDictionary<string, byte[]>();
 		private readonly IScsRegistrationService _registration;
 		private readonly IMainfestResourceStreamService _manifestResourceStreamService;
-
+		private static DateTime StartTime = DateTime.Now;
 		protected ScsController()
 		{
 			_registration = Bootstrap.Container.Resolve<IScsRegistrationService>();
@@ -162,6 +162,7 @@ namespace SitecoreSidekick.Core
 		{
 			filename = filename.ToLowerInvariant();
 			string result;
+			Response.AppendHeader("scs", "true");
 			if (_resourceCache.TryGetValue(filename, out result)) return result;
 
 			result = _manifestResourceStreamService.GetManifestResourceText(GetType(), _registration.GetScsRegistration(GetType()).ResourcesPath + "." + filename, ()=>throw new ScsEmbeddedResourceNotFoundException());
@@ -180,6 +181,7 @@ namespace SitecoreSidekick.Core
 		{
 			filename = filename.ToLowerInvariant();
 			byte[] result;
+			Response.AppendHeader("scs", "true"); 
 			if (_imageCache.TryGetValue(filename, out result)) return result;
 
 			result = _manifestResourceStreamService.GetManifestResourceImage(GetType(), _registration.GetScsRegistration(GetType()).ResourcesPath + "." + filename, imageFormat, () => throw new ScsEmbeddedResourceNotFoundException());

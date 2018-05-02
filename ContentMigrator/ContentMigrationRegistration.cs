@@ -25,7 +25,7 @@ namespace ScsContentMigrator
 		public static CompareContentTreeNode Root { get; } = new CompareContentTreeNode { DatabaseName = "master", DisplayName = "Root", Icon = "/~/icon/Applications/32x32/media_stop.png", Open = true, Nodes = new List<ContentTreeNode>() };
 		public int RemoteThreads { get; } = 1;
 		public int WriterThreads { get; } = 1;
-		public List<string> ServerList { get; } = new List<string>();
+		public Dictionary<string, string> ServerList { get; } = new Dictionary<string, string>();
 		public override string Directive => "cmmasterdirective";
 		public override NameValueCollection DirectiveAttributes { get; set; }
 		public override string ResourcesPath => "ScsContentMigrator.Resources";
@@ -83,7 +83,12 @@ namespace ScsContentMigrator
 
 		public void BuildServerList(XmlNode node)
 		{
-			ServerList.Add(node.InnerText);
+			string serverValue = node.InnerText;
+	  		if(!string.IsNullOrWhiteSpace(node.Attributes?["desc"]?.Value)){
+				serverValue = node.Attributes["desc"].Value;
+			} 
+			
+			ServerList.Add(node.InnerText, serverValue);	
 		}
 
 		public static int GetChecksum(string id)

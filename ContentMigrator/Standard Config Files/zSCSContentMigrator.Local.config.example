@@ -30,11 +30,13 @@
 						For example, you might add the URLs to your production content management server here.
 						These servers must have Sidekick Content Migrator installed.
 						
+						You can set a label for each entry by providing the "desc"-attribute.
+						
 						NOTE: It is _highly_ recommended to use an SSL/TLS connection for all content migration.
 					-->
 					<servers hint="raw:BuildServerList">
 						<server>[enter server 1 url here i.e. https://sitecore-qa-cm]</server>
-						<server>[enter server 2 url here i.e. https://sitecore-prod-cm]</server>
+						<server desc="optional label">[enter server 2 url here i.e. https://sitecore-prod-cm]</server>
 					</servers>
 				</processor>
 			</scsRegister>

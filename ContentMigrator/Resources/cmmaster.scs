@@ -2,7 +2,7 @@
 	<div ng-if="!vm.operationId">
 		<fieldset>
 			<legend>Choose a Sitecore server to pull content from</legend>
-			<select ng-model="vm.server" ng-options="i for i in vm.serverList" ng-change="vm.serverSubmit()"> </select>
+			<select ng-model="vm.server" ng-options="key as value for (key, value) in vm.serverList" ng-change="vm.serverSubmit()"> </select>
 		</fieldset>
 		<fieldset ng-if="!vm.serverModified">
 			<legend>Select a content item to pull</legend>

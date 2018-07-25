@@ -84,6 +84,10 @@ namespace ScsSitecoreResourceManager
 					{
 						targets[target][property + "-o"] = "???";
 					}
+					if (targets[target][property] == "???" && _savedProps[$"{target}.{property}", target] != null)
+					{
+						targets[target][property] = _savedProps[$"{target}.{property}", target];
+					}
 					if (targets[target][property] == "???" && _savedProps[$"{target}.{property}", template] != null)
 					{
 						targets[target][property] = _savedProps[$"{target}.{property}", template];
@@ -141,7 +145,7 @@ namespace ScsSitecoreResourceManager
 				ret.Id = x.Key;
 				if (x.Value.Remember)
 				{
-					ret.Value = _savedProps[$"{model.Target}.{x.Key}", model.Template] ?? "";
+					ret.Value = _savedProps[$"{model.Target}.{x.Key}", model.Template] ?? _savedProps[$"{model.Target}.{x.Key}", model.Target] ?? "";
 					if (string.IsNullOrWhiteSpace(ret.Value))
 					{
 						ret.Value = x.Value.Default;
@@ -160,6 +164,7 @@ namespace ScsSitecoreResourceManager
 		public ActionResult SubmitTargetProperty(SubmitTargetPropertyModel model)
 		{
 			_savedProps[$"{model.TargetId}.{model.PropertyId}", model.Template] = model.Value;
+			_savedProps[$"{model.TargetId}.{model.PropertyId}", model.TargetId] = model.Value;
 			return ScsJson(true);
 		}
 		[ActionName("hgexecute.scsvc")]
@@ -171,6 +176,8 @@ namespace ScsSitecoreResourceManager
 			var propertyDictionary = model.Properties.ToDictionary(x => x.Id);
 			foreach (var prop in model.Properties)
 			{
+				if (propertyDictionary[prop.Id].Value == null)
+					continue;
 				if (!string.IsNullOrWhiteSpace(prop.Processor) && !collectors[prop.Processor].Validate(prop.Value))
 				{
 					return Content(prop.Name);

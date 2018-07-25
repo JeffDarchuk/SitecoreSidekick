@@ -16,6 +16,8 @@ namespace ScsSitecoreResourceManager.Pipelines.SitecoreResourceManager
 		public const string _standardTemplateId = "{AB86861A-6030-46C5-B394-E8F99E8B87DB}";
 		public void Process(SitecoreResourceManagerArgs args)
 		{
+			if (args.TemplateFolderTemplateId == null || args.BaseTemplateId == null || args.TemplateName == null)
+				return;
 			var folderId = args.TemplateFolderTemplateId;
 			var templatePath = args.TemplatePath;
 			var db = Factory.GetDatabase("master", false);
@@ -46,7 +48,7 @@ namespace ScsSitecoreResourceManager.Pipelines.SitecoreResourceManager
 			{
 				template[FieldIDs.Icon] = args.SitecoreIcon;
 			}
-			args.GeneratedTemplateId = template.ID.ToString();
+			args["_GENERATEDTEMPLATEID_"] = template.ID.ToString();
 			args.EventLog.Add($"Creating new template {args.GeneratedTemplateId}");
 
 		}

@@ -74,7 +74,7 @@ namespace ScsSitecoreResourceManager.Pipelines.SitecoreResourceManager
 					rendering["Datasource Location"] = args.RenderingDatasourceLocation;
 				}
 			}
-			args.GeneratedRenderingId = rendering.ID.ToString();
+			args["_GENERATEDRENDERINGID_"] = rendering.ID.ToString();
 			args.EventLog.Add($"Creating new rendering {args.GeneratedRenderingId}");
 		}
 	}

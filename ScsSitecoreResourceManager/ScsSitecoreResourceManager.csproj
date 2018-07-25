@@ -118,6 +118,9 @@
     <Compile Include="Models\ContentTreeModel.cs" />
     <Compile Include="Models\SubmitTargetPropertyModel.cs" />
     <Compile Include="Models\TargetModel.cs" />
+    <Compile Include="Pipelines\PropertyProcessorPostGather\GenerateDefaultUnicornDependencies.cs" />
+    <Compile Include="Pipelines\SitecoreResourceManager\InsertNewCsMethod.cs" />
+    <Compile Include="Pipelines\SitecoreResourceManager\InsertIntoCsMethod.cs" />
     <Compile Include="Pipelines\SitecoreResourceManager\AddToExistingController.cs" />
     <Compile Include="Pipelines\SitecoreResourceManager\ApplyFilesToProject.cs" />
     <Compile Include="Pipelines\SitecoreResourceManager\ApplyProjectsToSolution.cs" />
@@ -153,7 +156,9 @@
     <None Include="packages.config" />
     <EmbeddedResource Include="Resources\hgmaster.scs" />
     <EmbeddedResource Include="Resources\hgcontenttree.scs" />
-    <None Include="zScsSitecoreResourceManager.config" />
+    <None Include="zSCSSitecoreResourceManager.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\hgicon.png" />

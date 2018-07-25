@@ -16,7 +16,8 @@ namespace ScsSitecoreResourceManager.Pipelines.SitecoreResourceManager
 		public const string PlaceholderSettingsTemplateId = "{5C547D4E-7111-4995-95B0-6B561751BF2E}";
 		public void Process(SitecoreResourceManagerArgs args)
 		{
-
+			if (args.PlaceholderSettings == null || args.GeneratedRenderingId == null)
+				return;
 			var placeholderSettings = Factory.GetDatabase("master", false)?.GetItem(args.PlaceholderSettings);
 			if (placeholderSettings != null && placeholderSettings.TemplateID.ToString() == PlaceholderSettingsTemplateId && !placeholderSettings["Allowed Controls"].Contains(args.GeneratedRenderingId))
 			{

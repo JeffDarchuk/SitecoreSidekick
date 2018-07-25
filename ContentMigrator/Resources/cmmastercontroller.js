@@ -180,7 +180,7 @@
 				}
 				vm.operationList = response.data;
 				if (scsActiveModule === "Content Migrator")
-					setTimeout(function () { vm.GetOperationsInProgress() }, 1000);
+					setTimeout(function () { vm.GetOperationsInProgress() }, 3000);
 			});
 		}
 		vm.runPreview = function () {

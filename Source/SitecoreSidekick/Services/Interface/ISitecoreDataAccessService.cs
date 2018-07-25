@@ -16,6 +16,7 @@ namespace SitecoreSidekick.Services.Interface
 		IItemData GetLatestItemData(Guid idataId, string database = null);
 		IItemData GetItemData(string idataId, string database = null);
 		IItemData GetItemData(Guid idataId, string database = null);
+		string GetItemRevision(Guid idataId, string database = null);
 		IItemData GetRootItemData(string database = null);
 		List<Guid> GetChildrenIds(Guid guid);
 		HashSet<Guid> GetSubtreeOfGuids(IEnumerable<Guid> rootIds);

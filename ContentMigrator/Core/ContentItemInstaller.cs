@@ -68,9 +68,12 @@ namespace ScsContentMigrator.Core
 			{
 				try
 				{
-					_sitecore.RecycleItem(id);
 					var data = _sitecore.GetItemData(id);
 					_logger.BeginEvent(data, LogStatus.Recycle, _sitecore.GetIconSrc(data), false);
+					string status = $"{DateTime.Now:h:mm:ss tt} [RECYCLED] Recycled old item {data.Name} - {data.Id}";
+					_logger.LoggerOutput.Add(status);
+					_sitecore.RecycleItem(id);
+					
 				}
 				catch (Exception e)
 				{
@@ -264,7 +267,7 @@ namespace ScsContentMigrator.Core
 					{
 						if (localData != null)
 						{							
-							_logger.BeginEvent(remoteData, LogStatus.Changed, _logger.GetSrc(GetSrc(_sitecore.GetIconSrc(localData))), true);
+							_logger.BeginEvent(remoteData, LogStatus.Changed, GetSrc(_sitecore.GetIconSrc(localData)), true);
 						}
 						_scDatastore.Save(remoteData);
 					}
@@ -284,7 +287,7 @@ namespace ScsContentMigrator.Core
 					}
 					if (localData != null)
 					{
-						if (!_logger.HasLinesSupportEvents(localData.Id.ToString()))
+						if (_logger.HasLinesSupportEvents(localData.Id.ToString()))
 						{
 							_logger.CompleteEvent(localData.Id.ToString());
 						}

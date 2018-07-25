@@ -17,10 +17,34 @@ namespace ScsSitecoreResourceManager
 {
 	public class ScsSitecoreResourceManagerRegistration : ScsRegistration
 	{
-		private IJsonSerializationService _json;
-		public ScsSitecoreResourceManagerRegistration(string roles, string isAdmin, string users) : base(roles, isAdmin, users)
+		private readonly IJsonSerializationService _json;
+		public ScsSitecoreResourceManagerRegistration(string roles, string isAdmin, string users, string replaceExistingTemplates) : base(roles, isAdmin, users)
 		{
+			bool replaceExisting = replaceExistingTemplates.ToLower() == "true";
 			_json = Bootstrap.Container.Resolve<IJsonSerializationService>();
+			var templatesDir = GetInitialTemplatesDir();
+			if (templatesDir == null)
+				return;
+			if (replaceExisting)
+			{
+				foreach (var file in Directory.EnumerateFiles(templatesDir))
+				{
+					if (File.Exists(GetDataDirectory() + $"\\Templates\\{Path.GetFileName(file)}"))
+					{
+						File.Delete(GetDataDirectory() + $"\\Templates\\{Path.GetFileName(file)}");
+					}
+					File.Copy(file, GetDataDirectory() + $"\\Templates\\{Path.GetFileName(file)}");
+				}
+			}
+			else
+			{
+				Dictionary<string, string> defaultTemplates = Directory.EnumerateFiles(templatesDir).ToDictionary(Path.GetFileName);
+				HashSet<string> existingTemplates = new HashSet<string>(Directory.EnumerateFiles(GetDataDirectory() + "\\Templates").Select(Path.GetFileName));
+				foreach (var key in defaultTemplates.Keys.Where(x => !existingTemplates.Contains(x)))
+				{
+					File.Copy(defaultTemplates[key], GetDataDirectory() + $"\\Templates\\{key}");
+				}
+			}
 		}
 
 		public override string Identifier => "hg";
@@ -42,12 +66,22 @@ namespace ScsSitecoreResourceManager
 						   @"\SitecoreResourceManager";
 			if (!System.IO.Directory.Exists(filepath))
 				System.IO.Directory.CreateDirectory(filepath);
+			if (!System.IO.Directory.Exists(filepath+"\\Templates"))
+				System.IO.Directory.CreateDirectory(filepath + "\\Templates");
 			return filepath;
+		}
+
+		public string GetInitialTemplatesDir()
+		{
+			string path = HttpRuntime.AppDomainAppPath + @"\SitecoreResourceManager";
+			if (Directory.Exists(path))
+				return path;
+			return null;
 		}
 		public PropertiesWrapper GetPropertiesWrapper(string template)
 		{
 			string templateDirectory = GetDataDirectory() + "\\Templates";
-			string templatePath = Directory.GetFiles(templateDirectory).FirstOrDefault(x => x.EndsWith(template));
+			string templatePath = Directory.GetFiles(templateDirectory).FirstOrDefault(x => Path.GetFileName(x) == template);
 			PropertiesWrapper ret = new PropertiesWrapper();
 			using (ZipArchive archive = ZipFile.OpenRead(templatePath))
 			{

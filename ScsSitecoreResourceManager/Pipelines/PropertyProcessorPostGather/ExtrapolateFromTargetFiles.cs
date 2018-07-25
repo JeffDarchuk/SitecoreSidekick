@@ -24,6 +24,7 @@ namespace ScsSitecoreResourceManager.Pipelines.PropertyProcessorPostGather
 				var controllerContent = File.ReadAllText(args.TargetControllerPath);
 				args["_CONTROLLERNAMESPACE_"] = Regex.Match(controllerContent, NamespaceRegex).Groups[1].Value;
 				args["_LAYER_"] = GetLayer(args.TargetControllerPath);
+				args["_PARENTPROJECTNAME_"] = Path.GetFileName(args.TargetControllerPath).Split(new []{"Controller"}, StringSplitOptions.RemoveEmptyEntries)[0];
 			}
 
 			if (args.TargetCsProjPath != null)
@@ -37,7 +38,11 @@ namespace ScsSitecoreResourceManager.Pipelines.PropertyProcessorPostGather
 				args["_ASSEMBLYNAME_"] = doc.SelectSingleNode("//def:AssemblyName", xmlnsManager)?.InnerText;
 				args["_PROJECTROOTNAMESPACE_"] = doc.SelectSingleNode("//def:RootNamespace", xmlnsManager)?.InnerText;
 				args["_OVERLAYTARGET_"] = Path.GetDirectoryName(args.TargetCsProjPath);
-				args["_LAYER_"] = GetLayer(args.TargetCsProjPath);
+				if (args.TargetControllerPath == null)
+				{
+					args["_LAYER_"] = GetLayer(args.TargetCsProjPath);
+					args["_PARENTPROJECTNAME_"] = args.TargetCsProjPath.Split('.')[2];
+				}
 			}
 		}
 

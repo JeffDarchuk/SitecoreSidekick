@@ -19,8 +19,6 @@ namespace ScsSitecoreResourceManager.Pipelines.SitecoreResourceManager
 		public IEnumerable<string> NewOverlayFiles { get; set; }
 		public IEnumerable<string> NewOverlayDirectories { get; set; }
 
-		public string GeneratedTemplateId { get; set; }
-		public string GeneratedRenderingId { get; set; }
 		public List<string> EventLog { get; set; } = new List<string>();
 		public SitecoreResourceManagerArgs(Dictionary<string,DefaultCollector> properties, PropertiesWrapper wrapper):base(properties)
 		{

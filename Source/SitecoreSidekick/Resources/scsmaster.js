@@ -24,11 +24,16 @@
 			$cookies.put("sidekick", sk);
 			scsActiveModule = sk;
 		}
-		$interval(function () {
-			ScsFactory.valid().then(function(result) {
+		vm.validate = function() {
+			ScsFactory.valid().then(function (result) {
 				vm.valid = result.data === true;
+				setTimeout(function()
+				{
+					vm.validate();
+				}, 15000);
 			});
-		}, 3000);
+		}
+		vm.validate();
 		vm.goHome = function () {
 			$(".scs-form").css("max-height", window.top.screen.height + "px");
 			var active = $("#" + vm.sidekick.replace(" ", "").toLowerCase());

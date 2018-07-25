@@ -18,8 +18,8 @@ namespace SitecoreSidekick.Core
 	public abstract class ScsController : Controller
 	{
 		private readonly IJsonSerializationService _jsonSerializationService;
-		private readonly ConcurrentDictionary<string, string> _resourceCache = new ConcurrentDictionary<string, string>();
-		private readonly ConcurrentDictionary<string, byte[]> _imageCache = new ConcurrentDictionary<string, byte[]>();
+		private readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, string>> _resourceCache = new ConcurrentDictionary<Type, ConcurrentDictionary<string, string>>();
+		private readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, byte[]>> _imageCache = new ConcurrentDictionary<Type, ConcurrentDictionary<string, byte[]>>();
 		private readonly IScsRegistrationService _registration;
 		private readonly IMainfestResourceStreamService _manifestResourceStreamService;
 		private static DateTime StartTime = DateTime.Now;
@@ -65,89 +65,6 @@ namespace SitecoreSidekick.Core
 			return Content("Requested resource not found");
 
 		}
-		/// <summary>
-		/// sets up the context for specific content
-		/// </summary>
-		/// <param name="context"></param>
-		/// <param name="message"></param>
-		/// <param name="contentType"></param>
-		/// <param name="status"></param>
-		/// <param name="endResponse"></param>
-		protected void ReturnResponse(HttpContextBase context, string message, string contentType = "text/plain", HttpStatusCode status = HttpStatusCode.OK, bool endResponse = false)
-		{
-			if (!string.IsNullOrWhiteSpace(message)) context.Response.Write(message);
-			context.Response.StatusCode = (int)status;
-			context.Response.ContentType = contentType;
-			if (endResponse) context.Response.End();
-		}
-
-		/// <summary>
-		/// return not found response
-		/// </summary>
-		/// <param name="context"></param>
-		/// <param name="message"></param>
-		protected void NotFound(HttpContextBase context, string message = null)
-		{
-			ReturnResponse(context, message, status: HttpStatusCode.NotFound);
-		}
-
-		/// <summary>
-		/// returns an error response
-		/// </summary>
-		/// <param name="context"></param>
-		/// <param name="e"></param>
-		/// <param name="message"></param>
-		protected void Error(HttpContextBase context, Exception e, string message = null)
-		{
-			message = string.IsNullOrWhiteSpace(message) ? e.ToString() : message + "\r\n" + e;
-			ReturnResponse(context, message, status: HttpStatusCode.InternalServerError);
-		}
-
-		/// <summary>
-		/// return specific file resource stored in the binary
-		/// </summary>
-		/// <param name="context"></param>
-		/// <param name="file"></param>
-		/// <param name="contentType"></param>
-		protected void ReturnResource(HttpContextBase context, string file, string contentType)
-		{
-			var result = GetResource(file);
-			if (!string.IsNullOrWhiteSpace(result))
-				ReturnResponse(context, result, contentType);
-		}
-
-		/// <summary>
-		/// return image resource from the binary
-		/// </summary>
-		/// <param name="context"></param>
-		/// <param name="file"></param>
-		/// <param name="imageFormat"></param>
-		/// <param name="contentType"></param>
-		protected void ReturnImage(HttpContextBase context, string file, ImageFormat imageFormat, string contentType)
-		{
-			var buffer = GetImage(file, imageFormat);
-			if (buffer == null || !buffer.Any()) return;
-			context.Response.StatusCode = 200;
-			context.Response.ContentType = "image/png";
-			context.Response.BinaryWrite(buffer);
-			context.Response.Flush();
-		}
-
-		/// <summary>
-		/// return json resource
-		/// </summary>
-		/// <param name="context"></param>
-		/// <param name="o"></param>
-		protected void ReturnJson(HttpContextBase context, object o)
-		{
-			if (o == null) return;
-			context.Response.StatusCode = 200;
-			var json = _jsonSerializationService.SerializeObject(o);
-			context.Response.AppendHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1.
-			context.Response.AppendHeader("Pragma", "no-cache"); // HTTP 1.0.
-			context.Response.AppendHeader("Expires", "0"); // Proxies.
-			ReturnResponse(context, json, "application/json");
-		}
 
 		public virtual ActionResult ScsJson(object o)
 		{
@@ -161,13 +78,16 @@ namespace SitecoreSidekick.Core
 		public string GetResource(string filename)
 		{
 			filename = filename.ToLowerInvariant();
-			string result;
-			Response.AppendHeader("scs", "true");
-			if (_resourceCache.TryGetValue(filename, out result)) return result;
+			Sitecore.Context.SetActiveSite("scs");
+			_resourceCache.TryGetValue(GetType(), out var cache);
+			if (cache != null && cache.TryGetValue(filename, out var result)) return result;
 
 			result = _manifestResourceStreamService.GetManifestResourceText(GetType(), _registration.GetScsRegistration(GetType()).ResourcesPath + "." + filename, ()=>throw new ScsEmbeddedResourceNotFoundException());
-
-			_resourceCache[filename] = result;
+			if (!_resourceCache.ContainsKey(GetType()))
+			{
+				_resourceCache[GetType()] = new ConcurrentDictionary<string, string>();
+			}
+			_resourceCache[GetType()][filename] = result;
 			return result;
 		}
 
@@ -180,13 +100,16 @@ namespace SitecoreSidekick.Core
 		private byte[] GetImage(string filename, ImageFormat imageFormat)
 		{
 			filename = filename.ToLowerInvariant();
-			byte[] result;
-			Response.AppendHeader("scs", "true"); 
-			if (_imageCache.TryGetValue(filename, out result)) return result;
+			Sitecore.Context.SetActiveSite("scs");
+			_imageCache.TryGetValue(GetType(), out var cache);
+			if (cache != null && cache.TryGetValue(filename, out var result)) return result;
 
 			result = _manifestResourceStreamService.GetManifestResourceImage(GetType(), _registration.GetScsRegistration(GetType()).ResourcesPath + "." + filename, imageFormat, () => throw new ScsEmbeddedResourceNotFoundException());
-
-			_imageCache[filename] = result;
+			if (!_imageCache.ContainsKey(GetType()))
+			{
+				_imageCache[GetType()] = new ConcurrentDictionary<string, byte[]>();
+			}
+			_imageCache[GetType()][filename] = result;
 			return result;
 		}
 	}

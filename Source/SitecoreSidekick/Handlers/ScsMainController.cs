@@ -35,7 +35,7 @@ namespace SitecoreSidekick.Handlers
 		public ActionResult Valid()
 		{
 			string ticket = _authenticationService.GetCurrentTicketId();
-			if (!string.IsNullOrWhiteSpace(ticket))
+			if (!string.IsNullOrWhiteSpace(ticket) && !_authenticationService.IsAuthenticated)
 				_authenticationService.Relogin(ticket);
 			if (!_authenticationService.IsAuthenticated)
 			{

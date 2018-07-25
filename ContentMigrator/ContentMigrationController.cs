@@ -12,6 +12,7 @@ using Microsoft.CSharp.RuntimeBinder;
 using Rainbow.Model;
 using Rainbow.Storage.Yaml;
 using ScsContentMigrator.Args;
+using ScsContentMigrator.Core.Interface;
 using ScsContentMigrator.Data;
 using ScsContentMigrator.Models;
 using ScsContentMigrator.Services;
@@ -35,6 +36,7 @@ namespace ScsContentMigrator
 		private readonly IContentMigrationManagerService _migrationManager;
 		private readonly IRemoteContentService _remoteContent;
 		private readonly IYamlSerializationService _yamlSerializationService;
+		private readonly IChecksumManager _checksumManager;
 
 		public ContentMigrationController()
 		{
@@ -43,6 +45,7 @@ namespace ScsContentMigrator
 			_migrationManager = Bootstrap.Container.Resolve<IContentMigrationManagerService>();
 			_remoteContent = Bootstrap.Container.Resolve<IRemoteContentService>();
 			_yamlSerializationService = Bootstrap.Container.Resolve<IYamlSerializationService>();
+			_checksumManager = Bootstrap.Container.Resolve<IChecksumManager>();
 		}
 
 		[MchapOrLoggedIn]
@@ -65,14 +68,25 @@ namespace ScsContentMigrator
 
 		[MchapOrLoggedIn]
 		[ActionName("cmgetitemyamlwithchildren.scsvc")]
-		public ActionResult GetItemYamlWithChildren(string id)
+		public ActionResult GetItemYamlWithChildren(RevisionModel data)
 		{
-			Assert.ArgumentNotNullOrEmpty(id, "id");
-			using (var stream = new MemoryStream())
+			var guid = Guid.Parse(data.Id);
+
+			using (new SecurityDisabler())
 			{
-				using (new SecurityDisabler())
+
+				IItemData item = _sitecore.GetItemData(guid);
+				if (_sitecore.GetItemRevision(guid) == data.Rev)
 				{
-					IItemData item = _sitecore.GetItemData(Guid.Parse(id));
+					return ScsJson(new ChildrenItemDataModel
+					{
+						Item = null,
+						Children = item.GetChildren().Select(x => x.Id).ToList()
+					});
+				}
+
+				using (var stream = new MemoryStream())
+				{
 					_yamlSerializationService.WriteSerializedItem(item, stream);
 					stream.Seek(0, SeekOrigin.Begin);
 
@@ -127,9 +141,9 @@ namespace ScsContentMigrator
 
 		[MchapOrLoggedIn]
 		[ActionName("cmitemdatachildren.scsvc")]
-		public ActionResult GetItemDataWithChildren(string id)
+		public ActionResult GetItemDataWithChildren(RevisionModel data)
 		{
-			return ScsJson(ItemDataWithChildren(id));
+			return ScsJson(ItemDataWithChildren(data.Id, data.Rev));
 		}
 
 		[ScsLoggedIn]
@@ -177,7 +191,7 @@ namespace ScsContentMigrator
 		[ActionName("cmchecksum.scsvc")]
 		public ActionResult ItemChecksum()
 		{
-			return ScsJson(ContentMigrationRegistration.GetChecksum(Request.QueryString["id"]));
+			return ScsJson(_checksumManager.GetChecksum(Request.QueryString["id"]));
 		}
 
 		[ActionName("cmbuilddiff.scsvc")]
@@ -191,12 +205,21 @@ namespace ScsContentMigrator
 			}
 		}
 
-		private object ItemDataWithChildren(string id)
+		private object ItemDataWithChildren(string id, string rev)
 		{
 			var ret = new ChildrenItemDataModel();
 			Guid guid = Guid.Parse(id);
-			ret.Item = _yamlSerializationService.SerializeYaml(_sitecore.GetItemData(guid));
-			ret.Children = _sitecore.GetChildrenIds(guid);
+			if (rev != _sitecore.GetItemRevision(guid))
+			{
+				ret.Item = _yamlSerializationService.SerializeYaml(_sitecore.GetItemData(guid));
+				ret.Children = _sitecore.GetChildrenIds(guid);
+			}
+			else
+			{
+				ret.Item = null;
+				ret.Children = _sitecore.GetChildrenIds(guid);
+			}
+
 			return ret;
 		}
 

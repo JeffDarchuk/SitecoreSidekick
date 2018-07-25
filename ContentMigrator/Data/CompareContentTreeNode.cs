@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using ScsContentMigrator.Core.Interface;
 using SitecoreSidekick.Services.Interface;
 using Version = Sitecore.Data.Version;
 
@@ -24,6 +25,7 @@ namespace ScsContentMigrator.Data
 	{
 		private static readonly List<IFieldComparer> Comparers = new List<IFieldComparer>();
 		private readonly ISitecoreDataAccessService _sitecoreAccessService;
+		private readonly IChecksumManager _checksumManager;
 		static CompareContentTreeNode()
 		{
 			Comparers.Add(new CheckboxComparison());
@@ -44,6 +46,7 @@ namespace ScsContentMigrator.Data
 		public CompareContentTreeNode()
 		{
 			_sitecoreAccessService = Bootstrap.Container.Resolve<ISitecoreDataAccessService>();
+			_checksumManager = Bootstrap.Container.Resolve<IChecksumManager>();
 		}
 
 		public CompareContentTreeNode(IItemData item, bool open = true) : base(item, open)
@@ -51,7 +54,8 @@ namespace ScsContentMigrator.Data
 			_sitecoreAccessService = Bootstrap.Container.Resolve<ISitecoreDataAccessService>();
 			SortedSet<string> tmp = new SortedSet<string>(_sitecoreAccessService.GetVersions(item));
 			Revision = string.Join("", tmp);
-			Checksum = ContentMigrationRegistration.GetChecksum(item.Id.ToString());
+			_checksumManager = Bootstrap.Container.Resolve<IChecksumManager>();
+			Checksum = _checksumManager.GetChecksum(item.Id.ToString());
 		}
 
 		private bool AreFieldsEqual(Field local, IItemFieldValue remote)
@@ -74,7 +78,7 @@ namespace ScsContentMigrator.Data
 			using (new SecurityDisabler())
 			{
 				var localItem = Factory.GetDatabase("master", true).DataManager.DataEngine.GetItem(new ID(Id), LanguageManager.DefaultLanguage, Sitecore.Data.Version.Latest);
-
+				localItem.Fields.ReadAll();
 				foreach (var chk in itemData.SharedFields)
 				{
 
@@ -104,6 +108,8 @@ namespace ScsContentMigrator.Data
 						tracker[LanguageManager.GetLanguage(ver.Language.Name).Name]++;
 					}
 					Item verItem = localItem.Database.DataManager.DataEngine.GetItem(new ID(Id), LanguageManager.GetLanguage(ver.Language.Name), Version.Parse(ver.VersionNumber));
+					verItem.Fields.ReadAll();
+					HashSet<Guid> fieldsProcessed = new HashSet<Guid>(ver.Fields.Select(x=>x.FieldId));
 					foreach (var verfield in ver.Fields)
 					{
 						if (AreFieldsEqual(verItem.Fields[new ID(verfield.FieldId)], verfield))
@@ -119,10 +125,24 @@ namespace ScsContentMigrator.Data
 							? new Tuple<string, string>(verfield.NameHint, "Blob value changed")
 							: new Tuple<string, string>(verfield.NameHint, HtmlDiff.HtmlDiff.Execute(HttpUtility.HtmlEncode(localItem[new ID(verfield.FieldId)].Replace("\r", "")), HttpUtility.HtmlEncode(verfield.Value.Replace("\r", "")))));
 					}
+
+					foreach (Field field in verItem.Fields.Where(x => !x.Unversioned && !x.Shared).Where(x => !fieldsProcessed.Contains(x.ID.Guid) && !string.IsNullOrWhiteSpace(x.Value)))
+					{
+						string key = ver.Language.Name + " v" + ver.VersionNumber;
+						if (!Compare.ContainsKey(key))
+						{
+							Compare[key] = new List<Tuple<string, string>>();
+						}
+						Compare[key].Add(field.HasBlobStream
+							? new Tuple<string, string>(field.DisplayName, "Blob value changed")
+							: new Tuple<string, string>(field.DisplayName, HtmlDiff.HtmlDiff.Execute(HttpUtility.HtmlEncode(localItem[field.ID].Replace("\r", "")), "")));
+
+					}
 				}
 				foreach (var lang in localItem.Languages.Where(x => !tracker.ContainsKey(x.Name)))
 				{
 					Item langItem = localItem.Database.DataManager.DataEngine.GetItem(new ID(Id), lang, Version.Latest);
+					langItem.Fields.ReadAll();
 					for (int ver = 1; ver <= langItem.Versions.Count; ver++)
 					{
 						string key = "Extra version";
@@ -136,6 +156,7 @@ namespace ScsContentMigrator.Data
 				foreach (var lang in localItem.Languages.Where(x => tracker.ContainsKey(x.Name)))
 				{
 					Item langItem = localItem.Database.DataManager.DataEngine.GetItem(new ID(Id), lang, Version.Latest);
+					langItem.Fields.ReadAll();
 					for (int ver = tracker[lang.Name] + 1; ver <= langItem.Versions.Count; ver++)
 					{
 						string key = "Extra version";
@@ -149,6 +170,7 @@ namespace ScsContentMigrator.Data
 				foreach (var unver in itemData.UnversionedFields)
 				{
 					Item verItem = localItem.Database.DataManager.DataEngine.GetItem(new ID(Id), LanguageManager.GetLanguage(unver.Language.Name), Version.Latest);
+					verItem.Fields.ReadAll();
 					foreach (var unverfield in unver.Fields)
 					{
 						if (AreFieldsEqual(verItem.Fields[new ID(unverfield.FieldId)], unverfield))
@@ -181,7 +203,7 @@ namespace ScsContentMigrator.Data
 						return;
 					}
 
-					ChildChanged = Checksum != ContentMigrationRegistration.GetChecksum(localItem.Id.ToString());
+					ChildChanged = Checksum != _checksumManager.GetChecksum(localItem.Id.ToString());
 					CompareContentTreeNode local = new CompareContentTreeNode(localItem);
 					if (Revision != local.Revision)
 					{

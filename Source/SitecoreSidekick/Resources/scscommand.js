@@ -1,6 +1,6 @@
 ﻿//from here: http://stackoverflow.com/questions/902407/how-to-hijack-key-combos-in-javascript
 
-if (window.location.href.endsWith("Content%20Editor.aspx?sc_bw=1") || window.location.href.endsWith("default.aspx")) {
+if (window.location.href.indexOf("Content%20Editor.aspx") > -1 || window.location.href.indexOf("default.aspx") > -1) {
 	window.onload = function() {
 		document.onkeydown = function(event) {
 			var keyCode;

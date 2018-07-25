@@ -146,6 +146,12 @@ namespace ScsContentMigrator.CMRainbow
 			string status = $"{DateTime.Now:h:mm:ss tt} [FIELD RESET] Reset a field {field.Name} that doesn't exist in item {field.Item.DisplayName} - {field.Item.ID}";
 			LoggerOutput.Add(status);
 			Log.Info(status, this);
+			if (!LinesSupport.ContainsKey(field.Item.ID.Guid.ToString()))
+				LinesSupport[field.Item.ID.Guid.ToString()] = new { Events = new Dictionary<string, List<Tuple<string, string>>>() };
+			if (!LinesSupport[field.Item.ID.Guid.ToString()].Events.ContainsKey(field.Item.Language.Name + " v" + field.Item.Version.Number))
+				LinesSupport[field.Item.ID.Guid.ToString()].Events[field.Item.Language.Name + " v" + field.Item.Version.Number] = new List<Tuple<string, string>>();
+			LinesSupport[field.Item.ID.Guid.ToString()].Events[field.Item.Language.Name + " v" + field.Item.Version.Number].Add(new Tuple<string, string>(field.DisplayName,
+				HtmlDiff.HtmlDiff.Execute(HttpUtility.HtmlEncode(field.Value), "")));
 		}
 
 		public void SkippedPastingIgnoredField(Item item, IItemFieldValue field)

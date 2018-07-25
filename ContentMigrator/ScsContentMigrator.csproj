@@ -111,6 +111,8 @@
     <Compile Include="ContentAgent.cs" />
     <Compile Include="ContentMigrationController.cs" />
     <Compile Include="ContentMigrationRegistration.cs" />
+    <Compile Include="Core\ChecksumManager.cs" />
+    <Compile Include="Core\Interface\IChecksumManager.cs" />
     <Compile Include="Data\Checksum.cs" />
     <Compile Include="Data\ChecksumGenerator.cs" />
     <Compile Include="Models\ChildrenItemDataModel.cs" />
@@ -128,6 +130,7 @@
     <Compile Include="Core\Interface\IContentItemInstaller.cs" />
     <Compile Include="Core\Interface\IContentItemPuller.cs" />
     <Compile Include="Core\Interface\IContentMigration.cs" />
+    <Compile Include="Models\RevisionModel.cs" />
     <Compile Include="Services\Interface\ILoggingService.cs" />
     <Compile Include="Services\Interface\IRemoteContentService.cs" />
     <Compile Include="ItemExtensions.cs" />

@@ -11,8 +11,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScsEditingContext", "ScsEdi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScsAuditLog", "ScsAuditLog\ScsAuditLog.csproj", "{96A08E68-0029-4DAE-AA1B-290706A22F6A}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SitecoreSidekick.Shared", "Source\SitecoreSidekick.Shared\SitecoreSidekick.Shared.shproj", "{DC668275-6331-4090-B89A-91B367231F79}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SitecoreSidekick.Shared.UnitTests", "Source\SitecoreSidekick.Shared.UnitTests\SitecoreSidekick.Shared.UnitTests.csproj", "{3BF608D1-CF04-4A9C-A098-B5455492F6FD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SitecoreSidekick.UnitTests", "Source\SitecoreSidekick.UnitTests\SitecoreSidekick.UnitTests.csproj", "{23421921-4A34-4FB4-AB8F-1B2CEB204F07}"
@@ -21,14 +19,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScsContentMigrator.UnitTest
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{8F4C28DB-BD0A-4BB8-A068-EE822E8881CF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScsSitecoreResourceManager", "ScsHelixLayerGenerator\ScsSitecoreResourceManager.csproj", "{960AA8F3-60FF-4D9D-B885-BFAB98B892C7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScsSitecoreResourceManager", "ScsSitecoreResourceManager\ScsSitecoreResourceManager.csproj", "{960AA8F3-60FF-4D9D-B885-BFAB98B892C7}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Source\SitecoreSidekick.Shared\SitecoreSidekick.Shared.projitems*{0da36c4a-1b13-4891-a263-5f994127051c}*SharedItemsImports = 4
 		Source\SitecoreSidekick.Shared\SitecoreSidekick.Shared.projitems*{3bf608d1-cf04-4a9c-a098-b5455492f6fd}*SharedItemsImports = 4
 		Source\SitecoreSidekick.Shared\SitecoreSidekick.Shared.projitems*{960aa8f3-60ff-4d9d-b885-bfab98b892c7}*SharedItemsImports = 4
-		Source\SitecoreSidekick.Shared\SitecoreSidekick.Shared.projitems*{dc668275-6331-4090-b89a-91b367231f79}*SharedItemsImports = 13
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

@@ -49,6 +49,7 @@ namespace ScsSitecoreResourceManager.Data.Properties
 		public string SitecoreIcon => GetValue("_SITECOREICON_");
 		public string RenderingDatasourceLocation => GetValue("_RENDERINGDATASOURCELOCATION_");
 		public string AssemblyName => GetValue("_ASSEMBLYNAME_");
+		public string ActionFormat => GetValue("_ACTIONFORMAT_");
 
 		public string ViewPath => GetValue("_VIEWPATH_");
 		// CreateTemplate
@@ -58,6 +59,11 @@ namespace ScsSitecoreResourceManager.Data.Properties
 		public string TemplateName => GetValue("_TEMPLATENAME_");
 		// OverlayTemplate
 		public string OverlayTarget => GetValue("_OVERLAYTARGET_");
+		public string Prefix => GetValue("_PREFIX_");
+		public string Layer => GetValue("_LAYER_");
+
+		public string GeneratedTemplateId => GetValue("_GENERATEDTEMPLATEID_");
+		public string GeneratedRenderingId => GetValue("_GENERATEDRENDERINGID_");
 
 		public bool ContainsKey(string key) {
 

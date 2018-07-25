@@ -67,6 +67,7 @@ namespace ScsContentMigrator
 			container.RegisterFactory<ISignatureService>(args=> new SignatureService((string)args[0]));
 			container.RegisterFactory<IItemComparer>(args => new DefaultItemComparer());
 			container.RegisterFactory<IYamlSerializationService>(args => new YamlSerializationService());
+			container.Register<IChecksumManager, ChecksumManager>();
 
 			return container;
 		}

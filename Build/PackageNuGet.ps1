@@ -38,3 +38,4 @@ $targetAssemblyVersion = $tmAssembly.ProductVersion
 & $nuGet pack "$scriptRoot\..\ScsAuditLog\ScsAuditLog.csproj" -Symbols -Prop "Configuration=Release"
 & $nuGet pack "$scriptRoot\..\ScsEditingContext\ScsEditingContext.csproj" -Symbols -Prop "Configuration=Release"
 & $nuGet pack "$scriptRoot\..\ContentMigrator\ScsContentMigrator.csproj" -Symbols -Prop "Configuration=Release"
+& $nuGet pack "$scriptRoot\..\ScsSitecoreResourceManager\ScsSitecoreResourceManager.csproj" -Symbols -Prop "Configuration=Release"

@@ -15,7 +15,7 @@ namespace ScsSitecoreResourceManager.Data.Properties.Collectors
 		{
 			get
 			{
-				return Id.EndsWith("LOWER_") ? Guid.NewGuid().ToString("D").ToLower() : Guid.NewGuid().ToString("P");
+				return Id.EndsWith("LOWER_") ? Guid.NewGuid().ToString("D").ToLower() : Guid.NewGuid().ToString("B");
 			}
 			set
 			{

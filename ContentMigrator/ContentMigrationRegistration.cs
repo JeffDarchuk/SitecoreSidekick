@@ -10,9 +10,13 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Xml;
+using ScsContentMigrator.Core.Interface;
+using Sitecore.Events;
+using Sitecore.Web.Authentication;
 using SitecoreSidekick.Services.Interface;
 
 namespace ScsContentMigrator
@@ -20,8 +24,7 @@ namespace ScsContentMigrator
 	public class ContentMigrationRegistration : ScsRegistration
 	{
 		private readonly ISitecoreDataAccessService _sitecoreDataAccessService;
-
-		private static Checksum _checksum;
+		private readonly IChecksumManager _checksumManager;
 		public static CompareContentTreeNode Root { get; } = new CompareContentTreeNode { DatabaseName = "master", DisplayName = "Root", Icon = "/~/icon/Applications/32x32/media_stop.png", Open = true, Nodes = new List<ContentTreeNode>() };
 		public int RemoteThreads { get; } = 1;
 		public int WriterThreads { get; } = 1;
@@ -39,36 +42,24 @@ namespace ScsContentMigrator
 		public ContentMigrationRegistration(string roles, string isAdmin, string users, string remotePullingThreads, string databaseWriterThreads) : base(roles, isAdmin, users)
 		{
 			_sitecoreDataAccessService = Bootstrap.Container.Resolve<ISitecoreDataAccessService>();
+			_checksumManager = Bootstrap.Container.Resolve<IChecksumManager>();
 			if (RemoteThreads == 1)
 			{
-				int remoteTmp;
-				int.TryParse(remotePullingThreads, out remoteTmp);
+				int.TryParse(remotePullingThreads, out var remoteTmp);
 				RemoteThreads = remoteTmp;
 			}
 
 			if (WriterThreads == 1)
 			{
-				int writerTmp;
-				int.TryParse(databaseWriterThreads, out writerTmp);
+				int.TryParse(databaseWriterThreads, out var writerTmp);
 				WriterThreads = writerTmp;
 			}
-
-			Timer t = new Timer(20 * 1000);
-			t.Elapsed += (sender, e) =>
-			{
-				if (Root != null)
-					_checksum = new ChecksumGenerator().Generate(Root.Nodes.Select(x => new ID(x.Id)).ToList(), "master");
-			};
-			t.Start();
 		}
 
 		public override void Process(PipelineArgs args)
 		{
-			Task.Run(() =>
-			{
-				_checksum = new ChecksumGenerator().Generate(Root.Nodes.Select(x => new ID(x.Id)).ToList(), "master");
-			});
-
+			_checksumManager.RegenerateChecksum();
+			_checksumManager.StartChecksumTimer();
 			if (string.IsNullOrWhiteSpace(AuthenticationSecret))
 			{
 				throw new InvalidOperationException("Sitecore Sidekick Content Migrator was initialized with an empty shared secret. Make a copy of zSCSContentMigrator.Local.config.example, rename it to .config, and set up a unique, long, randomly generated shared secret there.");
@@ -86,10 +77,6 @@ namespace ScsContentMigrator
 			ServerList.Add(node.InnerText);
 		}
 
-		public static int GetChecksum(string id)
-		{
-			return _checksum?.GetChecksum(id) ?? -1;
-		}
 		public void BuildRoot(XmlNode node)
 		{
 			string dbName = "master";

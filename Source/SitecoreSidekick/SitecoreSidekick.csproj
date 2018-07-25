@@ -113,6 +113,7 @@
     <Compile Include="Models\ScsModelBinder.cs" />
     <Compile Include="Models\ScsSitecoreItem.cs" />
     <Compile Include="Pipelines\ExperienceEditor\RegisterSidekickForEE.cs" />
+    <Compile Include="Pipelines\HttpRequestBegin\CheckScs.cs" />
     <Compile Include="Pipelines\HttpRequestBegin\IsAdmin.cs" />
     <Compile Include="Pipelines\Initialize\InitializeSidekick.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -18,6 +18,7 @@
 		<dependency id="SitecoreSidekickEditingContext" version="$version$" />
 		<dependency id="SitecoreSidekickAuditLog" version="$version$" />
 		<dependency id="SitecoreSidekickContentMigrator" version="$version$" />
+		<dependency id="SitecoreSidekickResourceManager" version="$version$" />
 	</dependencies>
 	</metadata>
 </package>

@@ -12,7 +12,7 @@ namespace ScsSitecoreResourceManager.Pipelines.SitecoreResourceManager
 {
 	public class ApplyProjectsToSolution
 	{
-		private const string _solutionProjectTemplate = @"Project(""{0}"") = ""{1}"", ""{2}"", ""{3}""
+		private const string _solutionProjectTemplate = "\n"+@"Project(""{0}"") = ""{1}"", ""{2}"", ""{3}""
 EndProject";
 		private const string _solutionGlobalSectionTemplate = @"
 		{0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -36,7 +36,7 @@ EndProject";
 					string.Format(
 						_solutionProjectTemplate,
 						projTypeGuid.ToUpper(),
-						$"{args.ProjectName}",
+						$"{args.Prefix}.{args.Layer}.{args.ProjectName}",
 						proj.Split(new[] { Path.GetDirectoryName(args.SolutionPath)+'\\' }, StringSplitOptions.None).Last(),
 						projGuid));
 				index = solution.IndexOf("GlobalSection(ProjectConfigurationPlatforms) = postSolution") + 59;

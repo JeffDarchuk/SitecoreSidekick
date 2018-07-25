@@ -47,6 +47,13 @@ namespace SitecoreSidekick.Services
 			return new ItemData(item);
 		}
 
+		public string GetItemRevision(Guid idataId, string database = null)
+		{
+			var item = GetItem(idataId, database);
+			return item?[FieldIDs.Revision];
+		}
+
+
 		public IItemData GetRootItemData(string database = null)
 		{
 			Database db = database == null ? _db : Factory.GetDatabase(database);

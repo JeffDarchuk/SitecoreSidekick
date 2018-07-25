@@ -11,6 +11,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using SitecoreSidekick.Services.Interface;
 
 namespace ScsContentMigrator.Core
 {
@@ -21,6 +22,7 @@ namespace ScsContentMigrator.Core
 		private readonly IRemoteContentService _remoteContent;
 		private readonly IYamlSerializationService _yamlSerializationService;
 		private readonly ILoggingService _log;
+		private readonly ISitecoreDataAccessService _sitecore;
 		private readonly object _locker = new object();
 		private int _processing = 0;
 
@@ -28,6 +30,7 @@ namespace ScsContentMigrator.Core
 		{
 			_remoteContent = Bootstrap.Container.Resolve<IRemoteContentService>();
 			_yamlSerializationService = Bootstrap.Container.Resolve<IYamlSerializationService>();
+			_sitecore = Bootstrap.Container.Resolve<ISitecoreDataAccessService>();
 			_log = Bootstrap.Container.Resolve<ILoggingService>();
 		}
 
@@ -64,9 +67,17 @@ namespace ScsContentMigrator.Core
 					}
 					lock (_locker)
 						_processing++;
-					ChildrenItemDataModel remoteContentItem = _remoteContent.GetRemoteItemDataWithChildren(id, server);
-					IItemData itemData = _yamlSerializationService.DeserializeYaml(remoteContentItem.Item, id.ToString());
-					GatheredRemoteItems.Add(itemData, cancellationToken);
+					ChildrenItemDataModel remoteContentItem = _remoteContent.GetRemoteItemDataWithChildren(id, server, _sitecore.GetItemRevision(id));
+					if (remoteContentItem.Item != null)
+					{
+						IItemData itemData = _yamlSerializationService.DeserializeYaml(remoteContentItem.Item, id.ToString());
+						GatheredRemoteItems.Add(itemData, cancellationToken);
+					}
+					else
+					{
+						GatheredRemoteItems.Add(_sitecore.GetItemData(id), cancellationToken);
+					}
+
 					if (getChildren && remoteContentItem.Children != null)
 					{
 						foreach (var child in remoteContentItem.Children)

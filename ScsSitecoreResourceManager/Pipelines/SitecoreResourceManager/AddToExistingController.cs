@@ -10,12 +10,17 @@ namespace ScsSitecoreResourceManager.Pipelines.SitecoreResourceManager
 {
 	public class AddToExistingController
 	{
-		public string ActionFormat { get; set; } = @"    public ActionResult _CONTROLLERACTION_()
+		public readonly string ActionFormat;
+
+		public AddToExistingController(string actionFormat = @"    public ActionResult _CONTROLLERACTION_()
         {
             //Your code goes here!
             return Content(""Magic"");
         }
-	";
+	")
+		{
+			ActionFormat = actionFormat;
+		}
 		public void Process(SitecoreResourceManagerArgs args)
 		{
 			if (args.TargetControllerPath.IsNullOrEmpty() || args.ControllerAction.IsNullOrEmpty())
@@ -35,7 +40,7 @@ namespace ScsSitecoreResourceManager.Pipelines.SitecoreResourceManager
 			if (index > -1)
 				index--;
 			index = text.LastIndexOf('}', index);
-			string action = ReplaceAllTokens.ReplaceTokens(ActionFormat, args, "Controller Code");
+			string action = ReplaceAllTokens.ReplaceTokens(args.ActionFormat ?? ActionFormat, args, "Controller Code");
 			text = text.Insert(index-1, action);
 			Log.Debug($"Adding controller action to controller at {args.TargetControllerPath}");
 			System.IO.File.WriteAllText(args.TargetControllerPath, text);

@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Mvc.Html;
 
 namespace ScsSitecoreResourceManager.Pipelines.SitecoreResourceManager
 {
@@ -48,7 +49,25 @@ namespace ScsSitecoreResourceManager.Pipelines.SitecoreResourceManager
 			{
 				try
 				{
-					Directory.Move(path, resolved);
+					if (Directory.Exists(resolved))
+					{
+						foreach (var child in Directory.EnumerateFileSystemEntries(path))
+						{
+							if (Directory.Exists(child))
+							{
+								Directory.Move(child, resolved + $@"\{Path.GetFileName(child)}");
+							}
+							else
+							{
+								File.Move(child, resolved + $@"\{Path.GetFileName(child)}");
+							}
+						}
+						Directory.Delete(path);
+					}
+					else
+					{
+						Directory.Move(path, resolved);
+					}
 				}
 				catch (IOException e)
 				{
@@ -69,7 +88,7 @@ namespace ScsSitecoreResourceManager.Pipelines.SitecoreResourceManager
 			}
 		}
 
-		public static string ReplaceTokens(string text, SitecoreResourceManagerArgs args, string name)
+		public static string ReplaceTokens(string text, SitecoreResourceManagerArgs args, string name = null)
 		{
 			return ReplaceTokens(text, args.ContainsKey, x => args[x], args, name);
 		}

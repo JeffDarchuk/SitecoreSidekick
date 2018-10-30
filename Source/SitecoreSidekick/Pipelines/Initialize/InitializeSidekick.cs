@@ -14,6 +14,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 using System.Xml;
+using Sitecore;
 
 namespace SitecoreSidekick.Pipelines.Initialize
 {
@@ -65,23 +66,39 @@ namespace SitecoreSidekick.Pipelines.Initialize
 					return;
 
 				Item sk = core.GetItem(new ID(SidekickButton));
-				if (sk != null)
+				if (sk != null && EnsureButtonItem(sk))
 					return;
 				Item right = core.GetItem(new ID(DesktopMenuRight));
 				if (right == null)
 					return;
-				sk = ItemManager.CreateItem("Sitecore Sidekick", right, new ID(ActionTemplate), new ID(SidekickButton));
+				if (sk == null)
+				{
+					sk = ItemManager.CreateItem("Sitecore Sidekick", right, new ID(ActionTemplate), new ID(SidekickButton));
+				}
 				using (new EditContext(sk))
 				{
-					sk["Display name"] = "Sitecore Sidekick";
+					sk[FieldIDs.DisplayName] = "Sitecore Sidekick";
 					if (IsGreaterThanSc7())
-						sk["Icon"] = "office/32x32/sword.png";
+						sk[FieldIDs.Icon] = "office/32x32/sword.png";
 					else
-						sk["Icon"] = "Network/32x32/knight.png";
+						sk[FieldIDs.Icon] = "Network/32x32/knight.png";
 					sk["Message"] = "scs:open";
 					sk["Tool tip"] = "Open the Sitecore Sidekick";
+					sk[FieldIDs.Security] = @"ar|sitecore\Sitecore Client Authoring|pd|+item:read|pe|+item:read|";
 				}
 			}
+		}
+
+		public static bool EnsureButtonItem(Item sk)
+		{
+			return
+				sk[FieldIDs.DisplayName] == "Sitecore Sidekick" &&
+				IsGreaterThanSc7()
+					? sk[FieldIDs.Icon] == "office/32x32/sword.png"
+					: sk[FieldIDs.Icon] == "Network/32x32/knight.png" &&
+				sk["Message"] == "scs:open" &&
+				sk["Tool tip"] == "Open the Sitecore Sidekick" &&
+				sk[FieldIDs.Security] == @"ar|sitecore\Sitecore Client Authoring|pd|+item:read|pe|+item:read|";
 		}
 
 		private static bool IsGreaterThanSc7()

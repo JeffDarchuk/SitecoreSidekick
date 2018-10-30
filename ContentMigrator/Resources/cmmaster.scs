@@ -7,7 +7,11 @@
 		<fieldset ng-if="!vm.serverModified">
 			<legend>Select a content item to pull</legend>
 			<div>
-				<span><i class="cmmultiroot">Ctr+Click to select multiple roots.</i></span>
+				<span>
+					<i class="cmmultiroot">Ctr+Click to select multiple roots.</i>
+					<i>
+						Click the red box <span class="cmcompare cmfieldchanged"></span> to view a diff</i>
+				</span>
 				<cmcontenttree parent="''" database="'master'" selected="vm.events.selectedIds" events="vm.events" server="vm.server" standardValues="vm.diffStandardValues"></cmcontenttree>
 				<p>
 					<strong>Legend</strong><br/>

@@ -202,8 +202,8 @@ namespace ScsContentMigrator.Data
 						Status.Add(new Tuple<string, string>("cmmissing", "This content item only exists on the remote server."));
 						return;
 					}
-
-					ChildChanged = Checksum != _checksumManager.GetChecksum(localItem.Id.ToString());
+					var localChecksum = _checksumManager.GetChecksum(localItem.Id.ToString());
+					ChildChanged = localChecksum != -1 && Checksum != localChecksum;
 					CompareContentTreeNode local = new CompareContentTreeNode(localItem);
 					if (Revision != local.Revision)
 					{

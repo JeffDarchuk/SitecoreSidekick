@@ -10,7 +10,8 @@ namespace ScsSitecoreResourceManager.Data
 {
 	public class PropertiesWrapper
 	{
-
+		public string Name { get; set; }
+		public string Description { get; set; }
 		public Dictionary<string, Dictionary<string,string>> Targets { get; set; }
 		public Dictionary<string, ConfigurationNode> Properties { get; set; }
 		public Dictionary<string, string> CompiledProperties { get; set; }

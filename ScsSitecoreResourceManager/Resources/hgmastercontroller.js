@@ -25,7 +25,7 @@
 		}
 		
 		vm.getProperties = function () {
-			hgFactory.getProperties(vm.selectedTemplate, vm.selectedTargetKey).then(function (result) {
+			hgFactory.getProperties(vm.selectedTemplate.Template, vm.selectedTargetKey).then(function (result) {
 				vm.properties = result.data;
 				vm.propertyMap = new Object();
 				for (var i = 0; i < vm.properties.length; i++) {
@@ -53,8 +53,8 @@
 			});
 		}
 		vm.removeTemplate = function () {
-			if (confirm("You sure you want to delete " + vm.selectedTemplate + "?")) {
-				hgFactory.removeTemplate(vm.selectedTemplate).then(function (result) {
+			if (confirm("You sure you want to delete " + vm.selectedTemplate.Name + "?")) {
+				hgFactory.removeTemplate(vm.selectedTemplate.Template).then(function (result) {
 					vm.getTemplates();
 				});
 			}
@@ -81,13 +81,13 @@
 			for (var o in vm.selectedTarget) {
 				vm.properties.push({ "Id": o, "Value": vm.selectedTarget[o] });
 			}
-			hgFactory.execute(vm.properties, vm.selectedTemplate, vm.selectedTargetKey).then(function(result) {
+			hgFactory.execute(vm.properties, vm.selectedTemplate.Template, vm.selectedTargetKey).then(function(result) {
 				vm.executing = false;
 				vm.finalize = result.data;
 			});
 		}
 		vm.getTargets = function () {
-			hgFactory.getTargets(vm.selectedTemplate).then(function (result) {
+			hgFactory.getTargets(vm.selectedTemplate.Template).then(function (result) {
 				vm.targets = result.data;
 				if (vm.targets.length === 1) {
 					vm.selectedTarget = vm.targets[0];
@@ -109,7 +109,7 @@
 		}
 		vm.downloadTemplate = function () {
 			var downloadFrame = document.getElementById("downloadframe");
-			downloadFrame.src = "/scs/hg/hgdownloadtemplate.scsvc?template=" + vm.selectedTemplate;
+			downloadFrame.src = "/scs/hg/hgdownloadtemplate.scsvc?template=" + vm.selectedTemplate.Template;
 		}
 		vm.uploadTemplate = function () {
 			var data = document.getElementById("templateUpload");
@@ -158,7 +158,7 @@
 			vm.executing = false;
 			vm.setup = true;
 			vm.editTarget = false;
-			vm.selectedTemplate = "";
+			vm.selectedTemplate = new Object();
 			vm.selectedTarget = "";
 			vm.selectedTargetKey = "";
 			vm.projects = new Array();

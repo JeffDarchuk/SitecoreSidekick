@@ -12,6 +12,7 @@ namespace ScsContentMigrator.Data
 	public class Checksum
 	{
 		internal readonly Dictionary<string, SortedSet<string>> _checksumTracker = new Dictionary<string, SortedSet<string>>();
+		internal readonly Dictionary<string, string> _revTracker = new Dictionary<string, string>();
 		internal readonly Dictionary<string, List<string>> _childTracker = new Dictionary<string, List<string>>();
 		internal readonly Dictionary<string,string> _parentTracker = new Dictionary<string, string>();
 		internal readonly HashSet<string> _leafTracker = new HashSet<string>();
@@ -19,6 +20,7 @@ namespace ScsContentMigrator.Data
 		//t.ID, t.Name, t.TemplateID, t.MasterID, t.ParentID, v.Value
 		public void LoadRow(string id, string parentId, string value)
 		{
+			if (_parentTracker.ContainsKey(id)) return;
 			_parentTracker[id] = parentId;
 			if (!_childTracker.ContainsKey(parentId))
 			{
@@ -29,7 +31,7 @@ namespace ScsContentMigrator.Data
 			{
 				_checksumTracker[id] = new SortedSet<string>();
 			}
-			_checksumTracker[id].Add(value);
+			_revTracker[id] = value;
 			if (!_childTracker.ContainsKey(id))
 				_leafTracker.Add(id);
 			_leafTracker.Remove(parentId);
@@ -47,25 +49,52 @@ namespace ScsContentMigrator.Data
 		public void Generate()
 		{
 			Queue<string> processing = new Queue<string>(_leafTracker);
-			HashSet<string> tracker = new HashSet<string>();
 			while (processing.Any())
 			{
 				string id = processing.Dequeue();
-				_checksum[id] = string.Join("", _checksumTracker[id]).GetHashCode();
-				if (_checksumTracker.ContainsKey(_parentTracker[id]))
+				if (_checksumTracker[id].Count == 0)
 				{
-					_checksumTracker[_parentTracker[id]].Add(_checksum[id].ToString());
+					if (_checksumTracker.ContainsKey(_parentTracker[id]))
+					{
+						_checksumTracker[_parentTracker[id]].Add(GetHashCode32(_revTracker[id]+id).ToString());
+					}
 				}
-				if (!tracker.Contains(_parentTracker[id]) && _checksumTracker.ContainsKey(_parentTracker[id]))
+				else
+				{
+					_checksum[id] = GetHashCode32(string.Join("", _checksumTracker[id]));
+					if (_checksumTracker.ContainsKey(_parentTracker[id]))
+					{
+						_checksumTracker[_parentTracker[id]].Add(_checksum[id].ToString());
+					}
+				}
+				if (_checksumTracker.ContainsKey(_parentTracker[id]) && _checksumTracker[_parentTracker[id]].Count >= _childTracker[_parentTracker[id]].Count)
 				{
 					processing.Enqueue(_parentTracker[id]);
-					tracker.Add(_parentTracker[id]);
 				}
 			}
 			_checksumTracker.Clear();
 			_childTracker.Clear();
 			_parentTracker.Clear();
 			_leafTracker.Clear();
+		}
+		public int GetHashCode32(string s)
+		{
+			var chars = s.ToCharArray();
+			var lastCharInd = chars.Length - 1;
+			var num1 = 0x15051505;
+			var num2 = num1;
+			var ind = 0;
+			while (ind <= lastCharInd)
+			{
+				var ch = chars[ind];
+				var nextCh = ++ind > lastCharInd ? '\0' : chars[ind];
+				num1 = (((num1 << 5) + num1) + (num1 >> 0x1b)) ^ (nextCh << 16 | ch);
+				if (++ind > lastCharInd) break;
+				ch = chars[ind];
+				nextCh = ++ind > lastCharInd ? '\0' : chars[ind++];
+				num2 = (((num2 << 5) + num2) + (num2 >> 0x1b)) ^ (nextCh << 16 | ch);
+			}
+			return num1 + num2 * 0x5d588b65;
 		}
 	}
 }

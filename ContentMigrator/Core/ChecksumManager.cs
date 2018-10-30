@@ -53,6 +53,7 @@ namespace ScsContentMigrator.Core
 						_timeSinceLastChecksumRefresh = 0;
 						_checksum = new ChecksumGenerator().Generate(ContentMigrationRegistration.Root.Nodes.Select(x => new ID(x.Id)).ToList(), "master");
 						_checksumRefreshing = false;
+						_checksumRefreshQueued = false;
 					}
 					_timeSinceLastChecksumRefresh += 500;
 				}

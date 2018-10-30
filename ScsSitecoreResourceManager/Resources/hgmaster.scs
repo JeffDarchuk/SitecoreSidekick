@@ -4,9 +4,9 @@
 	</div>
 	<div ng-if="vm.setup">
 		<h4>Select a template to utilize.</h4>
-		<div ng-class="{hgselected: template == vm.selectedTemplate}" class="hghorizontallist" ng-click="vm.selectedTemplate = template" ng-repeat="template in vm.templates">
+		<div ng-class="{hgselected: template === vm.selectedTemplate}" class="hghorizontallist" ng-click="vm.selectedTemplate = template" ng-repeat="template in vm.templates">
 			<h4>
-				{{template}}
+				{{template.Name}}
 			</h4>
 		</div>
 		<div class="hgtemplateframe">
@@ -19,6 +19,7 @@
 			<iframe style="visibility:hidden" width="0" height="0" id="downloadframe" />
 		</div>
 		<div ng-if="vm.selectedTemplate">
+			<h4>{{vm.selectedTemplate.Description}}</h4>
 			<a ng-click ="vm.setup = false;vm.configure=true;vm.getTargets()" class="btn">Begin</a>
 		</div>
 	</div>
@@ -32,7 +33,9 @@
 		<div ng-if="!vm.editTarget">
 			<div ng-if="!key.endsWith('-o')" ng-repeat="(key,value) in vm.selectedTarget"  ng-init="vm.targetProps[key] = false">
 				<div ng-if="value=='???' || vm.targetProps[key]">
-					Define {{key}} <input width="100px" ng-init="vm.targetProps[key] = true" ng-model="vm.selectedTarget[key]" />
+					<strong ng-if="key === '_SOLUTIONPATH_'">Define the full path to the targets .sln file (i.e. d:\\code\mysolution.sln)</strong>
+					<strong ng-if="key !== '_SOLUTIONPATH_'">Define {{key}}</strong>
+					<input width="100px" ng-init="vm.targetProps[key] = true" ng-model="vm.selectedTarget[key]" />
 					<a class="btn" ng-click="vm.targetProps[key]=false;vm.submitTargetProp(key, vm.selectedTarget[key])">Submit</a>
 				</div>
 			</div>

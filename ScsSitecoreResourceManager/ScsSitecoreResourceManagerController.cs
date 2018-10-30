@@ -40,7 +40,16 @@ namespace ScsSitecoreResourceManager
 		[ActionName("hggettemplates.scsvc")]
 		public ActionResult GetTemplates()
 		{
-			return ScsJson(Directory.EnumerateFiles(_registration.GetScsRegistration<ScsSitecoreResourceManagerRegistration>().GetDataDirectory() + "\\Templates").Select(x => Path.GetFileName(x)));
+			return ScsJson(Directory.EnumerateFiles(
+				_registration.GetScsRegistration<ScsSitecoreResourceManagerRegistration>().GetDataDirectory() + "\\Templates")
+				.Select(Path.GetFileName)
+				.Select(x =>
+				{
+					var wrapper = _registration.GetScsRegistration<ScsSitecoreResourceManagerRegistration>().GetPropertiesWrapper(x);
+					return new {wrapper.Name, wrapper.Description, Template = x};
+
+				})
+			);
 		}
 		[ActionName("hgdownloadtemplate.scsvc")]
 		public ActionResult DownloadTemplate()

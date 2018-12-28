@@ -105,6 +105,12 @@ namespace ScsAuditLog
 		{
 			return ScsJson(RebuildLogStatus());
 		}
+		[ScsLoggedIn]
+		[ActionName("algetdatabases.scsvc")]
+		public ActionResult GetDatabases()
+		{
+			return ScsJson(_sitecoreDataAccessSerivce.GetAllDatabases().Where(x => x.Name != "core" && x.Name != "filesystem").ToDictionary(x => x.Name, x => x.Name == "master"));
+		}
 
 		private object RebuildLogStatus()
 		{
@@ -127,10 +133,10 @@ namespace ScsAuditLog
 			DateTime start = DateTime.Parse(data.Start);
 			DateTime end = DateTime.Parse(data.End);
 			StringBuilder sb = new StringBuilder();
-			sb.Append(BuildArrayQuery(data.Filters, data.Field));
+			sb.Append(BuildArrayQuery(data.Filters, data.Field, data.Databases));
 			if (sb.Length > 0)
 				sb.Append(" AND ");
-			sb.Append(BuildArrayQuery(data.EventTypes, "event"));
+			sb.Append(BuildArrayQuery(data.EventTypes, "event", data.Databases));
 			if (sb.Length > 0)
 				sb.Append(" AND ");
 			sb.Append($"date:[{start:yyyyMMdd} TO {end:yyyyMMdd}]");
@@ -143,21 +149,39 @@ namespace ScsAuditLog
 			return ret;
 		}
 
-		private string BuildArrayQuery(IEnumerable<object> terms, string key)
+		private string BuildArrayQuery(IEnumerable<object> terms, string key, Dictionary<string,bool> databases)
 		{
+			if (key == "descendants")
+			{
+				var tmp = new List<object>();
+				foreach (var id in terms)
+				{
+					tmp.Add(_sitecoreDataAccessSerivce.GetItemData(id.ToString()).Path.Trim('/'));
+				}
+				terms = tmp;
+				key = "path";
+			}
 			StringBuilder sb = new StringBuilder("(");
 			foreach (string term in terms)
 			{
 				if (term != "*")
-					sb.Append($"{key}:{ReplaceReservedChars(term)} OR ");
+					sb.Append($"{key}:{(key=="path" ? '"'+ReplaceReservedChars(term)+'"' : ReplaceReservedChars(term))} OR ");
 			}
 			if (sb.Length > 1)
 			{
 				sb.Remove(sb.Length - 4, 4);
 				sb.Append(")");
 			}
-			else
-				return "";
+
+			if (!databases.Any(x => x.Value)) return sb.ToString();
+			if (sb.Length > 1)
+			{
+				sb.Append(" AND (");
+			}
+			sb.Append("database:");
+			sb.Append(string.Join(" OR database:", databases.Where(x => x.Value).Select(x => x.Key)));
+			sb.Append(")");
+
 			return sb.ToString();
 		}
 		private IEnumerable<IAuditEntry> getResults(TopDocs ids, int page, IndexSearcher searcher)
@@ -191,7 +215,7 @@ namespace ScsAuditLog
 			DateTime start = DateTime.Parse(data.Start);
 			DateTime end = DateTime.Parse(data.End);
 			TimeSpan range = end.Subtract(start);
-			var filter = BuildArrayQuery(data.Filters, data.Field);
+			var filter = BuildArrayQuery(data.Filters, data.Field, data.Databases);
 			List<string> dates = new List<string>();
 			for (int i = 0; i <= range.Days; i++)
 				dates.Add(start.AddDays(i).ToString("yyyyMMdd"));
@@ -221,6 +245,7 @@ namespace ScsAuditLog
 		private string ReplaceReservedChars(string rawInput)
 		{
 			return _luceneSpecialChars.Aggregate(rawInput, (current, c) => current.Replace(c, "*"));
+
 		}
 
 	}

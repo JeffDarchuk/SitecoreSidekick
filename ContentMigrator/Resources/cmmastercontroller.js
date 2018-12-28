@@ -20,6 +20,8 @@
 		vm.spinner = false;
 		vm.isPreview = false;
 		vm.displayLog = false;
+		vm.useItemBlaster = true;
+		vm.ignoreRevId = false;
 		vm.events = {
 			'selectedIds': [],
 			'selected': [],
@@ -82,7 +84,7 @@
 			if (preview || confirm("Are you sure you would like to pull content from the items " + vm.listSources())) {
 				vm.spinner = true;
 				if (!vm.serverModified && vm.events.selected && vm.events.selectedIds.length > 0)
-					CMfactory.contentTreePullItem(vm.events.selectedIds, vm.events.selected[0].DatabaseName, vm.events.server, vm.children, vm.overwrite, vm.pullParent, vm.mirror, preview, vm.eventDisabler, vm.bulkUpdate).then(function (response) {
+					CMfactory.contentTreePullItem(vm.events.selectedIds, vm.events.selected[0].DatabaseName, vm.events.server, vm.children, vm.overwrite, vm.pullParent, vm.mirror, preview, vm.eventDisabler, vm.bulkUpdate, vm.useItemBlaster, vm.ignoreRevId).then(function (response) {
 						vm.streamResults(response.data, vm.events.server, vm.listIds(), vm.listSources(), preview);
 					}, function (response) {
 						vm.error = response.data;

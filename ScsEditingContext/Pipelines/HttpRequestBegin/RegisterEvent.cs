@@ -57,8 +57,8 @@ namespace ScsEditingContext.Pipelines.HttpRequestBegin
 						if (myCookie?.Value != null)
 						{
 							var list = GetValue(myCookie, current.Id);
-							list.Add($"{current.Id}|{current.DatabaseName}|{current.DisplayName}|{current.Icon}");
-							if (list.Count > 20)
+							list.Add($"{current.Id}|{current.DatabaseName}");
+							if (list.Count > 10)
 								list.RemoveAt(0);
 							SetValue(myCookie, string.Join(",", list));
 							args.Context.Response.Cookies.Add(myCookie);
@@ -66,7 +66,7 @@ namespace ScsEditingContext.Pipelines.HttpRequestBegin
 						else
 						{
 							myCookie = new HttpCookie("scseditorcontext" + Regex.Replace(Context.GetUserName(), "[^a-zA-Z0-9 -]", string.Empty));
-							SetValue(myCookie, $"{current.Id}|{current.DatabaseName}|{current.DisplayName}|{current.Icon}");
+							SetValue(myCookie, $"{current.Id}|{current.DatabaseName}");
 							myCookie.Expires = DateTime.Now.AddDays(1d);
 							args.Context.Response.Cookies.Add(myCookie);
 						}

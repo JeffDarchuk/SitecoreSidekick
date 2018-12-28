@@ -19,22 +19,6 @@
 			vm.error = response.data;
 		});
 
-		vm.refreshHistory = function () {
-			ECFactory.getItemHistory().then(function (response) {
-				var items = response.data.items;
-				if (items)
-					items.reverse();
-				vm.itemHistory = items;
-			}, function (response) {
-				vm.error = response.data;
-			});
-		}
-		var running = $interval(function () {
-			vm.refreshHistory();
-			if (scsActiveModule !== "Editing Context")
-				$interval.cancel(running);
-		}, 2000);
-		vm.refreshHistory();
 		vm.refreshRelated = function () {
 			ECFactory.getRelatedItems().then(function (response) {
 				var items = response.data;

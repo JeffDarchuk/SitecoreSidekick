@@ -22,6 +22,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ScsContentMigrator.CMRainbow.Interface;
+using ScsContentMigrator.DataBlaster;
+using ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Load;
+using Sitecore.Data.Engines;
+using Sitecore.Data.Proxies;
 using SitecoreSidekick.Services.Interface;
 
 namespace ScsContentMigrator.Core
@@ -33,6 +37,8 @@ namespace ScsContentMigrator.Core
 		private readonly IItemComparer _comparer;
 		private readonly ISitecoreDataAccessService _sitecore;
 		private readonly IJsonSerializationService _jsonSerializationService;
+		private readonly IChecksumManager _checksumManager;
+		private readonly BlockingCollection<IItemData> _itemsToCreate = new BlockingCollection<IItemData>();
 		internal ConcurrentHashSet<Guid> AllowedItems = new ConcurrentHashSet<Guid>();
 		internal ConcurrentHashSet<Guid> Errors = new ConcurrentHashSet<Guid>();
 		internal ConcurrentHashSet<Guid> CurrentlyProcessing = new ConcurrentHashSet<Guid>();
@@ -48,6 +54,7 @@ namespace ScsContentMigrator.Core
 			_sitecore = Bootstrap.Container.Resolve<ISitecoreDataAccessService>();
 			_jsonSerializationService = Bootstrap.Container.Resolve<IJsonSerializationService>();
 			_comparer = Bootstrap.Container.Resolve<IItemComparer>();
+			_checksumManager = Bootstrap.Container.Resolve<IChecksumManager>();
 		}
 
 		public IEnumerable<dynamic> GetItemLogEntries(int lineToStartFrom)
@@ -70,10 +77,13 @@ namespace ScsContentMigrator.Core
 				{
 					var data = _sitecore.GetItemData(id);
 					_logger.BeginEvent(data, LogStatus.Recycle, _sitecore.GetIconSrc(data), false);
-					string status = $"{DateTime.Now:h:mm:ss tt} [RECYCLED] Recycled old item {data.Name} - {data.Id}";
+					string status = $"{DateTime.Now:h:mm:ss tt} [RECYCLED] Recycled old item {data?.Name} - {id}";
 					_logger.LoggerOutput.Add(status);
-					_sitecore.RecycleItem(id);
-					
+					if (data != null)
+					{
+						_sitecore.RecycleItem(id);
+					}
+
 				}
 				catch (Exception e)
 				{
@@ -97,17 +107,73 @@ namespace ScsContentMigrator.Core
 			Status.StartedTime = DateTime.Now;
 			Status.RootNodes = args.Ids.Select(x => new ContentTreeNode(x));
 			Status.IsPreview = args.Preview;
-			Status.Server = args.Server;			
-			for (int i = 0; i < threads; i++)
+			Status.Server = args.Server;
+			Task.Run(() =>
 			{
-				Task.Run(async () =>
+				try
 				{
-					await ItemInstaller(args, itemsToInstall, cancellationToken).ConfigureAwait(false);
-				});
+					List<Task> running = new List<Task>();
+					for (int i = 0; i < threads; i++)
+					{
+						running.Add(Task.Run(() => { ItemInstaller(args, itemsToInstall, cancellationToken); }, cancellationToken));
+					}
+
+					Task.Run(() => { ItemCreator(args, cancellationToken); }, cancellationToken);
+					foreach (var t in running)
+					{
+						t.Wait(cancellationToken);
+					}
+
+					_itemsToCreate.CompleteAdding();
+				}
+				catch (OperationCanceledException)
+				{
+					Status.Cancelled = true;
+				}
+				finally
+				{
+					Finalize(ItemsInstalled, args);
+				}
+			}, cancellationToken);
+		}
+		private IEnumerable<BulkLoadItem> GetAllItemsToCreate(BulkLoadContext context, CancellationToken cancellationToken)
+		{
+			ItemMapper mapper = new ItemMapper();
+			while (!Completed)
+			{
+				if (_itemsToCreate.TryTake(out var remoteData, int.MaxValue, cancellationToken))
+				{
+					yield return mapper.ToBulkLoadItem(remoteData, context, BulkLoadAction.Update);
+				}
+				else
+				{
+					break;
+				}
+			}
+		}
+		private void ItemCreator(PullItemModel args, CancellationToken cancellationToken)
+		{
+			var bulkLoader = new BulkLoader();
+			try
+			{
+
+				var context = bulkLoader.NewBulkLoadContext("master");
+				bulkLoader.LoadItems(context, GetAllItemsToCreate(context, cancellationToken));
+				_checksumManager.RegenerateChecksum();
+			}
+			catch (OperationCanceledException e)
+			{
+				Log.Warn("Content migration operation was cancelled", e, this);
+				Status.Cancelled = true;
+			}
+			catch (Exception e)
+			{
+				Log.Error("Catastrophic error when creating items", e, this);
 			}
 		}
 
-		private async Task ItemInstaller(PullItemModel args, BlockingCollection<IItemData> itemsToInstall, CancellationToken cancellationToken)
+
+		private void ItemInstaller(PullItemModel args, BlockingCollection<IItemData> itemsToInstall, CancellationToken cancellationToken)
 		{
 			Thread.CurrentThread.Priority = ThreadPriority.Lowest;
 			BulkUpdateContext bu = null;
@@ -123,36 +189,29 @@ namespace ScsContentMigrator.Core
 					ed = new EventDisabler();
 				}
 				using (new SecurityDisabler())
+				using (new SyncOperationContext())
 				{
 					while (!Completed)
 					{
-						IItemData remoteData;
-						if (!itemsToInstall.TryTake(out remoteData, int.MaxValue, cancellationToken))
+						if (!itemsToInstall.TryTake(out var remoteData, int.MaxValue, cancellationToken))
 						{
-							lock (_locker)
-							{
-								if (!Completed && !CurrentlyProcessing.Any())
-								{
-									Finalize(ItemsInstalled, args);
-								}
-							}
 							break;
 						}
-						CurrentlyProcessing.Add(remoteData.Id);						
+						if (!args.UseItemBlaster)
+						{
+							CurrentlyProcessing.Add(remoteData.Id);
+						}
+
 						IItemData localData = _sitecore.GetItemData(remoteData.Id);
-						await ProcessItem(args, localData, remoteData).ConfigureAwait(false);
+
+						ProcessItem(args, localData, remoteData);
+
 						lock (_locker)
 						{
 							ItemsInstalled++;
-							CurrentlyProcessing.Remove(remoteData.Id);
-							if (CurrentlyProcessing.Any() || !itemsToInstall.IsAddingCompleted || itemsToInstall.Count != 0)
+							if (!args.UseItemBlaster)
 							{
-								continue;
-							}
-
-							if (!Completed)
-							{
-								Finalize(ItemsInstalled, args);
+								CurrentlyProcessing.Remove(remoteData.Id);
 							}
 						}
 					}
@@ -186,9 +245,11 @@ namespace ScsContentMigrator.Core
 				}
 			}
 		}
-		
+
 		private void Finalize(int items, PullItemModel args)
 		{
+			if (args.RemoveLocalNotInRemote)
+				CleanUnwantedLocalItems();
 			Completed = true;
 			Status.FinishedTime = DateTime.Now;
 			Status.Completed = true;
@@ -200,11 +261,9 @@ namespace ScsContentMigrator.Core
 				Status.Cancelled
 			});
 			_logger.LoggerOutput.Add(_jsonSerializationService.SerializeObject(_logger.Lines.Last()));
-			if (args.RemoveLocalNotInRemote)
-				CleanUnwantedLocalItems();
 		}
 
-		internal async Task ProcessItem(PullItemModel args, IItemData localData, IItemData remoteData)
+		internal void ProcessItem(PullItemModel args, IItemData localData, IItemData remoteData)
 		{
 			AllowedItems.Remove(remoteData.Id);
 			if (args.Preview)
@@ -247,7 +306,7 @@ namespace ScsContentMigrator.Core
 						skip = true;
 					}
 				}
-				else if (!skip)
+				else if (!skip && !args.UseItemBlaster)
 				{
 					while (CurrentlyProcessing.Contains(remoteData.ParentId))
 					{
@@ -257,19 +316,35 @@ namespace ScsContentMigrator.Core
 							skip = true;
 							break;
 						}
-						
-						await Task.Delay(WaitForParentDelay).ConfigureAwait(false);
+
+						Task.Delay(WaitForParentDelay).Wait();
 					}
 				}
 				if (!skip)
 				{
 					try
 					{
-						if (localData != null)
-						{							
+						if (localData != null || !args.UseItemBlaster)
+						{
 							_logger.BeginEvent(remoteData, LogStatus.Changed, GetSrc(_sitecore.GetIconSrc(localData)), true);
+							_scDatastore.Save(remoteData);
 						}
-						_scDatastore.Save(remoteData);
+						else if (args.UseItemBlaster)
+						{
+							string icon = remoteData.SharedFields.FirstOrDefault(x => x.NameHint == "__Icon")?.Value;
+							if (string.IsNullOrWhiteSpace(icon))
+							{
+								icon = _sitecore.GetIcon(remoteData.TemplateId);
+							}
+							_logger.BeginEvent(remoteData, LogStatus.Created, $"/scs/platform/scsicon.scsvc?icon={icon}", false);
+							_logger.AddToLog($"{DateTime.Now:h:mm:ss tt} [Created] Staging creation of item using Data Blaster {remoteData.Name} - {remoteData.Id}");
+							_itemsToCreate.Add(remoteData);
+						}
+						else
+						{
+							_scDatastore.Save(remoteData);
+						}
+
 					}
 					catch (TemplateMissingFieldException tm)
 					{

@@ -59,8 +59,20 @@
     <Reference Include="Rainbow.Storage.Yaml, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Rainbow.Storage.Yaml.2.0.0\lib\net452\Rainbow.Storage.Yaml.dll</HintPath>
     </Reference>
+    <Reference Include="Sitecore.Buckets, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Sitecore.Buckets.NoReferences.8.2.170407\lib\NET452\Sitecore.Buckets.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Sitecore.ContentSearch, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Sitecore.ContentSearch.NoReferences.8.2.170407\lib\NET452\Sitecore.ContentSearch.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Sitecore.Kernel, Version=10.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sitecore.Kernel.NoReferences.8.2.170407\lib\NET452\Sitecore.Kernel.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Sitecore.Logging, Version=10.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Sitecore.Logging.NoReferences.8.2.170407\lib\NET452\Sitecore.Logging.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -113,6 +125,51 @@
     <Compile Include="ContentMigrationRegistration.cs" />
     <Compile Include="Core\ChecksumManager.cs" />
     <Compile Include="Core\Interface\IChecksumManager.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\BulkField.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\BulkItem.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\ItemReference.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\BulkLoadAction.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\BulkLoadContext.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\BulkLoader.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\BulkLoadItem.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\FieldRule.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\ItemChange.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\Links\BulkItemLink.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\Links\BulkItemLinkParser.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\Paths\AncestorGenerator.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\Processors\ChangeCacheClearer.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\Processors\ChangeIndexer.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\Processors\ChangeLogger.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\Processors\IChangeProcessor.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\Processors\IItemProcessor.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\Processors\ISyncInTransaction.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\Processors\ItemBucketer.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\Processors\ItemLinker.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\Processors\ItemValidator.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\Processors\ItemVersionEnsurer.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\Processors\IValidateStagedData.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\Processors\SyncHistoryTable.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\Processors\SyncPublishQueue.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\Processors\ValidateDataIntegrity.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\Processors\ValidateNoDuplicates.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\Sql\BulkLoadSqlContext.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\Stage.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\StageResult.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Read\BulkReader.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Read\ItemHeader.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Read\ItemVersionHeader.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\SharedBulkField.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\UnversionedBulkField.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Util\CacheUtil.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Util\Chain.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Util\GuidUtility.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Util\LogExtensions.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Util\Sql\AbstractEnumeratorReader.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Util\Sql\SqlContext.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Util\Sql\SqlContextExtensions.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Util\Sql\SqlLine.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\VersionedBulkField.cs" />
+    <Compile Include="DataBlaster\ItemMapper.cs" />
     <Compile Include="Data\Checksum.cs" />
     <Compile Include="Data\ChecksumGenerator.cs" />
     <Compile Include="Models\ChildrenItemDataModel.cs" />
@@ -191,6 +248,23 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\cmphoto_scenery.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="DataBlaster\Sitecore.DataBlaster\Load\Sql\01.CreateTempTable.sql" />
+    <EmbeddedResource Include="DataBlaster\Sitecore.DataBlaster\Load\Sql\02.LookupBlobs.sql" />
+    <EmbeddedResource Include="DataBlaster\Sitecore.DataBlaster\Load\Sql\03.LookupItems.sql" />
+    <EmbeddedResource Include="DataBlaster\Sitecore.DataBlaster\Load\Sql\04.SplitTempTable.sql" />
+    <EmbeddedResource Include="DataBlaster\Sitecore.DataBlaster\Load\Sql\05.CheckDuplicates.sql" />
+    <EmbeddedResource Include="DataBlaster\Sitecore.DataBlaster\Load\Sql\06.CreateIndexes.sql" />
+    <EmbeddedResource Include="DataBlaster\Sitecore.DataBlaster\Load\Sql\07.CheckTempData.sql" />
+    <EmbeddedResource Include="DataBlaster\Sitecore.DataBlaster\Load\Sql\08.MergeTempData.sql" />
+    <EmbeddedResource Include="DataBlaster\Sitecore.DataBlaster\Load\Sql\09.UpdateHistory.sql" />
+    <EmbeddedResource Include="DataBlaster\Sitecore.DataBlaster\Load\Sql\10.UpdatePublishQueue.sql" />
+    <EmbeddedResource Include="DataBlaster\Sitecore.DataBlaster\Load\Sql\20.CreateLinkTempTable.sql" />
+    <EmbeddedResource Include="DataBlaster\Sitecore.DataBlaster\Load\Sql\21.MergeLinkTempData.sql" />
+    <EmbeddedResource Include="DataBlaster\Sitecore.DataBlaster\Read\Sql\GetDescendantHeaders.sql" />
+    <EmbeddedResource Include="DataBlaster\Sitecore.DataBlaster\Read\Sql\GetDescendants.sql" />
+    <EmbeddedResource Include="DataBlaster\Sitecore.DataBlaster\Read\Sql\GetDescendantVersionHeaders.sql" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

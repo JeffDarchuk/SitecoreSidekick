@@ -94,7 +94,7 @@ namespace ScsContentMigrator.UnitTests.Core
 
 			contentMigration.StartContentMigration(new PullItemModel { PullParent = false, Ids = new List<string> { Guid.NewGuid().ToString() } });
 
-			GetSubstitute<IContentItemPuller>().Received(1).StartGatheringItems(Arg.Any<IEnumerable<Guid>>(), Arg.Any<int>(), Arg.Any<bool>(), Arg.Any<string>(), Arg.Any<CancellationToken>());
+			GetSubstitute<IContentItemPuller>().Received(1).StartGatheringItems(Arg.Any<IEnumerable<Guid>>(), Arg.Any<int>(), Arg.Any<bool>(), Arg.Any<string>(), Arg.Any<CancellationToken>(), Arg.Any<bool>());
 		}
 
 		[Fact]

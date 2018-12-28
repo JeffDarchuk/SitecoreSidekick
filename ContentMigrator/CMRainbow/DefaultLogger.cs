@@ -23,11 +23,17 @@ namespace ScsContentMigrator.CMRainbow
 		private readonly object _listLocker = new object();
 		public void BeginEvent(Item data, string status, string icon, bool keepOpen)
 		{
-			BeginEvent(data.Name, data.ID.ToString(), data.Paths.FullPath, status, icon, data.Database.Name, keepOpen);
+			if (data != null)
+			{
+				BeginEvent(data.Name, data.ID.ToString(), data.Paths.FullPath, status, icon, data.Database.Name, keepOpen);
+			}
 		}
 		public void BeginEvent(IItemData data, string status, string icon, bool keepOpen)
 		{
-			BeginEvent(data.Name, data.Id.ToString(), data.Path, status, icon, data.DatabaseName, keepOpen);
+			if (data != null)
+			{
+				BeginEvent(data.Name, data.Id.ToString(), data.Path, status, icon, data.DatabaseName, keepOpen);
+			}
 		}
 
 		public void BeginEvent(string name, string id, string path, string status, string icon, string database, bool keepOpen)
@@ -53,7 +59,18 @@ namespace ScsContentMigrator.CMRainbow
 
 		public void CompleteEvent(string id)
 		{
-			Lines.Add(LinesSupport[id]);
+			lock (Lines)
+			{
+				Lines.Add(LinesSupport[id]);
+			}
+		}
+
+		public void AddToLog(string message)
+		{
+			lock (LoggerOutput)
+			{
+				LoggerOutput.Add(message);
+			}
 		}
 		public string GetSrc(string imgTag)
 		{
@@ -67,7 +84,7 @@ namespace ScsContentMigrator.CMRainbow
 		{
 			BeginEvent(targetItem, "Created", GetSrc(ThemeManager.GetIconImage(targetItem, 32, 32, "", "")), false);
 			string status = $"{DateTime.Now:h:mm:ss tt} [CREATED] Created new item {targetItem.DisplayName} - {targetItem.ID}";
-			LoggerOutput.Add(status);
+			AddToLog(status);
 			Log.Info(status, this);
 		}
 
@@ -75,7 +92,7 @@ namespace ScsContentMigrator.CMRainbow
 		{
 			BeginEvent(movedItem, "Moved", GetSrc(ThemeManager.GetIconImage(movedItem, 32, 32, "", "")), false);
 			string status = $"{DateTime.Now:h:mm:ss tt} [MOVED] Moved Item {movedItem.ID} from {oldParentItem.ID} to {newParentItem.ID}";
-			LoggerOutput.Add(status);
+			AddToLog(status);
 			Log.Info(status, this);
 		}
 
@@ -83,7 +100,7 @@ namespace ScsContentMigrator.CMRainbow
 		{
 			BeginEvent(versionToRemove.DisplayName + " v"+versionToRemove.Version.Number, versionToRemove.ID.ToString(), versionToRemove.Paths.FullPath , "Removed Version", GetSrc(ThemeManager.GetIconImage(versionToRemove, 32, 32, "", "")), versionToRemove.Database.Name, false);
 			string status = $"{DateTime.Now:h:mm:ss tt} [REMOVED VERSION] Removing orphaned item version {versionToRemove.DisplayName} v{versionToRemove.Version.Number} - {versionToRemove.ID}";
-			LoggerOutput.Add(status);
+			AddToLog(status);
 			Log.Info(status, this);
 
 		}
@@ -92,7 +109,7 @@ namespace ScsContentMigrator.CMRainbow
 		{
 			BeginEvent(targetItem, "Renamed", GetSrc(ThemeManager.GetIconImage(targetItem, 32, 32, "", "")), false);
 			string status = $"{DateTime.Now:h:mm:ss tt} [RENAMED] Renaming item {targetItem.DisplayName} - {targetItem.ID} from name {oldName} to {targetItem.Name}";
-			LoggerOutput.Add(status);
+			AddToLog(status);
 			Log.Info(status, this);
 		}
 
@@ -100,7 +117,7 @@ namespace ScsContentMigrator.CMRainbow
 		{
 			BeginEvent(targetItem, "Branch Change", GetSrc(ThemeManager.GetIconImage(targetItem, 32, 32, "", "")), false);
 			string status = $"{DateTime.Now:h:mm:ss tt} [BRANCH MOVED] Branch Template moved for item {targetItem.DisplayName} - {targetItem.ID} from {oldBranchId} to {targetItem.BranchId}";
-			LoggerOutput.Add(status);
+			AddToLog(status);
 			Log.Info(status, this);
 		}
 
@@ -108,7 +125,7 @@ namespace ScsContentMigrator.CMRainbow
 		{
 			BeginEvent(targetItem, "Template Change", GetSrc(ThemeManager.GetIconImage(targetItem, 32, 32, "", "")), false);
 			string status = $"{DateTime.Now:h:mm:ss tt} [TEMPLATE CHANGED] Template changed for item {targetItem.DisplayName} - {targetItem.ID} from {oldTemplate.ID} to {targetItem.TemplateID}";
-			LoggerOutput.Add(status);
+			AddToLog(status);
 			Log.Info(status, this);
 		}
 
@@ -116,7 +133,7 @@ namespace ScsContentMigrator.CMRainbow
 		{
 			BeginEvent(newVersion, "New Version", GetSrc(ThemeManager.GetIconImage(newVersion, 32, 32, "", "")), false);
 			string status = $"{DateTime.Now:h:mm:ss tt} [ADDED VERSION] Added new version for item {newVersion.DisplayName} - {newVersion.ID}";
-			LoggerOutput.Add(status);
+			AddToLog(status);
 			Log.Info(status, this);
 		}
 
@@ -124,14 +141,14 @@ namespace ScsContentMigrator.CMRainbow
 		{
 			BeginEvent(item, "Wrote Blob", GetSrc(ThemeManager.GetIconImage(item, 32, 32, "", "")), false);
 			string status = $"{DateTime.Now:h:mm:ss tt} [WROTE BLOB] Wrote blob stream for item {item.DisplayName} - {item.ID}";
-			LoggerOutput.Add(status);
+			AddToLog(status);
 			Log.Info(status, this);
 		}
 
 		public void UpdatedChangedFieldValue(Item item, IItemFieldValue field, string oldValue)
 		{
 			string status = $"{DateTime.Now:h:mm:ss tt} [FIELD CHANGED] Field {field.NameHint} value changed for item {item.DisplayName} - {item.ID} from {oldValue} to {item[new ID(field.FieldId)]}";
-			LoggerOutput.Add(status);
+			AddToLog(status);
 			Log.Info(status, this);
 			if (!LinesSupport.ContainsKey(item.ID.Guid.ToString()))
 				LinesSupport[item.ID.Guid.ToString()] = new {Events = new Dictionary<string, List<Tuple<string, string>>>()};
@@ -144,7 +161,7 @@ namespace ScsContentMigrator.CMRainbow
 		public void ResetFieldThatDidNotExistInSerialized(Field field)
 		{
 			string status = $"{DateTime.Now:h:mm:ss tt} [FIELD RESET] Reset a field {field.Name} that doesn't exist in item {field.Item.DisplayName} - {field.Item.ID}";
-			LoggerOutput.Add(status);
+			AddToLog(status);
 			Log.Info(status, this);
 			if (!LinesSupport.ContainsKey(field.Item.ID.Guid.ToString()))
 				LinesSupport[field.Item.ID.Guid.ToString()] = new { Events = new Dictionary<string, List<Tuple<string, string>>>() };
@@ -157,7 +174,7 @@ namespace ScsContentMigrator.CMRainbow
 		public void SkippedPastingIgnoredField(Item item, IItemFieldValue field)
 		{
 			string status = $"{DateTime.Now:h:mm:ss tt} [SKIPPED] Skipped an ignored field {field.NameHint} in item {item.DisplayName} - {item.ID} ";
-			LoggerOutput.Add(status);
+			AddToLog(status);
 			Log.Info(status, this);
 		}
 	}

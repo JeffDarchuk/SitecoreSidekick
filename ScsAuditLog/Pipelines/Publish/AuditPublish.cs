@@ -4,6 +4,7 @@ using Sitecore.Publishing.Pipelines.Publish;
 using System;
 using System.Linq;
 using System.Text;
+using Sitecore;
 using Sitecore.Data;
 
 namespace ScsAuditLog.Pipelines.Publish

@@ -115,3 +115,19 @@ del {
 .algear {
 	margin-bottom: -13px;
 }
+.aldatabases {
+	max-width: 460px;
+}
+.aldatabases label {
+	font-size: 14pt;
+	margin-right: 10px;
+}
+.aldatabases input {
+	margin-right: -3px;
+}
+.aldatabases span {
+	white-space: nowrap;
+}
+.aliconcol {
+	text-align: center;
+}

@@ -19,8 +19,8 @@
 			getToday: function() {
 				return $http.get("/scs/al/algettoday.scsvc");
 			},
-			query: function(value, field, types, start, end) {
-				var data = { "filters": value, "field": field, "eventTypes": types, "start": start, "end": end };
+			query: function(value, field, types, start, end, databases) {
+				var data = { "filters": value, "field": field, "eventTypes": types, "start": start, "end": end, "databases": databases };
 				return $http.post("/scs/al/alqueryactivity.scsvc", data);
 			},
 			rebuildIndex: function() {
@@ -36,8 +36,8 @@
 				var data = { "text": text, "start": start, "end": end, "eventTypes": types };
 				return $http.post("/scs/al/alautocomplete.scsvc", data);
 			},
-			getData: function(value, field, types, start, end, page) {
-				var data = { "filters": value, "field": field, "eventTypes": types, "start": start, "end": end, "page": page };
+			getData: function(value, field, types, start, end, page, databases) {
+				var data = { "filters": value, "field": field, "eventTypes": types, "start": start, "end": end, "page": page, "databases": databases};
 				return $http.post("/scs/al/alactivitydata.scsvc", data);
 			},
 			rebuild: function() {
@@ -45,6 +45,9 @@
 			},
 			rebuildStatus: function() {
 				return $http.get("/scs/al/alrebuildstatus.scsvc");
+			},
+			getDatabases: function() {
+				return $http.get("/scs/al/algetdatabases.scsvc");
 			}
 	};
 

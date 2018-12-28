@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -17,15 +18,22 @@ using ScsContentMigrator.Data;
 using ScsContentMigrator.Models;
 using ScsContentMigrator.Services;
 using ScsContentMigrator.Services.Interface;
+using Sitecore;
 using Sitecore.Configuration;
 using Sitecore.Data;
+using Sitecore.Data.Engines;
 using Sitecore.Data.Items;
 using Sitecore.Diagnostics;
+using Sitecore.Install.Files;
+using Sitecore.Install.Framework;
+using Sitecore.Install.Items;
+using Sitecore.Install.Utils;
 using Sitecore.SecurityModel;
 using SitecoreSidekick;
 using SitecoreSidekick.Core;
 using SitecoreSidekick.Services.Interface;
 using SitecoreSidekick.Shared.IoC;
+using Guid = System.Guid;
 
 namespace ScsContentMigrator
 {
@@ -76,29 +84,57 @@ namespace ScsContentMigrator
 			{
 
 				IItemData item = _sitecore.GetItemData(guid);
-				if (_sitecore.GetItemRevision(guid) == data.Rev)
+				var localRev = _sitecore.GetItemAndChildrenRevision(guid);
+				List<Guid> GrandChildren = new List<Guid>();
+				var items = new List<KeyValuePair<Guid, string>>();
+				if (data.Rev == null || !data.Rev.ContainsKey(item.Id) || data.Rev[item.Id] != localRev[item.Id])
 				{
-					return ScsJson(new ChildrenItemDataModel
+					using (var stream = new MemoryStream())
 					{
-						Item = null,
-						Children = item.GetChildren().Select(x => x.Id).ToList()
-					});
-				}
+						_yamlSerializationService.WriteSerializedItem(item, stream);
+						stream.Seek(0, SeekOrigin.Begin);
 
-				using (var stream = new MemoryStream())
-				{
-					_yamlSerializationService.WriteSerializedItem(item, stream);
-					stream.Seek(0, SeekOrigin.Begin);
-
-					using (var reader = new StreamReader(stream))
-					{
-						return ScsJson(new ChildrenItemDataModel
+						using (var reader = new StreamReader(stream))
 						{
-							Item = reader.ReadToEnd(),
-							Children = item.GetChildren().Select(x => x.Id).ToList()
-						});
+							items.Add(new KeyValuePair<Guid, string>(item.Id, reader.ReadToEnd()));
+						}
 					}
 				}
+				else
+				{
+					items.Add(new KeyValuePair<Guid, string>(item.Id, null));
+				}
+				if (item.Path.StartsWith("/sitecore/media library/"))
+				{
+					GrandChildren.AddRange(item.GetChildren().Select(x => x.Id));
+				}
+				else
+				{
+					items.AddRange(item.GetChildren().Select(x =>
+					{
+						GrandChildren.AddRange(x.GetChildren().Select(c => c.Id));
+						if (data.Rev != null && data.Rev.ContainsKey(x.Id) && localRev.ContainsKey(x.Id) && data.Rev[x.Id] == localRev[x.Id])
+						{
+							return new KeyValuePair<Guid, string>(x.Id, null);
+						}
+						using (var stream = new MemoryStream())
+						{
+							_yamlSerializationService.WriteSerializedItem(x, stream);
+							stream.Seek(0, SeekOrigin.Begin);
+
+							using (var reader = new StreamReader(stream))
+							{
+								return new KeyValuePair<Guid, string>(x.Id, reader.ReadToEnd());
+							}
+						}
+
+					}));
+				}
+				return ScsJson(new ChildrenItemDataModel
+				{
+					Items = items,
+					GrandChildren = GrandChildren
+				});
 			}
 		}
 
@@ -137,13 +173,6 @@ namespace ScsContentMigrator
 		public ActionResult ItemYaml(ContentTreeModel data)
 		{
 			return ScsJson(GetItemYaml(data));
-		}
-
-		[MchapOrLoggedIn]
-		[ActionName("cmitemdatachildren.scsvc")]
-		public ActionResult GetItemDataWithChildren(RevisionModel data)
-		{
-			return ScsJson(ItemDataWithChildren(data.Id, data.Rev));
 		}
 
 		[ScsLoggedIn]
@@ -204,23 +233,40 @@ namespace ScsContentMigrator
 				return ScsJson(ret);
 			}
 		}
-
-		private object ItemDataWithChildren(string id, string rev)
+		[ScsLoggedIn]
+		[ActionName("cminstallpackage.scsvc")]
+		public ActionResult InstallPackage()
 		{
-			var ret = new ChildrenItemDataModel();
-			Guid guid = Guid.Parse(id);
-			if (rev != _sitecore.GetItemRevision(guid))
+			StringBuilder ret = new StringBuilder();
+			Stopwatch sw = new Stopwatch();
+			sw.Start();
+			try
 			{
-				ret.Item = _yamlSerializationService.SerializeYaml(_sitecore.GetItemData(guid));
-				ret.Children = _sitecore.GetChildrenIds(guid);
+				using (new SecurityDisabler())
+				using (new SyncOperationContext())
+				{
+					IProcessingContext context = new SimpleProcessingContext();
+					IItemInstallerEvents events =
+						new DefaultItemInstallerEvents(
+							new BehaviourOptions(InstallMode.Overwrite, MergeMode.Undefined));
+					context.AddAspect(events);
+					IFileInstallerEvents events1 = new DefaultFileInstallerEvents(true);
+					context.AddAspect(events1);
+
+					Sitecore.Install.Installer installer = new Sitecore.Install.Installer();
+					installer.InstallPackage(MainUtil.MapPath(@"C:\inetpub\wwwroot\demo1.local\App_Data\packages\bigtst.zip"), context);
+				}
 			}
-			else
+			catch (Exception e)
 			{
-				ret.Item = null;
-				ret.Children = _sitecore.GetChildrenIds(guid);
+				ret.Append(e.ToString());
+			}
+			finally
+			{
+				ret.Append($"\n\n{sw.Elapsed.TotalSeconds}");
 			}
 
-			return ret;
+			return Content(ret.ToString());
 		}
 
 		private object OperationQueueLength(string operationId)

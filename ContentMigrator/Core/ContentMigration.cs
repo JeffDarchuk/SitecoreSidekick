@@ -50,7 +50,7 @@ namespace ScsContentMigrator.Core
 			{
 				_installer.SetupTrackerForUnwantedLocalItems(model.Ids.Select(Guid.Parse));
 			}
-			_puller.StartGatheringItems(model.Ids.Select(Guid.Parse), _registration.GetScsRegistration<ContentMigrationRegistration>()?.RemoteThreads ?? 1, model.Children, model.Server, _cancellation.Token);
+			_puller.StartGatheringItems(model.Ids.Select(Guid.Parse), _registration.GetScsRegistration<ContentMigrationRegistration>()?.RemoteThreads ?? 1, model.Children, model.Server, _cancellation.Token, model.IgnoreRevId);
 			_installer.StartInstallingItems(model, _puller.ItemsToInstall, _registration.GetScsRegistration<ContentMigrationRegistration>()?.WriterThreads ?? 1, _cancellation.Token);
 		}
 

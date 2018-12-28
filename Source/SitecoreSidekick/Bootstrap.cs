@@ -43,6 +43,7 @@ namespace SitecoreSidekick
 			container.Register<IMainfestResourceStreamService, MainfestResourceStreamService>();
 			container.RegisterFactory<IHttpClientService>(args => args.Any() ? new HttpClientService(args[0].ToString()) : new HttpClientService());
 			container.Register<ISitecoreDataAccessService, SitecoreDataAccessService>();
+			container.Register<IIconService, IconService>();
 
 			return container;
 		}

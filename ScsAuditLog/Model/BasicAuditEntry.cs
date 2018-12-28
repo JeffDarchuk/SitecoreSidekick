@@ -20,6 +20,7 @@ namespace ScsAuditLog.Model
 		public string Note { get; set; }
 		public string Label { get; set; }
 		public string Color { get; set; }
+		public string Icon { get; set; }
 
 		public BasicAuditEntry(Document doc, int luceneId)
 		{
@@ -36,6 +37,7 @@ namespace ScsAuditLog.Model
 			Color = doc.Get("color");
 			Database = doc.Get("database");
 			Uid = luceneId.ToString();
+			Icon = doc.Get("icon");
 		}
 	}
 }

@@ -13,9 +13,6 @@
 			getLocations: function () {
 				return $http.get("/scs/ec/getcommonlocations.json");
 			},
-			getItemHistory: function () {
-				return $http.get("/scs/ec/getitemhistory.json");
-			},
 			getRelatedItems: function () {
 				return $http.get("/scs/ec/getrelated.json");
 			},

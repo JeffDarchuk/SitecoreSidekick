@@ -27,11 +27,13 @@ namespace ScsEditingContext
 	public class EditingContextController: ScsController
 	{
 		private readonly IScsRegistrationService _registration;
+		private readonly ISitecoreDataAccessService _sitecore;
         private readonly SessionStateSection SessionSettings = (SessionStateSection)ConfigurationManager.GetSection("system.web/sessionState");
 
         public EditingContextController()
 		{
 			_registration = Bootstrap.Container.Resolve<IScsRegistrationService>();
+			_sitecore = Bootstrap.Container.Resolve<ISitecoreDataAccessService>();
 		}
 
 		protected EditingContextController(IScsRegistrationService registration)
@@ -43,13 +45,6 @@ namespace ScsEditingContext
 		public ActionResult CommonLocations()
 		{
 			return ScsJson(GetCommonLocations());
-		}
-
-		[ScsLoggedIn]
-		[ActionName("getitemhistory.json")]
-		public ActionResult HistoryItems()
-		{
-			return ScsJson(GetItemHistory());
 		}
 
 		[ScsLoggedIn]
@@ -82,50 +77,6 @@ namespace ScsEditingContext
 			return new List<TypeContentTreeNode>();
 		}
 
-		private dynamic GetItemHistory()
-		{
-			dynamic ret = new ExpandoObject();
-			HttpCookie authCookie = Request.Cookies[FormsAuthentication.FormsCookieName];
-			if (authCookie != null)
-			{
-				FormsAuthenticationTicket ticket = FormsAuthentication.Decrypt(authCookie.Value);
-				if (ticket != null)
-				{
-					string u = Regex.Replace(ticket.Name, "[^a-zA-Z0-9 -]", string.Empty);
-					var httpCookie = Request.Cookies["scseditorcontext" + u];
-					if (httpCookie?.Value != null)
-						using (new SecurityDisabler())
-						{
-							try
-							{
-								var urlDecode = Encoding.UTF8.GetString(System.Convert.FromBase64String(httpCookie.Value));
-								if (urlDecode != null)
-									ret.items = urlDecode.Split(',').Select(FindItem).Where(x => x != null);
-							}
-							catch (Exception e)
-							{
-								Log.Error("Unable to get item history.", e, this);
-							}
-						}
-				}
-			}
-			return ret;
-		}
-
-		private dynamic FindItem(string key)
-		{
-			if (string.IsNullOrWhiteSpace(key))
-				return null;
-			dynamic ret = new ExpandoObject();
-			string[] parts = key.Split('|');
-			if (parts.Length != 4)
-				return null;
-			ret.Icon = parts[3];
-			ret.DisplayName = parts[2];
-			ret.DatabaseName = parts[1];
-			ret.Id = parts[0];
-			return ret;
-		}
 
 		private dynamic GetCommonLocations()
 		{

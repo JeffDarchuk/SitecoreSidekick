@@ -14,8 +14,8 @@ namespace ScsContentMigrator.Services.Interface
 	public interface IRemoteContentService
 	{
 		IItemData GetRemoteItemData(Guid id, string server);
-		ChildrenItemDataModel GetRemoteItemDataWithChildren(Guid id, string server, string rev = "");
-		IItemData DeserializeYaml(string yaml, string id);
+		ChildrenItemDataModel GetRemoteItemDataWithChildren(Guid id, string server, Dictionary<Guid, string> rev = null);
+		IItemData DeserializeYaml(string yaml, Guid id);
 		CompareContentTreeNode GetContentTreeNode(RemoteContentTreeArgs args);
 		ScsHmacServer HmacServer { get; }
 	}

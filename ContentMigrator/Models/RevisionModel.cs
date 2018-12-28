@@ -9,6 +9,6 @@ namespace ScsContentMigrator.Models
 	public class RevisionModel
 	{
 		public string Id;
-		public string Rev;
+		public Dictionary<Guid, string> Rev;
 	}
 }

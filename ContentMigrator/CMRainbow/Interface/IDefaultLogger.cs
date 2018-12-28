@@ -20,6 +20,7 @@ namespace ScsContentMigrator.CMRainbow.Interface
 		void BeginEvent(IItemData data, string status, string icon, bool keepOpen);
 		void BeginEvent(string name, string id, string path, string status, string icon, string database, bool keepOpen);
 		void CompleteEvent(string id);
+		void AddToLog(string message);
 		string GetSrc(string imgTag);
 	}
 }

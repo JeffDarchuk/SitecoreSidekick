@@ -13,6 +13,7 @@ namespace ScsEditingContext.Services.Interface
 		IEnumerable<IItemData> GetItemReferences(IItemData itemData);
 		IEnumerable<IItemData> GetItemReferrers(IItemData itemData);
 		bool TryGetItemData(string id, out IItemData itemData);
+		Database GetCurrentDatabase();
 		IItemData GetLatestItemData(string id, Database db = null);
 	}
 }

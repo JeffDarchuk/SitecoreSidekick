@@ -8,6 +8,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -38,7 +39,7 @@ namespace ScsContentMigrator.Core
 
 		public bool Completed { get; private set; }
 
-		public void StartGatheringItems(IEnumerable<Guid> rootIds, int threads, bool getChildren, string server, CancellationToken cancellationToken)
+		public void StartGatheringItems(IEnumerable<Guid> rootIds, int threads, bool getChildren, string server, CancellationToken cancellationToken, bool ignoreRevId)
 		{			
 			foreach (Guid id in rootIds)
 			{
@@ -48,13 +49,12 @@ namespace ScsContentMigrator.Core
 			{
 				Task.Run(() =>
 				{
-					Thread.CurrentThread.Priority = ThreadPriority.Lowest;
-					GatherItems(getChildren, server, cancellationToken);
+					GatherItems(getChildren, server, cancellationToken, ignoreRevId);
 				});
 			}
 		}
 
-		internal void GatherItems(bool getChildren, string server, CancellationToken cancellationToken)
+		internal void GatherItems(bool getChildren, string server, CancellationToken cancellationToken, bool ignoreRevId)
 		{			
 			while (!Completed)
 			{
@@ -67,20 +67,22 @@ namespace ScsContentMigrator.Core
 					}
 					lock (_locker)
 						_processing++;
-					ChildrenItemDataModel remoteContentItem = _remoteContent.GetRemoteItemDataWithChildren(id, server, _sitecore.GetItemRevision(id));
-					if (remoteContentItem.Item != null)
+					ChildrenItemDataModel remoteContentItem = _remoteContent.GetRemoteItemDataWithChildren(id, server, ignoreRevId ? null : _sitecore.GetItemAndChildrenRevision(id));
+					foreach (var item in (getChildren ? remoteContentItem.Items : remoteContentItem.Items.Where(x => x.Key == id)))
 					{
-						IItemData itemData = _yamlSerializationService.DeserializeYaml(remoteContentItem.Item, id.ToString());
-						GatheredRemoteItems.Add(itemData, cancellationToken);
+						if (item.Value != null)
+						{
+							IItemData itemData = _yamlSerializationService.DeserializeYaml(item.Value, item.Key.ToString());
+							GatheredRemoteItems.Add(itemData, cancellationToken);
+						}
+						else
+						{
+							GatheredRemoteItems.Add(_sitecore.GetItemData(item.Key), cancellationToken);
+						}
 					}
-					else
+					if (getChildren && remoteContentItem.GrandChildren != null)
 					{
-						GatheredRemoteItems.Add(_sitecore.GetItemData(id), cancellationToken);
-					}
-
-					if (getChildren && remoteContentItem.Children != null)
-					{
-						foreach (var child in remoteContentItem.Children)
+						foreach (var child in remoteContentItem.GrandChildren)
 						{
 							ProcessingIds.Add(child, cancellationToken);
 						}

@@ -23,7 +23,12 @@
 		vm.treeEvents = {
 			'click': function(val) {
 				vm.treeEvents.selected = val;
-				vm.query(val.Id.replace(/\W/g, ''), "id");
+				if (vm.getDescendants) {
+					vm.query(val.Id, "descendants");
+				} else {
+					vm.query(val.Id.replace(/[^\w-]/g, '').replace(/-/g, '*'), "id");
+				}
+				
 			}
 		};
 		vm.start = new Date();
@@ -35,6 +40,8 @@
 		vm.pageNum = 1;
 		vm.pagination = new Object();
 		vm.rebuildNum = -1;
+		vm.getDescendants = false;
+		vm.databases = new Object();
 		ALfactory.getUsers()
 			.then(function(response) {
 				vm.users = response.data;
@@ -45,7 +52,10 @@
 				for (var key in vm.eventList) {
 					vm[key] = true;
 				}
-				vm.query(vm.queryText, "content");
+				ALfactory.getDatabases().then(function (response) {
+					vm.databases = response.data;
+					vm.query(vm.queryText, "content");
+				});
 			});
 		vm.queryAutoComplete = function(event) {
 			if (event.which === 13)
@@ -124,7 +134,7 @@
 			vm.lastQuery = text;
 			if (vm.field === "content")
 				vm.queryText = text;
-			ALfactory.query(text.split(/[\s,]+/), field, vm.getFilters(), vm.start, vm.end).then(function (response) {
+			ALfactory.query(text.split(/[\s,]+/), field, vm.getFilters(), vm.start, vm.end, vm.databases).then(function (response) {
 				buildGraph(response.data);
 				for (var key in response.data.GraphEntries) {
 					drawLine(response.data.GraphEntries[key]);
@@ -147,7 +157,7 @@
 			for (var key in vm.eventList)
 				if (vm[key])
 					arr.push(key);
-			ALfactory.getData(vm.lastQuery.split(/[\s,]+/), vm.field, arr, vm.start, vm.end, vm.page).then(function (response) {
+			ALfactory.getData(vm.lastQuery.split(/[\s,]+/), vm.field, arr, vm.start, vm.end, vm.page, vm.databases).then(function (response) {
 				vm.events = response.data.results;
 				vm.totalResults = response.data.total;
 				vm.resultsPerPage = response.data.perPage;

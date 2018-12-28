@@ -54,6 +54,15 @@ namespace SitecoreSidekick.Services
 		}
 
 
+		public Dictionary<Guid, string> GetItemAndChildrenRevision(Guid idataId, string database = null)
+		{
+			var item = GetItem(idataId, database);
+			var revs = item?.GetChildren().ToDictionary(x => x.ID.Guid, x => x[FieldIDs.Revision]);
+			if (revs == null) return null;
+			revs.Add(item.ID.Guid, item?[FieldIDs.Revision]);
+			return revs;
+		}
+
 		public IItemData GetRootItemData(string database = null)
 		{
 			Database db = database == null ? _db : Factory.GetDatabase(database);
@@ -82,6 +91,7 @@ namespace SitecoreSidekick.Services
 			while (processing.Any())
 			{
 				Item item = processing.Pop();
+				if (item == null) continue;
 				ret.Add(item.ID.Guid);
 				foreach (Item child in item.Children)
 				{
@@ -92,11 +102,22 @@ namespace SitecoreSidekick.Services
 		}
 
 		public string GetIconSrc(IItemData item, int width = 32, int height = 32, string align = "", string margin = "")
-		{			
+		{
+			if (item == null) return "";
 			return ThemeManager.GetIconImage(GetItem(item.Id, item.DatabaseName), width, height, align, margin);
 		}
 
 		public void RecycleItem(Guid id) => RecycleItem(new ID(id).ToString());
+		public string GetIcon(Guid id)
+		{
+			return GetItem(id)?[FieldIDs.Icon] ?? "";
+		}
+
+		public List<Database> GetAllDatabases()
+		{
+			return Factory.GetDatabases();
+		}
+
 		public void RecycleItem(string id)
 		{
 			Item item = GetItem(id);

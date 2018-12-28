@@ -63,6 +63,8 @@
     <Reference Include="System.Drawing">
       <Private>False</Private>
     </Reference>
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Web">
       <Private>False</Private>
@@ -120,9 +122,11 @@
     <Compile Include="ScsLoggedInAttribute.cs" />
     <Compile Include="Services\AuthorizationService.cs" />
     <Compile Include="Services\HttpClientService.cs" />
+    <Compile Include="Services\IconService.cs" />
     <Compile Include="Services\Interface\IAuthenticationService.cs" />
     <Compile Include="Services\Interface\IAuthorizationService.cs" />
     <Compile Include="Services\Interface\IHttpClientService.cs" />
+    <Compile Include="Services\Interface\IIconService.cs" />
     <Compile Include="Services\Interface\IJsonSerializationService.cs" />
     <Compile Include="Services\AuthenticationService.cs" />
     <Compile Include="Services\Interface\IManifestResourceStreamService.cs" />

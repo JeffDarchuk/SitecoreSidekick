@@ -14,5 +14,6 @@ namespace ScsAuditLog.Model
 		public List<object> EventTypes;
 		public string Field;
 		public int Page;
+		public Dictionary<string, bool> Databases;
 	}
 }

@@ -9,7 +9,7 @@ namespace ScsContentMigrator.Core.Interface
 	public interface IContentItemPuller
 	{
 		bool Completed { get; }
-		void StartGatheringItems(IEnumerable<Guid> rootIds, int threads, bool getChildren, string server, CancellationToken cancellationToken);
+		void StartGatheringItems(IEnumerable<Guid> rootIds, int threads, bool getChildren, string server, CancellationToken cancellationToken, bool ignoreRevId);
 		BlockingCollection<IItemData> ItemsToInstall { get; }
 	}
 }

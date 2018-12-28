@@ -21,6 +21,7 @@ namespace SitecoreSidekick.Handlers
 		private readonly IJsonSerializationService _jsonSerializationService;
 		private readonly IHttpClientService _httpClientService;
 		private readonly ISitecoreDataAccessService _sitecoreDataAccessService;
+		private readonly IIconService _iconService;
 
 		public ScsMainController()
 		{
@@ -29,6 +30,7 @@ namespace SitecoreSidekick.Handlers
 			_jsonSerializationService = Bootstrap.Container.Resolve<IJsonSerializationService>();
 			_httpClientService = Bootstrap.Container.Resolve<IHttpClientService>();
 			_sitecoreDataAccessService = Bootstrap.Container.Resolve<ISitecoreDataAccessService>();
+			_iconService = Bootstrap.Container.Resolve<IIconService>();
 		}
 
 		[ActionName("scsvalid.scsvc")]
@@ -66,7 +68,16 @@ namespace SitecoreSidekick.Handlers
 		{
 			return Resources("scscommand.js");
 		}
-
+		[ActionName("scsicon.scsvc")]
+		public ActionResult Icon()
+		{
+			string icon = Request.QueryString["icon"];
+			if (_iconService.Images.ContainsKey(icon))
+			{
+				return new FileStreamResult(_iconService.Images[icon].Open(), "image/png");
+			}
+			return new FileStreamResult(_iconService.Images["Core/32x32/new_document.png"].Open(), "image/png");
+		}
 		public override ActionResult Resources(string filename)
 		{
 			if (filename.Equals("scsangular.js") || filename.Equals("scscommand.js"))

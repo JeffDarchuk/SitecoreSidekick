@@ -1,4 +1,6 @@
-﻿using Rainbow.Storage;
+﻿using System;
+using System.Collections.Generic;
+using Rainbow.Storage;
 using Rainbow.Storage.Sc;
 using Rainbow.Storage.Sc.Deserialization;
 using ScsContentMigrator.CMRainbow;
@@ -8,6 +10,7 @@ using ScsContentMigrator.Services;
 using ScsContentMigrator.Services.Interface;
 using SitecoreSidekick.Shared.IoC;
 using System.Linq;
+using System.Reflection;
 using MicroCHAP;
 using Rainbow.Diff;
 using ScsContentMigrator.CMRainbow.Interface;
@@ -19,10 +22,15 @@ namespace ScsContentMigrator
 	public class Bootstrap
 	{
 		private static readonly object BootstrapLock = new object();
+
 		/// <summary>
 		/// Sets the container to use to an existing container
 		/// </summary>
 		/// <param name="container">The container to use</param>
+		static Bootstrap()
+		{
+
+		}
 		public static void SetContainer(Container container)
 		{
 			_container = container;
@@ -57,9 +65,19 @@ namespace ScsContentMigrator
 			container.Register<ILoggingService, LoggingService>();
 			container.RegisterFactory<IDataStore>(args =>
 			{
-				IDefaultDeserializerLogger logger = (IDefaultDeserializerLogger)args.FirstOrDefault(a => a is IDefaultDeserializerLogger);
-				var deserializer = new DefaultDeserializer(logger, new DefaultFieldFilter());
-				return new SitecoreDataStore(deserializer);
+				IDefaultDeserializerLogger logger = (IDefaultDeserializerLogger)args.FirstOrDefault(x => x is IDefaultDeserializerLogger);
+				Assembly a = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(x => x.GetName().Name == "Rainbow.Storage.Sc");
+				Type t = a?.GetType("Rainbow.Storage.Sc.Deserialization.DefaultDeserializer");
+				foreach (var constructor in t?.GetConstructors().Where(x => x.GetParameters().Length == 2) ?? Enumerable.Empty<ConstructorInfo>())
+				{
+					return new SitecoreDataStore((DefaultDeserializer)constructor.Invoke(new object[] {logger, new DefaultFieldFilter()}));
+				}
+				foreach (var constructor in t?.GetConstructors().Where(x => x.GetParameters().Length == 3) ?? Enumerable.Empty<ConstructorInfo>())
+				{
+					return new SitecoreDataStore((DefaultDeserializer)constructor.Invoke(new object[] { false, logger, new DefaultFieldFilter() }));
+				}
+
+				return null;
 			});
 			container.RegisterFactory<IContentItemPuller>(args => new ContentItemPuller());
 			container.RegisterFactory<IContentItemInstaller>(args => new ContentItemInstaller());

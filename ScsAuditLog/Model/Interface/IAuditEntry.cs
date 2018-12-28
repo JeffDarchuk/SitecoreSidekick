@@ -17,5 +17,6 @@ namespace ScsAuditLog.Model.Interface
 		string Note { get; set; }
 		string Label { get; set; }
 		string Color { get; set; }
+		string Icon { get; set; }
 	}
 }

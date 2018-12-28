@@ -24,6 +24,7 @@ namespace ScsAuditLog.Model
 		public List<string> Tokens { get; set; }
 		public string Label { get; set; }
 		public string Color { get; set; }
+		public string Icon { get; set; }
 
 		public ItemAuditEntry()
 		{
@@ -47,6 +48,11 @@ namespace ScsAuditLog.Model
 				Id = item.ID.ToString();
 				Path = item.Paths.FullPath;
 				Database = item.Database.Name;
+				Icon = item[FieldIDs.Icon];
+				if (string.IsNullOrWhiteSpace(Icon))
+				{
+					Icon = item.Template.InnerItem[FieldIDs.Icon];
+				}
 			}
 			TimeStamp = DateTime.Now;
 			Label = label;
@@ -76,6 +82,8 @@ namespace ScsAuditLog.Model
 					Path = entries[7];
 				if (entries.Length > 8)
 					Database = entries[8];
+				if (entries.Length > 9)
+					Icon = entries[9];
 			}
 			catch (Exception e)
 			{
@@ -98,7 +106,8 @@ namespace ScsAuditLog.Model
 				sb.Append(Id).Append("|");
 				sb.Append(Note).Append("|");
 				sb.Append(Path).Append("|");
-				sb.Append(Database);
+				sb.Append(Database).Append("|");
+				sb.Append(Icon);
 			}
 			catch (Exception e)
 			{

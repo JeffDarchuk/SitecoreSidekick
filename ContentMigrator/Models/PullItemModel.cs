@@ -18,5 +18,7 @@ namespace ScsContentMigrator.Models
 		public bool Preview;
 		public bool EventDisabler;
 		public bool BulkUpdate;
+		public bool UseItemBlaster;
+		public bool IgnoreRevId;
 	}
 }

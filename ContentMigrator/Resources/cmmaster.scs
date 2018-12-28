@@ -52,6 +52,14 @@
 			<div>
 				<input type="checkbox" id="bulkUpdateContext" ng-model="vm.bulkUpdate" /><label for="bulkUpdateContext"> Run using bulk update context.</label>
 			</div>
+			<div>
+				<input type="checkbox" id="useItemBlaster" ng-model="vm.useItemBlaster" />
+				<label for="bulkUpdateContext"> Use Item Blaster.  <i>This will increase item create speed by up to 200%</i></label>
+			</div>
+			<div>
+				<input type="checkbox" id="ignoreRevId" ng-model="vm.ignoreRevId" />
+				<label for="bulkUpdateContext"> Ignore Rev Id.  <i>In very rare cases an item update should be needed but the rev ids match.  Use this if a normal sync doesn't properly update the fields.</i></label>
+			</div>
 
 			<p>These options result in much faster processing speed, however the updated content will not be indexed or placed into the link database. Rebuilding the indexes and links may be required before updated items appear in searches or broken links reports.</p>
 		</fieldset>

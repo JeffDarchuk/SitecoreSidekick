@@ -14,12 +14,7 @@ namespace ScsContentMigrator.Models
 			_remote = Bootstrap.Container.Resolve<IRemoteContentService>();
 		}
 
-		public List<Guid> Children { get; set; }
-		public string Item { get; set; }
-
-		public IItemData ItemData(string itemId)
-		{
-			return _remote.DeserializeYaml(Item, itemId);
-		}
+		public List<Guid> GrandChildren { get; set; }
+		public List<KeyValuePair<Guid, string>> Items { get; set; } = new List<KeyValuePair<Guid, string>>();
 	}
 }

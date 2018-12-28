@@ -90,7 +90,7 @@ namespace ScsContentMigrator.UnitTests.Core
 		}
 
 		[Fact]
-		public async Task ProcessItem_ItemExistsInAllowedItems_RemovesFromAllowedItems()
+		public void ProcessItem_ItemExistsInAllowedItems_RemovesFromAllowedItems()
 		{
 			Guid itemGuid = Guid.NewGuid();
 			IItemData remoteData = Substitute.For<IItemData>();
@@ -99,13 +99,13 @@ namespace ScsContentMigrator.UnitTests.Core
 			var contentItemInstaller = CreateInstance<ContentItemInstaller>();
 			contentItemInstaller.AllowedItems.Add(itemGuid);
 
-			await contentItemInstaller.ProcessItem(new PullItemModel {Preview = true}, Substitute.For<IItemData>(), remoteData);
+			contentItemInstaller.ProcessItem(new PullItemModel {Preview = true}, Substitute.For<IItemData>(), remoteData);
 
 			contentItemInstaller.AllowedItems.Should().BeEmpty();
 		}
 
 		[Fact]
-		public async Task ProcessItem_ItemDoesNotExistInAllowedItems_DoesNotThrowException()
+		public void ProcessItem_ItemDoesNotExistInAllowedItems_DoesNotThrowException()
 		{
 			Guid itemGuid = Guid.NewGuid();
 			IItemData remoteData = Substitute.For<IItemData>();
@@ -116,7 +116,7 @@ namespace ScsContentMigrator.UnitTests.Core
 
 			try
 			{
-				await contentItemInstaller.ProcessItem(new PullItemModel {Preview = true}, Substitute.For<IItemData>(), remoteData);
+				contentItemInstaller.ProcessItem(new PullItemModel {Preview = true}, Substitute.For<IItemData>(), remoteData);
 			}
 			catch (Exception ex)
 			{
@@ -125,7 +125,7 @@ namespace ScsContentMigrator.UnitTests.Core
 		}
 
 		[Fact]
-		public async Task ProcessItem_Preview_LocalItemDoesNotExist_LogsCreated()
+		public void ProcessItem_Preview_LocalItemDoesNotExist_LogsCreated()
 		{
 			Guid itemGuid = Guid.NewGuid();
 			IItemData remoteData = Substitute.For<IItemData>();
@@ -133,7 +133,7 @@ namespace ScsContentMigrator.UnitTests.Core
 			var contentItemInstaller = CreateInstance<ContentItemInstaller>();
 			contentItemInstaller.AllowedItems.Add(itemGuid);
 
-			await contentItemInstaller.ProcessItem(new PullItemModel { Preview = true }, null, remoteData);
+			contentItemInstaller.ProcessItem(new PullItemModel { Preview = true }, null, remoteData);
 
 			GetSubstitute<IDefaultLogger>().Received(1).BeginEvent(Arg.Any<IItemData>(), LogStatus.Created, Arg.Any<string>(), Arg.Any<bool>());
 		}
@@ -151,7 +151,7 @@ namespace ScsContentMigrator.UnitTests.Core
 
 		[Theory]
 		[MemberData(nameof(ProcessItemPreviewTestCases), MemberType = typeof(ContentItemInstallerTests))]
-		public async Task ProcessItem_Preview_CompareResults_Logs(ItemComparisonResult compareResult, string expectedLogEvent)
+		public void ProcessItem_Preview_CompareResults_Logs(ItemComparisonResult compareResult, string expectedLogEvent)
 		{
 			Guid itemGuid = Guid.NewGuid();
 			IItemData remoteData = Substitute.For<IItemData>();
@@ -160,13 +160,13 @@ namespace ScsContentMigrator.UnitTests.Core
 			var contentItemInstaller = CreateInstance<ContentItemInstaller>();
 			contentItemInstaller.AllowedItems.Add(itemGuid);
 
-			await contentItemInstaller.ProcessItem(new PullItemModel { Preview = true }, remoteData, remoteData);
+			contentItemInstaller.ProcessItem(new PullItemModel { Preview = true }, remoteData, remoteData);
 
 			GetSubstitute<IDefaultLogger>().Received(1).BeginEvent(Arg.Any<IItemData>(), expectedLogEvent, Arg.Any<string>(), Arg.Any<bool>());
 		}
 
 		[Fact]
-		public async Task ProcessItem_Preview_CompareResults_Overwrite_LogsChanged()
+		public void ProcessItem_Preview_CompareResults_Overwrite_LogsChanged()
 		{
 			Guid itemGuid = Guid.NewGuid();
 			IItemData remoteData = Substitute.For<IItemData>();
@@ -175,13 +175,13 @@ namespace ScsContentMigrator.UnitTests.Core
 			var contentItemInstaller = CreateInstance<ContentItemInstaller>();
 			contentItemInstaller.AllowedItems.Add(itemGuid);
 
-			await contentItemInstaller.ProcessItem(new PullItemModel { Preview = true, Overwrite = true}, remoteData, remoteData);
+			contentItemInstaller.ProcessItem(new PullItemModel { Preview = true, Overwrite = true}, remoteData, remoteData);
 
 			GetSubstitute<IDefaultLogger>().Received(1).BeginEvent(Arg.Any<IItemData>(), LogStatus.Changed, Arg.Any<string>(), Arg.Any<bool>());
 		}
 
 		[Fact]
-		public async Task ProcessItem_NotOverwrite_LocalDataExists_LogsEventSkipped()
+		public void ProcessItem_NotOverwrite_LocalDataExists_LogsEventSkipped()
 		{			
 			Guid itemGuid = Guid.NewGuid();
 			IItemData remoteData = Substitute.For<IItemData>();
@@ -189,13 +189,13 @@ namespace ScsContentMigrator.UnitTests.Core
 			var contentItemInstaller = CreateInstance<ContentItemInstaller>();
 			contentItemInstaller.AllowedItems.Add(itemGuid);
 
-			await contentItemInstaller.ProcessItem(new PullItemModel { Overwrite = false }, remoteData, remoteData);
+			contentItemInstaller.ProcessItem(new PullItemModel { Overwrite = false }, remoteData, remoteData);
 
 			GetSubstitute<IDefaultLogger>().Received(1).BeginEvent(Arg.Any<IItemData>(), LogStatus.Skipped, Arg.Any<string>(), Arg.Any<bool>());
 		}
 
 		[Fact]
-		public async Task ProcessItem_NotOverwrite_LocalDataExists_DoesNotSaveToDataStore()
+		public void ProcessItem_NotOverwrite_LocalDataExists_DoesNotSaveToDataStore()
 		{
 			Guid itemGuid = Guid.NewGuid();
 			IItemData remoteData = Substitute.For<IItemData>();
@@ -203,13 +203,13 @@ namespace ScsContentMigrator.UnitTests.Core
 			var contentItemInstaller = CreateInstance<ContentItemInstaller>();
 			contentItemInstaller.AllowedItems.Add(itemGuid);
 
-			await contentItemInstaller.ProcessItem(new PullItemModel { Overwrite = false }, remoteData, remoteData);
+			contentItemInstaller.ProcessItem(new PullItemModel { Overwrite = false }, remoteData, remoteData);
 
 			GetSubstitute<IDataStore>().Received(0).Save(Arg.Any<IItemData>());
 		}
 
 		[Fact]
-		public async Task ProcessItem_Overwrite_LocalDataExists_SameAsRemoteData_LogsSkipped()
+		public void ProcessItem_Overwrite_LocalDataExists_SameAsRemoteData_LogsSkipped()
 		{
 			Guid itemGuid = Guid.NewGuid();
 			IItemData remoteData = Substitute.For<IItemData>();
@@ -219,13 +219,13 @@ namespace ScsContentMigrator.UnitTests.Core
 			var contentItemInstaller = CreateInstance<ContentItemInstaller>();
 			contentItemInstaller.AllowedItems.Add(itemGuid);
 
-			await contentItemInstaller.ProcessItem(new PullItemModel { Overwrite = true }, remoteData, remoteData);
+			contentItemInstaller.ProcessItem(new PullItemModel { Overwrite = true }, remoteData, remoteData);
 
 			GetSubstitute<IDefaultLogger>().Received(1).BeginEvent(Arg.Any<IItemData>(), LogStatus.Skipped, Arg.Any<string>(), Arg.Any<bool>());
 		}
 
 		[Fact]
-		public async Task ProcessItem_Overwrite_LocalDataExists_SameAsRemoteData_DoesNotSaveToDataStore()
+		public void ProcessItem_Overwrite_LocalDataExists_SameAsRemoteData_DoesNotSaveToDataStore()
 		{
 			Guid itemGuid = Guid.NewGuid();
 			IItemData remoteData = Substitute.For<IItemData>();
@@ -235,13 +235,13 @@ namespace ScsContentMigrator.UnitTests.Core
 			var contentItemInstaller = CreateInstance<ContentItemInstaller>();
 			contentItemInstaller.AllowedItems.Add(itemGuid);
 
-			await contentItemInstaller.ProcessItem(new PullItemModel { Overwrite = true }, remoteData, remoteData);
+			contentItemInstaller.ProcessItem(new PullItemModel { Overwrite = true }, remoteData, remoteData);
 
 			GetSubstitute<IDataStore>().Received(0).Save(Arg.Any<IItemData>());
 		}
 
 		[Fact]
-		public async Task ProcessItem_LocalDataExists_SameAsRemoteData_LogsSkipped()
+		public void ProcessItem_LocalDataExists_SameAsRemoteData_LogsSkipped()
 		{
 			Guid itemGuid = Guid.NewGuid();
 			IItemData remoteData = Substitute.For<IItemData>();
@@ -251,13 +251,13 @@ namespace ScsContentMigrator.UnitTests.Core
 			var contentItemInstaller = CreateInstance<ContentItemInstaller>();
 			contentItemInstaller.AllowedItems.Add(itemGuid);
 
-			await contentItemInstaller.ProcessItem(new PullItemModel {  }, remoteData, remoteData);
+			contentItemInstaller.ProcessItem(new PullItemModel {  }, remoteData, remoteData);
 
 			GetSubstitute<IDefaultLogger>().Received(1).BeginEvent(Arg.Any<IItemData>(), LogStatus.Skipped, Arg.Any<string>(), Arg.Any<bool>());
 		}
 
 		[Fact]
-		public async Task ProcessItem_LocalDataExists_SameAsRemoteData_DoesNotSaveToDataStore()
+		public void ProcessItem_LocalDataExists_SameAsRemoteData_DoesNotSaveToDataStore()
 		{
 			Guid itemGuid = Guid.NewGuid();
 			IItemData remoteData = Substitute.For<IItemData>();
@@ -267,13 +267,13 @@ namespace ScsContentMigrator.UnitTests.Core
 			var contentItemInstaller = CreateInstance<ContentItemInstaller>();
 			contentItemInstaller.AllowedItems.Add(itemGuid);
 
-			await contentItemInstaller.ProcessItem(new PullItemModel {  }, remoteData, remoteData);
+			contentItemInstaller.ProcessItem(new PullItemModel {  }, remoteData, remoteData);
 
 			GetSubstitute<IDataStore>().Received(0).Save(Arg.Any<IItemData>());
 		}
 
 		[Fact]
-		public async Task ProcessItem_LocalDataDoesNotExist_RemoteParentInError_DoesNotSaveToDataStore()
+		public void ProcessItem_LocalDataDoesNotExist_RemoteParentInError_DoesNotSaveToDataStore()
 		{
 			Guid itemGuid = Guid.NewGuid();
 			Guid parentItemGuid = Guid.NewGuid();			
@@ -283,15 +283,14 @@ namespace ScsContentMigrator.UnitTests.Core
 			var contentItemInstaller = CreateInstance<ContentItemInstaller>();
 			contentItemInstaller.AllowedItems.Add(itemGuid);
 			contentItemInstaller.Errors.Add(parentItemGuid);
-			contentItemInstaller.CurrentlyProcessing.Add(parentItemGuid);
 
-			await contentItemInstaller.ProcessItem(new PullItemModel { }, null, remoteData);
+			contentItemInstaller.ProcessItem(new PullItemModel { }, null, remoteData);
 
 			GetSubstitute<IDataStore>().Received(0).Save(Arg.Any<IItemData>());
 		}
 
 		[Fact]
-		public async Task ProcessItem_Overwrite_LocalDataExists_LogsChanged()
+		public void ProcessItem_Overwrite_LocalDataExists_LogsChanged()
 		{
 			Guid itemGuid = Guid.NewGuid();
 			IItemData remoteData = Substitute.For<IItemData>();
@@ -301,13 +300,13 @@ namespace ScsContentMigrator.UnitTests.Core
 			var contentItemInstaller = CreateInstance<ContentItemInstaller>();
 			contentItemInstaller.AllowedItems.Add(itemGuid);
 
-			await contentItemInstaller.ProcessItem(new PullItemModel { Overwrite = true }, remoteData, remoteData);
+			contentItemInstaller.ProcessItem(new PullItemModel { Overwrite = true }, remoteData, remoteData);
 
 			GetSubstitute<IDefaultLogger>().Received(1).BeginEvent(Arg.Any<IItemData>(), LogStatus.Changed, Arg.Any<string>(), Arg.Any<bool>());
 		}
 
 		[Fact]
-		public async Task ProcessItem_Overwrite_LocalDataExists_SavesToDataStore()
+		public void ProcessItem_Overwrite_LocalDataExists_SavesToDataStore()
 		{
 			Guid itemGuid = Guid.NewGuid();
 			IItemData remoteData = Substitute.For<IItemData>();
@@ -317,13 +316,13 @@ namespace ScsContentMigrator.UnitTests.Core
 			var contentItemInstaller = CreateInstance<ContentItemInstaller>();
 			contentItemInstaller.AllowedItems.Add(itemGuid);
 
-			await contentItemInstaller.ProcessItem(new PullItemModel { Overwrite = true }, remoteData, remoteData);
+			contentItemInstaller.ProcessItem(new PullItemModel { Overwrite = true }, remoteData, remoteData);
 
 			GetSubstitute<IDataStore>().Received(1).Save(Arg.Any<IItemData>());
 		}
 
 		[Fact]
-		public async Task ProcessItem_Overwrite_LocalDataDoesNotExist_DoesNotBeginLogEvent()
+		public void ProcessItem_Overwrite_LocalDataDoesNotExist_DoesNotBeginLogEvent()
 		{
 			Guid itemGuid = Guid.NewGuid();
 			IItemData remoteData = Substitute.For<IItemData>();
@@ -333,13 +332,13 @@ namespace ScsContentMigrator.UnitTests.Core
 			var contentItemInstaller = CreateInstance<ContentItemInstaller>();
 			contentItemInstaller.AllowedItems.Add(itemGuid);
 
-			await contentItemInstaller.ProcessItem(new PullItemModel { Overwrite = true }, null, remoteData);
+			contentItemInstaller.ProcessItem(new PullItemModel { Overwrite = true }, null, remoteData);
 
 			GetSubstitute<IDefaultLogger>().Received(0).BeginEvent(Arg.Any<IItemData>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<bool>());
 		}
 
 		[Fact]
-		public async Task ProcessItem_Overwrite_LocalDataDoesNotExist_SavesToDataStore()
+		public void ProcessItem_Overwrite_LocalDataDoesNotExist_SavesToDataStore()
 		{
 			Guid itemGuid = Guid.NewGuid();
 			IItemData remoteData = Substitute.For<IItemData>();
@@ -349,7 +348,7 @@ namespace ScsContentMigrator.UnitTests.Core
 			var contentItemInstaller = CreateInstance<ContentItemInstaller>();
 			contentItemInstaller.AllowedItems.Add(itemGuid);
 
-			await contentItemInstaller.ProcessItem(new PullItemModel { Overwrite = true }, null, remoteData);
+			contentItemInstaller.ProcessItem(new PullItemModel { Overwrite = true }, null, remoteData);
 
 			GetSubstitute<IDataStore>().Received(1).Save(Arg.Any<IItemData>());
 		}

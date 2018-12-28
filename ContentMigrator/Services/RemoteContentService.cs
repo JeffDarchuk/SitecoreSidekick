@@ -10,6 +10,7 @@ using Sitecore.Diagnostics;
 using SitecoreSidekick;
 using SitecoreSidekick.Services.Interface;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -52,10 +53,10 @@ namespace ScsContentMigrator.Services
 			string url = $"{server}/scs/cm/cmgetitemyaml.scsvc";
 			string parameters = _jsonSerializationService.SerializeObject(id);
 			string yaml = MakeRequest(url, parameters);
-			return DeserializeYaml(yaml, id.ToString());
+			return DeserializeYaml(yaml, id);
 		}
 
-		public ChildrenItemDataModel GetRemoteItemDataWithChildren(Guid id, string server, string rev = "")
+		public ChildrenItemDataModel GetRemoteItemDataWithChildren(Guid id, string server, Dictionary<Guid, string> rev = null)
 		{
 			string url = $"{server}/scs/cm/cmgetitemyamlwithchildren.scsvc";
 			string parameters = _jsonSerializationService.SerializeObject(new {id, rev});
@@ -108,7 +109,7 @@ namespace ScsContentMigrator.Services
 			return SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
 		}
 
-		public IItemData DeserializeYaml(string yaml, string itemId)
+		public IItemData DeserializeYaml(string yaml, Guid itemId)
 		{
 			var formatter = new YamlSerializationFormatter(null, null);
 			if (yaml != null)
@@ -122,7 +123,7 @@ namespace ScsContentMigrator.Services
 						ms.Write(bytes, 0, bytes.Length);
 
 						ms.Seek(0, SeekOrigin.Begin);
-						itemData = formatter.ReadSerializedItem(ms, itemId);
+						itemData = formatter.ReadSerializedItem(ms, itemId.ToString());
 					}
 					catch (Exception e)
 					{

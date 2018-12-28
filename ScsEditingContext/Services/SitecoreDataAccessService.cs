@@ -34,6 +34,11 @@ namespace ScsEditingContext.Services
 			return true;
 		}
 
+		public Database GetCurrentDatabase()
+		{
+			return _db;
+		}
+
 		public IItemData GetLatestItemData(string id, Database db = null)
 		{
 			var item = GetItem(id, db, LanguageManager.DefaultLanguage, Version.Latest);

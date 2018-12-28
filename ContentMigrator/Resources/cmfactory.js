@@ -18,8 +18,8 @@
 				var data = { "id": id, "database": database, "server": server };
 				return $http.post("/scs/cm/cmcontenttreegetitem.scsvc", data);
 			},
-			contentTreePullItem: function (ids, database, server, children, overwrite, pullParent, mirror, preview, eventDisabler, bulkUpdate) {
-				var data = { "ids": ids, "database": database, "server": server, "children": children, "overwrite": overwrite, "pullParent": pullParent, "removeLocalNotInRemote": mirror, "preview": preview, "eventDisabler": eventDisabler, "bulkUpdate": bulkUpdate };
+			contentTreePullItem: function (ids, database, server, children, overwrite, pullParent, mirror, preview, eventDisabler, bulkUpdate, useItemBlaster, ignoreRevId) {
+				var data = { "ids": ids, "database": database, "server": server, "children": children, "overwrite": overwrite, "pullParent": pullParent, "removeLocalNotInRemote": mirror, "preview": preview, "eventDisabler": eventDisabler, "bulkUpdate": bulkUpdate, "useItemBlaster" : useItemBlaster, "ignoreRevId" : ignoreRevId };
 				return $http.post("/scs/cm/cmstartoperation.scsvc", data);
 			},
 			contentTreeServerList: function () {

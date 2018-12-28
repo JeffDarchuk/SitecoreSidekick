@@ -25,7 +25,7 @@ namespace ScsContentMigrator.UnitTests.Core
 
 			List<Guid> expectedGuids = new List<Guid> {Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()};
 
-			contentItemPuller.StartGatheringItems(expectedGuids, 0, false, "", CancellationToken.None);
+			contentItemPuller.StartGatheringItems(expectedGuids, 0, false, "", CancellationToken.None, false);
 
 			contentItemPuller.ProcessingIds.Count.Should().Be(expectedGuids.Count);
 		}
@@ -37,7 +37,7 @@ namespace ScsContentMigrator.UnitTests.Core
 			GetSubstitute<IRemoteContentService>().GetRemoteItemDataWithChildren(Arg.Any<Guid>(), Arg.Any<string>()).Returns(new ChildrenItemDataModel());
 			contentItemPuller.ProcessingIds.Add(Guid.NewGuid());
 			
-			contentItemPuller.GatherItems(false, "", CancellationToken.None);
+			contentItemPuller.GatherItems(false, "", CancellationToken.None, false);
 
 			contentItemPuller.ProcessingIds.Should().BeEmpty();
 		}
@@ -49,7 +49,7 @@ namespace ScsContentMigrator.UnitTests.Core
 			GetSubstitute<IRemoteContentService>().GetRemoteItemDataWithChildren(Arg.Any<Guid>(), Arg.Any<string>()).Returns(new ChildrenItemDataModel());
 			contentItemPuller.ProcessingIds.Add(Guid.NewGuid());
 
-			contentItemPuller.GatherItems(false, "", CancellationToken.None);
+			contentItemPuller.GatherItems(false, "", CancellationToken.None, false);
 
 			GetSubstitute<IRemoteContentService>().Received(1).GetRemoteItemDataWithChildren(Arg.Any<Guid>(), Arg.Any<string>());
 		}
@@ -61,7 +61,7 @@ namespace ScsContentMigrator.UnitTests.Core
 			GetSubstitute<IRemoteContentService>().GetRemoteItemDataWithChildren(Arg.Any<Guid>(), Arg.Any<string>()).Returns(new ChildrenItemDataModel());
 			contentItemPuller.ProcessingIds.Add(Guid.NewGuid());
 
-			contentItemPuller.GatherItems(false, "", CancellationToken.None);
+			contentItemPuller.GatherItems(false, "", CancellationToken.None, false);
 
 			GetSubstitute<IYamlSerializationService>().Received(1).DeserializeYaml(Arg.Any<string>(), Arg.Any<string>());
 		}
@@ -76,7 +76,7 @@ namespace ScsContentMigrator.UnitTests.Core
 			GetSubstitute<IYamlSerializationService>().DeserializeYaml(Arg.Any<string>(), Arg.Any<string>()).Returns(expectedItemData);
 			contentItemPuller.ProcessingIds.Add(Guid.NewGuid());
 
-			contentItemPuller.GatherItems(false, "", CancellationToken.None);
+			contentItemPuller.GatherItems(false, "", CancellationToken.None, false);
 
 			contentItemPuller.GatheredRemoteItems.Should().NotBeEmpty();
 			contentItemPuller.GatheredRemoteItems.Should().Contain(expectedItemData);
@@ -94,7 +94,7 @@ namespace ScsContentMigrator.UnitTests.Core
 			GetSubstitute<IYamlSerializationService>().DeserializeYaml(Arg.Any<string>(), Arg.Any<string>()).Returns(expectedItemData);
 			contentItemPuller.ProcessingIds.Add(Guid.NewGuid());
 
-			contentItemPuller.GatherItems(false, "", CancellationToken.None);
+			contentItemPuller.GatherItems(false, "", CancellationToken.None, false);
 
 			contentItemPuller.GatheredRemoteItems.Count.Should().Be(1);
 		}
@@ -109,12 +109,12 @@ namespace ScsContentMigrator.UnitTests.Core
 			expectedItemData.GetChildren().Returns(new List<IItemData> { Substitute.For<IItemData>() });
 
 			ContentItemPuller contentItemPuller = CreateInstance<ContentItemPuller>();
-			GetSubstitute<IRemoteContentService>().GetRemoteItemDataWithChildren(parentGuid, Arg.Any<string>()).Returns(new ChildrenItemDataModel {Children = new List<Guid> {childGuid}});
+			GetSubstitute<IRemoteContentService>().GetRemoteItemDataWithChildren(parentGuid, Arg.Any<string>()).Returns(new ChildrenItemDataModel {GrandChildren = new List<Guid> {childGuid}});
 			GetSubstitute<IRemoteContentService>().GetRemoteItemDataWithChildren(childGuid, Arg.Any<string>()).Returns(new ChildrenItemDataModel());
 			GetSubstitute<IYamlSerializationService>().DeserializeYaml(Arg.Any<string>(), Arg.Any<string>()).Returns(expectedItemData);
 			contentItemPuller.ProcessingIds.Add(parentGuid);
 
-			contentItemPuller.GatherItems(true, "", CancellationToken.None);
+			contentItemPuller.GatherItems(true, "", CancellationToken.None, false);
 
 			contentItemPuller.GatheredRemoteItems.Count.Should().Be(2);
 		}
@@ -135,7 +135,7 @@ namespace ScsContentMigrator.UnitTests.Core
 			contentItemPuller.ProcessingIds.Add(Guid.NewGuid());
 
 			CancellationTokenSource cts = new CancellationTokenSource(10);
-			contentItemPuller.GatherItems(false, "", cts.Token);
+			contentItemPuller.GatherItems(false, "", cts.Token, false);
 
 			contentItemPuller.GatheredRemoteItems.Count.Should().BeLessThan(3);
 		}
@@ -154,7 +154,7 @@ namespace ScsContentMigrator.UnitTests.Core
 			contentItemPuller.ProcessingIds.Add(Guid.NewGuid());
 			contentItemPuller.ProcessingIds.Add(Guid.NewGuid());
 
-			contentItemPuller.GatherItems(false, "", CancellationToken.None);
+			contentItemPuller.GatherItems(false, "", CancellationToken.None, false);
 
 			contentItemPuller.GatheredRemoteItems.Count.Should().Be(3);
 		}
@@ -179,15 +179,15 @@ namespace ScsContentMigrator.UnitTests.Core
 			{
 				Task.Run(() =>
 				{
-					contentItemPuller.GatherItems(false, "", cancellationTokenSource.Token);
+					contentItemPuller.GatherItems(false, "", cancellationTokenSource.Token, false);
 				}),
 				Task.Run(() =>
 				{
-					contentItemPuller.GatherItems(false, "", cancellationTokenSource.Token);
+					contentItemPuller.GatherItems(false, "", cancellationTokenSource.Token, false);
 				}),
 				Task.Run(() =>
 				{
-					contentItemPuller.GatherItems(false, "", cancellationTokenSource.Token);
+					contentItemPuller.GatherItems(false, "", cancellationTokenSource.Token, false);
 				})
 			};
 

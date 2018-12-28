@@ -169,6 +169,7 @@ namespace ScsAuditLog.Core
 			AddField(doc, "timestamp", entry.TimeStamp.ToString("yyyy-MM-ddTHH:mm:ss.fff"), Field.Index.ANALYZED);
 			AddField(doc, "note", entry.Note, Field.Index.ANALYZED);
 			AddField(doc, "database", entry.Database, Field.Index.ANALYZED);
+			AddField(doc, "icon", entry.Icon, Field.Index.NOT_ANALYZED);
 			foreach (var role in entry.Role)
 				AddField(doc, "role", role.ToLower(), Field.Index.NOT_ANALYZED);
 			AddField(doc, "event", entry.EventId, Field.Index.ANALYZED);
@@ -192,34 +193,45 @@ namespace ScsAuditLog.Core
 			Rebuilt = 0;
 			Task.Run(() =>
 			{
-				Rebuilding = true;
-				lock (_locker)
+				try
 				{
-					_dir.ClearLock("rebuilding");
-					using (var writer = new IndexWriter(_dir, Analyzer, IndexWriter.MaxFieldLength.UNLIMITED))
+					Rebuilding = true;
+					lock (_locker)
 					{
-						writer.DeleteAll();
-					}
-				}
-				DateTime start = DateTime.Now.Subtract(TimeSpan.FromDays(_recordDays));
-				while (start < DateTime.Now.AddDays(1))
-				{
-					string file = _dataDirectory + "/source/" + start.ToString("yyyy-MMM-dd") + "/source.src";
-					if (File.Exists(file))
-					{
-						byte[] txt = File.ReadAllBytes(file);
-						foreach (string entry in StringZipper.Unzip(txt).Split(new[] {"<|||>"}, StringSplitOptions.RemoveEmptyEntries))
+						_dir.ClearLock("rebuilding");
+						using (var writer = new IndexWriter(_dir, Analyzer, IndexWriter.MaxFieldLength.UNLIMITED))
 						{
-							AuditSourceRecord record = _jsonSerializationService.DeserializeObject<AuditSourceRecord>(entry);
-							Task.Delay(1000).Wait();
-							Log(record.Entry, record.Content, false);
-							Rebuilt++;
+							writer.DeleteAll();
 						}
 					}
-					start = start.AddDays(1);
+
+					DateTime start = DateTime.Now.Subtract(TimeSpan.FromDays(_recordDays));
+					while (start < DateTime.Now.AddDays(1))
+					{
+						string file = _dataDirectory + "/source/" + start.ToString("yyyy-MMM-dd") + "/source.src";
+						if (File.Exists(file))
+						{
+							byte[] txt = File.ReadAllBytes(file);
+							foreach (string entry in StringZipper.Unzip(txt).Split(new[] {"<|||>"}, StringSplitOptions.RemoveEmptyEntries))
+							{
+								AuditSourceRecord record = _jsonSerializationService.DeserializeObject<AuditSourceRecord>(entry);
+								Log(record.Entry, record.Content, false);
+								Rebuilt++;
+							}
+						}
+
+						start = start.AddDays(1);
+					}
 				}
-				Rebuilt = -1;
-				Rebuilding = false;
+				catch (Exception e)
+				{
+					Sitecore.Diagnostics.Log.Error(e.ToString(), this);
+				}
+				finally
+				{
+					Rebuilt = -1;
+					Rebuilding = false;
+				}
 			});
 		}
 		private void KickOptimizeTimer()
@@ -300,6 +312,7 @@ namespace ScsAuditLog.Core
 
 		private void AddField(Document doc, string name, string value, Field.Index type)
 		{
+			if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(value)) return;
 			Field f = new Field(name, value, Field.Store.YES, type);
 			doc.Add(f);
 		}

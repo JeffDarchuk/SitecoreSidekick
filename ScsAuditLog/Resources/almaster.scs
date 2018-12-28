@@ -19,6 +19,14 @@
 					<label for="alEndDate">End Date</label>
 					<input type="text" id="alEndDate" ng-model="vm.end"/>
 				</fieldset>
+				<fieldset class="aldatabases">
+					<legend>Databases</legend>
+					<label ng-repeat="(key, value) in vm.databases">
+						<span>
+						<input type="checkbox" id="db{{key}}" ng-model="vm.databases[key]"/>
+						{{key}}</span>
+					</label>
+				</fieldset>
 				<span ng-click="vm.filterType='none'" ng-class="['tab', {alactive: vm.filterType==='none' || !vm.filterType}]">No Additional Filters</span>
 				<span ng-click="vm.filterType='text'" ng-class="['tab', {alactive: vm.filterType==='text'}]">Content Filter</span>
 				<span ng-click="vm.filterType='item'" ng-class="['tab', {alactive: vm.filterType==='item'}]">Item Filter</span>
@@ -36,6 +44,10 @@
 						</ul>
 					</div>
 					<div class="alqueryfilter" ng-show="vm.filterType === 'item'">
+						<div>
+							<input ng-model="vm.getDescendants" type="checkbox" />
+							<label>Get all descendents of item.</label>
+						</div>
 						<alcontenttree parent="''" events="vm.treeEvents" ></alcontenttree>
 					</div>
 					<div class="alqueryfilter" ng-if="vm.filterType === 'user'">
@@ -115,12 +127,16 @@
 			<table>
 				<tr>
 					<th>Time</th>
+					<th>Icon</th>
 					<th>User</th>
 					<th>Type</th>
 					<th>Details</th>
 				</tr>
 				<tr ng-repeat="item in vm.events"  ng-class="{even: $even, odd: $odd}">
 					<td ng-bind="item.TimeStamp | date:'h:mm ss a MMM, dd yyyy'"></td>
+					<td class ="aliconcol">
+						<img ng-src="/scs/platform/scsicon.scsvc?icon={{item.Icon}}"></img>
+					</td>
 					<td ng-bind="item.User"></td>
 					<td ng-style="{'border-left':'solid 10px ' + vm.eventList[item.EventId].Color}">{{vm.eventList[item.EventId].Label}}</td>
 					<td>

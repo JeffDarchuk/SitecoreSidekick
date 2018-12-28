@@ -15,48 +15,39 @@ namespace ScsContentMigrator.Data
 		{
 			using (var sqlConnection = new SqlConnection(System.Configuration.ConfigurationManager.ConnectionStrings[database].ConnectionString))
 			{
-				sqlConnection.Open();
-				using (var sqlCommand = ConstructSqlBatch(ids))
+				try
 				{
-					sqlCommand.Connection = sqlConnection;
-				
-					using (var reader = sqlCommand.ExecuteReader())
+					sqlConnection.Open();
+					using (var sqlCommand = ConstructSqlBatch(ids))
 					{
-						var checksum = new Checksum();
-						while (reader.Read())
+						sqlCommand.Connection = sqlConnection;
+
+						using (var reader = sqlCommand.ExecuteReader())
 						{
-							checksum.LoadRow(reader["ID"].ToString(), reader["ParentID"].ToString(), reader["Value"].ToString());
+							var checksum = new Checksum();
+							while (reader.Read())
+							{
+								checksum.LoadRow(reader["ID"].ToString(), reader["ParentID"].ToString(), reader["Value"].ToString());
+							}
+
+							checksum.Generate();
+							return checksum;
 						}
-						checksum.Generate();
-						return checksum;
 					}
 				}
+				catch (Exception e)
+				{
+					Log.Warn("Checksum generation failed.",e, this);
+				}
+				finally
+				{
+					sqlConnection.Close();
+				}
 			}
-		}
-		//to get on demand checksums, prooved to not scale well.
-		//public int Generate(ID id, string database)
-		//{
-		//	using (var sqlConnection = new SqlConnection(System.Configuration.ConfigurationManager.ConnectionStrings[database].ConnectionString))
-		//	{
-		//		sqlConnection.Open();
-		//		using (var sqlCommand = ConstructSqlBatch(id))
-		//		{
-		//			sqlCommand.Connection = sqlConnection;
 
-		//			using (var reader = sqlCommand.ExecuteReader())
-		//			{
-		//				var checksum = new Checksum();
-		//				StringBuilder sb = new StringBuilder();
-		//				while (reader.Read())
-		//				{
-		//					sb.Append(reader["Value"]);
-		//				}
-		//				checksum.Generate();
-		//				return sb.ToString().GetHashCode();
-		//			}
-		//		}
-		//	}
-		//}
+			return null;
+		}
+
 		private SqlCommand ConstructSqlBatch(List<ID> id)
 		{
 			var command = new SqlCommand();
@@ -67,7 +58,7 @@ namespace ScsContentMigrator.Data
 				WITH Roots AS (
 					SELECT Id
 					FROM Items
-					where Id {BuildSqlInStatement(id, command, "r")}
+					where Id {BuildSqlInStatement(id, "r")}
 				), tree AS (
 					SELECT x.ID, x.ParentID
 					FROM Items x
@@ -87,41 +78,11 @@ namespace ScsContentMigrator.Data
 			command.CommandText = sql.ToString();
 			return command;
 		}
-//		private SqlCommand ConstructSqlBatch(ID id)
-//		{
-//			var command = new SqlCommand();
 
-//			var sql = new StringBuilder(8000);
-
-//			sql.Append($@"
-//				WITH Roots AS (
-//					SELECT Id
-//					FROM Items
-//					where Id = '{id.Guid:D}'
-//				), tree AS (
-//					SELECT x.ID, x.ParentID
-//					FROM Items x
-//					INNER JOIN Roots ON x.ID = Roots.ID
-//					UNION ALL
-//					SELECT y.ID, y.ParentID
-//					FROM Items y
-//					INNER JOIN tree t ON y.ParentID = t.ID
-//				)
-//				SELECT v.Value
-//				FROM tree t
-//				inner join VersionedFields v on v.ItemId = t.ID
-//				WHERE v.FieldId = '{FieldIDs.Revision.Guid:D}'
-//				order by v.Value
-
-//");
-
-//			command.CommandText = sql.ToString();
-//			return command;
-//		}
-		private StringBuilder BuildSqlInStatement(List<ID> parameters, SqlCommand command, string parameterPrefix)
+		private StringBuilder BuildSqlInStatement(List<ID> parameters, string parameterPrefix)
 		{
 
-			var inStatement = new StringBuilder(((parameterPrefix.Length + 4) * parameters.Count) + 5); // ((prefixLength + '@, ') * paramCount) + 'IN ()'
+			var inStatement = new StringBuilder(((parameterPrefix.Length + 4) * parameters.Count) + 5);
 			inStatement.Append("IN (");
 			inStatement.Append("'"); // first element param @, subsequent get from join below
 			inStatement.Append(string.Join("', '", parameters.Select(x => x.Guid.ToString("D").ToUpper())));

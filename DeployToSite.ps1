@@ -12,7 +12,7 @@ Get-ChildItem "$PSScriptRoot\bin" | Foreach-Object{
 	Copy-Item $_.FullName "$Webroot\bin\$(Split-Path $_.FullName -Leaf)" -Force
 }
 
- $webroot = "c:\inetpub\wwwroot\demo1.local"
+ $webroot = "c:\inetpub\wwwroot\dh9-t.local"
 
  get-childitem "$psscriptroot\" -recurse -filter *.config -file | foreach-object{
 	 $filename = split-path $_.fullname -leaf

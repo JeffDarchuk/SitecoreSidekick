@@ -38,7 +38,7 @@ namespace ScsAuditLog
 					{
 						if (!_root.Nodes.Any())
 						{
-							foreach (IItemData child in _sitecoreDataAccessSerivce.GetRootItemData(_root.DatabaseName).GetChildren())
+							foreach (IItemData child in _sitecoreDataAccessSerivce.GetChildren(_sitecoreDataAccessSerivce.GetRootItemData(_root.DatabaseName)))
 							{
 								_root.Nodes.Add(new ContentTreeNode(child, false));
 							}

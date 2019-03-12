@@ -79,9 +79,17 @@ namespace SitecoreSidekick.Pipelines.Initialize
 				{
 					sk[FieldIDs.DisplayName] = "Sitecore Sidekick";
 					if (IsGreaterThanSc7())
+					{
 						sk[FieldIDs.Icon] = "office/32x32/sword.png";
+						sk["Icon"] = "office/32x32/sword.png";
+					}
 					else
+					{
 						sk[FieldIDs.Icon] = "Network/32x32/knight.png";
+						sk["Icon"] = "Network/32x32/knight.png";
+					}
+
+					sk["Display name"] = "Sitecore Sidekick";
 					sk["Message"] = "scs:open";
 					sk["Tool tip"] = "Open the Sitecore Sidekick";
 					sk[FieldIDs.Security] = @"ar|sitecore\Sitecore Client Authoring|pd|+item:read|pe|+item:read|";
@@ -93,9 +101,13 @@ namespace SitecoreSidekick.Pipelines.Initialize
 		{
 			return
 				sk[FieldIDs.DisplayName] == "Sitecore Sidekick" &&
-				IsGreaterThanSc7()
+				(IsGreaterThanSc7()
 					? sk[FieldIDs.Icon] == "office/32x32/sword.png"
-					: sk[FieldIDs.Icon] == "Network/32x32/knight.png" &&
+					: sk[FieldIDs.Icon] == "Network/32x32/knight.png") &&
+				(IsGreaterThanSc7()
+					? sk["Icon"] == "office/32x32/sword.png"
+					: sk["Icon"] == "Network/32x32/knight.png") &&
+				sk["Display name"] == "Sitecore Sidekick" &&
 				sk["Message"] == "scs:open" &&
 				sk["Tool tip"] == "Open the Sitecore Sidekick" &&
 				sk[FieldIDs.Security] == @"ar|sitecore\Sitecore Client Authoring|pd|+item:read|pe|+item:read|";

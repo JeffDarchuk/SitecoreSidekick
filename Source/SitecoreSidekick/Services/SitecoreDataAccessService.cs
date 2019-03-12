@@ -39,6 +39,14 @@ namespace SitecoreSidekick.Services
 		}
 
 		public IItemData GetItemData(Guid idataId, string database = null) => GetItemData(new ID(idataId).ToString(), database);
+		public IEnumerable<IItemData> GetChildren(IItemData parent)
+		{
+			using (new SecurityDisabler())
+			{
+				return parent.GetChildren();
+			}
+		}
+
 		public IItemData GetItemData(string id, string database = null)
 		{
 			var item = GetItem(id, database);
@@ -56,11 +64,14 @@ namespace SitecoreSidekick.Services
 
 		public Dictionary<Guid, string> GetItemAndChildrenRevision(Guid idataId, string database = null)
 		{
-			var item = GetItem(idataId, database);
-			var revs = item?.GetChildren().ToDictionary(x => x.ID.Guid, x => x[FieldIDs.Revision]);
-			if (revs == null) return null;
-			revs.Add(item.ID.Guid, item?[FieldIDs.Revision]);
-			return revs;
+			using (new SecurityDisabler())
+			{
+				var item = GetItem(idataId, database);
+				var revs = item?.GetChildren().ToDictionary(x => x.ID.Guid, x => x[FieldIDs.Revision]);
+				if (revs == null) return null;
+				revs.Add(item.ID.Guid, item?[FieldIDs.Revision]);
+				return revs;
+			}
 		}
 
 		public IItemData GetRootItemData(string database = null)
@@ -75,7 +86,10 @@ namespace SitecoreSidekick.Services
 
 		public List<Guid> GetChildrenIds(Guid guid)
 		{
-			return GetItem(guid).Children.Select(x => x.ID.Guid).ToList();
+			using (new SecurityDisabler())
+			{
+				return GetItem(guid).Children.Select(x => x.ID.Guid).ToList();
+			}
 		}
 
 		public IEnumerable<string> GetVersions(IItemData itemData)

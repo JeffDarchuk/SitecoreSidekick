@@ -5,6 +5,7 @@ using Rainbow.Model;
 using Sitecore.Configuration;
 using Sitecore.Data.Items;
 using Sitecore.Data.Managers;
+using Sitecore.SecurityModel;
 using SitecoreSidekick.Services.Interface;
 
 namespace SitecoreSidekick.ContentTree
@@ -46,7 +47,8 @@ namespace SitecoreSidekick.ContentTree
 			DisplayName = item.Name;
 			Id = item.Id.ToString();
 			if (Open)
-				Nodes = item.GetChildren().Select(c => new ContentTreeNode(c, false)).ToList();
+				using (new SecurityDisabler())
+					Nodes = item.GetChildren().Select(c => new ContentTreeNode(c, false)).ToList();
 		}
 
 		public void SetIcon(IItemData item)

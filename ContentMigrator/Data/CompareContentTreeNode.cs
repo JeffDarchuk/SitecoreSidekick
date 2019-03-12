@@ -224,7 +224,7 @@ namespace ScsContentMigrator.Data
 						tracker.Add(child.Id);
 					}
 
-					foreach (IItemData child in localItem.GetChildren())
+					foreach (IItemData child in _sitecoreAccessService.GetChildren(localItem))
 					{
 						if (tracker.Contains(child.Id.ToString())) continue;
 						var newnode = new CompareContentTreeNode(child, false)

@@ -278,13 +278,15 @@ namespace ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Load
 
             sqlContext.ExecuteSql(splitTempTablesSql);
 
-	        if (!OnStagedDataValidating.Execute(p => p.ValidateLoadStage(loadContext, sqlContext), breakOnDefault: true))
-		        return false;
+			if (!OnStagedDataValidating.Execute(p => p.ValidateLoadStage(loadContext, sqlContext), breakOnDefault: false))
+			{
+			}
 
-            sqlContext.ExecuteSql(indexesSql);
+			sqlContext.ExecuteSql(indexesSql);
 
-	        if (!OnTempDataValidating.Execute(p => p.ValidateLoadStage(loadContext, sqlContext), breakOnDefault: true))
-                return false;
+			if (!OnTempDataValidating.Execute(p => p.ValidateLoadStage(loadContext, sqlContext), breakOnDefault: false))
+			{
+			}
 
             loadContext.Log.Info($"Validated and prepared loaded data: {(int)stopwatch.Elapsed.TotalSeconds}s");
             return true;

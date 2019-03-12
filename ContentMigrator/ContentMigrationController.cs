@@ -106,13 +106,13 @@ namespace ScsContentMigrator
 				}
 				if (item.Path.StartsWith("/sitecore/media library/"))
 				{
-					GrandChildren.AddRange(item.GetChildren().Select(x => x.Id));
+					GrandChildren.AddRange(_sitecore.GetChildren(item).Select(x => x.Id));
 				}
 				else
 				{
-					items.AddRange(item.GetChildren().Select(x =>
+					items.AddRange(_sitecore.GetChildren(item).Select(x =>
 					{
-						GrandChildren.AddRange(x.GetChildren().Select(c => c.Id));
+						GrandChildren.AddRange(_sitecore.GetChildren(x).Select(c => c.Id));
 						if (data.Rev != null && data.Rev.ContainsKey(x.Id) && localRev.ContainsKey(x.Id) && data.Rev[x.Id] == localRev[x.Id])
 						{
 							return new KeyValuePair<Guid, string>(x.Id, null);
@@ -175,28 +175,28 @@ namespace ScsContentMigrator
 			return ScsJson(GetItemYaml(data));
 		}
 
-		[ScsLoggedIn]
+		[MchapOrLoggedIn]
 		[ActionName("cmopeartionstatus.scsvc")]
 		public ActionResult Status(OperationStatusRequestModel data)
 		{
 			return ScsJson(_migrationManager.GetItemLogEntries(data.OperationId, data.LineNumber));
 		}
 
-		[ScsLoggedIn]
+		[MchapOrLoggedIn]
 		[ActionName("cmopeartionlog.scsvc")]
 		public ActionResult LogStatus(OperationStatusRequestModel data)
 		{
 			return ScsJson(_migrationManager.GetAuditLogEntries(data.OperationId, data.LineNumber));
 		}
 
-		[ScsLoggedIn]
+		[MchapOrLoggedIn]
 		[ActionName("cmoperationlist.scsvc")]
 		public ActionResult OperationList()
 		{
 			return ScsJson(GetOperationList());
 		}
 
-		[ScsLoggedIn]
+		[MchapOrLoggedIn]
 		[ActionName("cmstopoperation.scsvc")]
 		public ActionResult Stop(string operationId)
 		{
@@ -210,7 +210,7 @@ namespace ScsContentMigrator
 			return ScsJson(StartPreviewAsPull(operationId));
 		}
 
-		[ScsLoggedIn]
+		[MchapOrLoggedIn]
 		[ActionName("cmqueuelength.scsvc")]
 		public ActionResult GetOperationQueueLength(string operationId)
 		{

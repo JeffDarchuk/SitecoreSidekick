@@ -10,7 +10,7 @@
         <projectUrl>https://github.com/JeffDarchuk/SitecoreSidekick</projectUrl>
 
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <description>A tool to help sitecore users more easilly navigate around the content editor with previously visited items and a customizable list of important locations.</description>
+        <description>A tool to help Sitecore users more easily navigate around the content editor with previously visited items and a customizable list of important locations.</description>
         <copyright>Copyright 2017 Jeff Darchuk</copyright>
         <tags>sitecore</tags>
   </metadata>

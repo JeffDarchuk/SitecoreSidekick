@@ -79,6 +79,7 @@ namespace ScsContentMigrator
 
 				return null;
 			});
+			container.Register<IDatastoreSaver, DatastoreSaver>();
 			container.RegisterFactory<IContentItemPuller>(args => new ContentItemPuller());
 			container.RegisterFactory<IContentItemInstaller>(args => new ContentItemInstaller());
 			container.RegisterFactory<IDefaultLogger>(args => new DefaultLogger() );

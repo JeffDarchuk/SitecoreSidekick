@@ -38,6 +38,7 @@ namespace ScsContentMigrator.Core
 		private readonly ISitecoreDataAccessService _sitecore;
 		private readonly IJsonSerializationService _jsonSerializationService;
 		private readonly IChecksumManager _checksumManager;
+		private readonly IDatastoreSaver _datastoreSaver;
 		private readonly BlockingCollection<IItemData> _itemsToCreate = new BlockingCollection<IItemData>();
 		internal ConcurrentHashSet<Guid> AllowedItems = new ConcurrentHashSet<Guid>();
 		internal ConcurrentHashSet<Guid> Errors = new ConcurrentHashSet<Guid>();
@@ -55,6 +56,7 @@ namespace ScsContentMigrator.Core
 			_jsonSerializationService = Bootstrap.Container.Resolve<IJsonSerializationService>();
 			_comparer = Bootstrap.Container.Resolve<IItemComparer>();
 			_checksumManager = Bootstrap.Container.Resolve<IChecksumManager>();
+			_datastoreSaver = Bootstrap.Container.Resolve<IDatastoreSaver>();
 		}
 
 		public IEnumerable<dynamic> GetItemLogEntries(int lineToStartFrom)
@@ -327,7 +329,7 @@ namespace ScsContentMigrator.Core
 						if (localData != null || !args.UseItemBlaster)
 						{
 							_logger.BeginEvent(remoteData, LogStatus.Changed, GetSrc(_sitecore.GetIconSrc(localData)), true);
-							_scDatastore.Save(remoteData);
+							_datastoreSaver.Save(_scDatastore, remoteData);
 						}
 						else if (args.UseItemBlaster)
 						{
@@ -342,7 +344,7 @@ namespace ScsContentMigrator.Core
 						}
 						else
 						{
-							_scDatastore.Save(remoteData);
+							_datastoreSaver.Save(_scDatastore, remoteData);
 						}
 
 					}

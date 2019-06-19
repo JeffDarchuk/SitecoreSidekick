@@ -188,6 +188,8 @@
     <Compile Include="Core\Interface\IContentItemPuller.cs" />
     <Compile Include="Core\Interface\IContentMigration.cs" />
     <Compile Include="Models\RevisionModel.cs" />
+    <Compile Include="Services\DatastoreSaver.cs" />
+    <Compile Include="Services\Interface\IDatastoreSaver.cs" />
     <Compile Include="Services\Interface\ILoggingService.cs" />
     <Compile Include="Services\Interface\IRemoteContentService.cs" />
     <Compile Include="ItemExtensions.cs" />

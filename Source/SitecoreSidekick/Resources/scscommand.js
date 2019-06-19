@@ -1,6 +1,5 @@
 ﻿//from here: http://stackoverflow.com/questions/902407/how-to-hijack-key-combos-in-javascript
 
-if (window.location.href.indexOf("Content%20Editor.aspx") > -1 || window.location.href.indexOf("default.aspx") > -1) {
 	window.onload = function() {
 		document.onkeydown = function(event) {
 			var keyCode;
@@ -41,7 +40,5 @@ if (window.location.href.indexOf("Content%20Editor.aspx") > -1 || window.locatio
 			}
 		};
 	};
-
-	document.innerHTML += "<div id='scs' style='display:none;height:100%;width:100%;position:absolute;z-index:9999;left:0;top:0;'></div>";
-	document.write("<div id='scs' style='display:none;height:100%;width:100%;position:absolute;z-index:9999;left:0;top:0;'></div>");
-}
+	
+	document.body.innerHTML += "<div id='scs' style='display:none;height:100%;width:100%;position:absolute;z-index:9999;left:0;top:0;'></div>";

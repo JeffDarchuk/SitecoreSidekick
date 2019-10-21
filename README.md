@@ -15,6 +15,10 @@ There are two main packages to choose from:
 
 Installation is as simple as installing the NuGet packages you want from within Visual Studio.
 
+### Via Package
+
+Installing via Sitecore Package is not recommended, but find in the root of the repo the latest package.  If you use Unicorn in your project to serialize items make sure you install the (No Rainbow) package as this will not overwrite Unicorn's Rainbow dll files but rather utilize whatever version Unicorn is using (Sidekick can work with any version).  After installing some manual configuration is required in the App_Config/local/Sidekick folder with the zSCSContentMigrator.Local.config.example file.  Remove the .example and set up your list of remote content source URLs.
+
 ## Extending Sidekick
 
 Implementing a new Sidekick app is easy by following [this](https://github.com/JeffDarchuk/SitecoreSidekick/blob/master/doc/SidekickTemplate.md) tutorial.

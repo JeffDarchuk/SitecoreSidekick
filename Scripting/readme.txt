@@ -14,6 +14,7 @@ $params = @{
     EventDisabler = $true
     BulkUpdate = $true
     PullParent = $true
+	UseItemBlaster = $true
 }
 #MAKE THE CONTENT FROM ONE SERVER MATCH THE OTHER EXACTLY
 Copy-SKContent @params -RootId '{0DE95AE4-41AB-4D01-9EB0-67441B7C2450}' -Children -Overwrite -RemoveLocalNotInRemote

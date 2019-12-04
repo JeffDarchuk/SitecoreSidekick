@@ -9,7 +9,7 @@ namespace ScsContentMigrator
 	{
 		private readonly PullItemModel _args;
 		private readonly IContentMigrationManagerService _migrationManager;
-		public ContentAgent(string remoteServer, string rootIds, string database, string bulkUpdate, string children, string overwrite, string eventDisabler, string pullParent, string removeLocalNotInRemote)
+		public ContentAgent(string remoteServer, string rootIds, string database, string bulkUpdate, string children, string overwrite, string eventDisabler, string pullParent, string removeLocalNotInRemote, string ignoreRevId = "false", string useItemBlaster = "true")
 		{
 			_args = new PullItemModel()
 			{
@@ -22,7 +22,10 @@ namespace ScsContentMigrator
 				EventDisabler = eventDisabler.ToLower() == "true",
 				PullParent = pullParent.ToLower() == "true",
 				RemoveLocalNotInRemote = removeLocalNotInRemote.ToLower() == "true",
-				Preview = false
+				Preview = false,
+				IgnoreRevId = ignoreRevId.ToLower() == "true",
+				UseItemBlaster = useItemBlaster.ToLower() == "true"
+
 			};
 			_migrationManager = Bootstrap.Container.Resolve<IContentMigrationManagerService>();
 		}

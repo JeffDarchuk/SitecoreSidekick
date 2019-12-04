@@ -24,7 +24,11 @@ Function Copy-SKContent {
 		
 		[switch]$EventDisabler,
 		
-		[switch]$BulkUpdate
+		[switch]$BulkUpdate,
+		
+		[switch]$UseItemBlaster,
+		
+		[switch]$IgnoreRevId
 	)
 	$idsJson = [string]::Join('"]["', $RootId)
 	
@@ -38,6 +42,8 @@ Function Copy-SKContent {
 		"RemoveLocalNotInRemote" = $RemoveLocalNotInRemote.ToBool()
 		"EventDisabler" = $EventDisabler.ToBool()
 		"BulkUpdate" = $BulkUpdate.ToBool()
+		"UseItemBlaster" = $UseItemBlaster.ToBool()
+		"IgnoreRevId" = $IgnoreRevId.ToBool()
 	} | ConvertTo-Json
 
 	$url = "{0}/scs/cm/cmstartoperation.scsvc" -f $LocalUrl

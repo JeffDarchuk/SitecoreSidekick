@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using ScsContentMigrator.Args;
+using ScsContentMigrator.Core;
 using ScsContentMigrator.Core.Interface;
 using ScsContentMigrator.Models;
 
@@ -7,7 +8,7 @@ namespace ScsContentMigrator.Services.Interface
 {
 	public interface IContentMigrationManagerService
 	{
-		string StartContentMigration(PullItemModel args);
+		ContentMigration StartContentMigration(PullItemModel args);
 		bool CancelContentMigration(string operationId);
 		IContentMigration GetContentMigration(string operationId);
 		IEnumerable<IContentMigration> GetAllContentMigrations();

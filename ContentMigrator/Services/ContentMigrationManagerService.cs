@@ -18,7 +18,7 @@ namespace ScsContentMigrator.Services
 	{
 
 		private readonly Dictionary<string, IContentMigration> _migrations = new Dictionary<string, IContentMigration>();
-		public string StartContentMigration(PullItemModel model)
+		public ContentMigration StartContentMigration(PullItemModel model)
 		{
 			Log.Info($"Starting Content Migration...\n{model.Server}\n{string.Join(", ", model.Ids)}", this);
 			string id = Guid.NewGuid().ToString();
@@ -26,7 +26,7 @@ namespace ScsContentMigrator.Services
 			newMigration.Status.OperationId = id;
 			newMigration.StartContentMigration(model);
 			_migrations.Add(id, newMigration);
-			return id;
+			return newMigration;
 		}
 
 		public bool CancelContentMigration(string operationId)

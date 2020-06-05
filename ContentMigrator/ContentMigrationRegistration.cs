@@ -18,6 +18,7 @@ using ScsContentMigrator.Core.Interface;
 using Sitecore.Events;
 using Sitecore.Web.Authentication;
 using SitecoreSidekick.Services.Interface;
+using ScsContentMigrator.Models;
 
 namespace ScsContentMigrator
 {
@@ -29,6 +30,7 @@ namespace ScsContentMigrator
 		public int RemoteThreads { get; } = 1;
 		public int WriterThreads { get; } = 1;
 		public Dictionary<string, string> ServerList { get; } = new Dictionary<string, string>();
+		public Dictionary<string, PresetModel> PresetList { get; } = new Dictionary<string, PresetModel>();
 		public override string Directive => "cmmasterdirective";
 		public override NameValueCollection DirectiveAttributes { get; set; }
 		public override string ResourcesPath => "ScsContentMigrator.Resources";
@@ -74,12 +76,44 @@ namespace ScsContentMigrator
 
 		public void BuildServerList(XmlNode node)
 		{
-			string serverValue = node.InnerText;
+			string serverValue = node.InnerText.Trim('/');
+			string descValue = serverValue;
 	  		if(!string.IsNullOrWhiteSpace(node.Attributes?["desc"]?.Value)){
-				serverValue = node.Attributes["desc"].Value;
+				descValue = node.Attributes["desc"].Value;
 			} 
 			
-			ServerList.Add(node.InnerText, serverValue);	
+			ServerList.Add(serverValue, descValue);	
+		}
+		public void BuildPresetList(XmlNode node)
+		{
+			PresetModel model = new PresetModel() { Ids = new List<string>() };
+			model.Name = node.Attributes["name"].Value;
+			model.Desc = node.Attributes["desc"].Value;
+			model.BulkUpdate = node.Attributes["bulkUpdate"]?.Value != null ? node.Attributes["bulkUpdate"]?.Value == "true" : model.BulkUpdate;
+			model.Children = node.Attributes["children"]?.Value != null ? node.Attributes["children"]?.Value == "true" : model.Children;
+			model.Overwrite = node.Attributes["overwrite"]?.Value != null ? node.Attributes["overwrite"]?.Value == "true" : model.Overwrite;
+			model.EventDisabler = node.Attributes["eventDisabler"]?.Value != null ? node.Attributes["eventDisabler"]?.Value == "true" : model.EventDisabler;
+			model.PullParent = node.Attributes["pullParent"]?.Value != null ? node.Attributes["pullParent"]?.Value == "true" : model.PullParent;
+			model.RemoveLocalNotInRemote = node.Attributes["removeLocalNotInRemote"]?.Value != null ? node.Attributes["removeLocalNotInRemote"]?.Value == "true" : model.RemoveLocalNotInRemote;
+			model.IgnoreRevId = node.Attributes["ignoreRevId"]?.Value != null ? node.Attributes["ignoreRevId"]?.Value == "true" : model.IgnoreRevId;
+			model.UseItemBlaster = node.Attributes["useItemBlaster"]?.Value != null ? node.Attributes["useItemBlaster"]?.Value == "true" : model.UseItemBlaster;
+
+			foreach (XmlNode xml in node.ChildNodes)
+			{
+				if (xml.Name.ToLower() == "serverblacklist")
+				{
+					model.BlackList.Add(xml.InnerText.Trim('/'));
+				}
+				else if(xml.Name.ToLower() == "serverwhitelist")
+				{
+					model.WhiteList.Add(xml.InnerText.Trim('/'));
+				}
+				else if(xml.Name.ToLower() == "source")
+				{
+					model.Ids.Add(xml.InnerText.Trim());
+				}
+			}
+			PresetList.Add(model.Name, model);
 		}
 
 		public void BuildRoot(XmlNode node)

@@ -58,18 +58,22 @@ namespace ScsContentMigrator.Data
 				WITH Roots AS (
 					SELECT Id
 					FROM Items
+					WITH (NOLOCK)
 					where Id {BuildSqlInStatement(id, "r")}
 				), tree AS (
 					SELECT x.ID, x.ParentID
 					FROM Items x
+					WITH (NOLOCK)
 					INNER JOIN Roots ON x.ID = Roots.ID
 					UNION ALL
 					SELECT y.ID, y.ParentID
 					FROM Items y
+					WITH (NOLOCK)
 					INNER JOIN tree t ON y.ParentID = t.ID
 				)
 				SELECT t.ID, t.ParentID, v.Value
 				FROM tree t
+				WITH (NOLOCK)
 				inner join VersionedFields v on v.ItemId = t.ID
 				WHERE v.FieldId = '{FieldIDs.Revision.Guid:D}'
 

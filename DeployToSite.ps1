@@ -1,4 +1,4 @@
-$Webroot = "C:\inetpub\wwwroot\dh911.local"
+$Webroot = "C:\inetpub\wwwroot\asc911.local"
 
 Get-ChildItem "$PSScriptRoot\" -recurse -filter *.config -File | Foreach-Object{
 	$fileName = Split-Path $_.FullName -leaf
@@ -9,5 +9,7 @@ Get-ChildItem "$PSScriptRoot\" -recurse -filter *.config -File | Foreach-Object{
 }
 Get-ChildItem "$PSScriptRoot\bin" | Foreach-Object{
 	Write-Host "moving $($_.FullName) to bin root" -ForegroundColor Green
-	Copy-Item $_.FullName "$Webroot\bin\$(Split-Path $_.FullName -Leaf)" -Force
+	if ($_.Name.StartsWith("Scs") -or -not (Test-Path "$Webroot\bin\$(Split-Path $_.FullName -Leaf)")){
+		Copy-Item $_.FullName "$Webroot\bin\$(Split-Path $_.FullName -Leaf)" -Force
+	}
 }

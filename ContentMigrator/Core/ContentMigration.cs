@@ -76,7 +76,7 @@ namespace ScsContentMigrator.Core
 				throw new ArgumentNullException("Cannot start an operation as a preview if it hasn't been started as a preview.");
 			}
 			_model.Preview = false;
-			_puller = new ContentItemPuller();
+			_puller = new ContentItemPuller(100);
 			_installer = new ContentItemInstaller();
 			StartContentMigration(_model);
 		}

@@ -26,9 +26,11 @@ namespace ScsContentMigrator.Core
 		private readonly ISitecoreDataAccessService _sitecore;
 		private readonly object _locker = new object();
 		private int _processing = 0;
+		private int _maxQueue;
 
-		public ContentItemPuller()
+		public ContentItemPuller(int maxQueue)
 		{
+			_maxQueue = maxQueue;
 			_remoteContent = Bootstrap.Container.Resolve<IRemoteContentService>();
 			_yamlSerializationService = Bootstrap.Container.Resolve<IYamlSerializationService>();
 			_sitecore = Bootstrap.Container.Resolve<ISitecoreDataAccessService>();
@@ -47,15 +49,16 @@ namespace ScsContentMigrator.Core
 			}
 			for (int i = 0; i < threads; i++)
 			{
-				Task.Run(() =>
+				Task.Run(async () =>
 				{
-					GatherItems(getChildren, server, cancellationToken, ignoreRevId);
+					await GatherItems(getChildren, server, cancellationToken, ignoreRevId);
 				});
 			}
 		}
 
-		internal void GatherItems(bool getChildren, string server, CancellationToken cancellationToken, bool ignoreRevId)
-		{			
+		internal async Task GatherItems(bool getChildren, string server, CancellationToken cancellationToken, bool ignoreRevId)
+		{
+			ChildrenItemDataModel buffer = null;
 			while (!Completed)
 			{
 				try
@@ -67,26 +70,38 @@ namespace ScsContentMigrator.Core
 					}
 					lock (_locker)
 						_processing++;
-					ChildrenItemDataModel remoteContentItem = _remoteContent.GetRemoteItemDataWithChildren(id, server, ignoreRevId ? null : _sitecore.GetItemAndChildrenRevision(id));
-					foreach (var item in (getChildren ? remoteContentItem.Items : remoteContentItem.Items.Where(x => x.Key == id)))
+					if (buffer == null)
 					{
-						if (item.Value != null)
-						{
-							IItemData itemData = _yamlSerializationService.DeserializeYaml(item.Value, item.Key.ToString());
-							GatheredRemoteItems.Add(itemData, cancellationToken);
-						}
-						else
-						{
-							GatheredRemoteItems.Add(_sitecore.GetItemData(item.Key), cancellationToken);
-						}
+						buffer = _remoteContent.GetRemoteItemDataWithChildren(id, server, ignoreRevId ? null : _sitecore.GetItemAndChildrenRevision(id));
 					}
-					if (getChildren && remoteContentItem.GrandChildren != null)
+					if (GatheredRemoteItems.Count >= _maxQueue)
 					{
-						foreach (var child in remoteContentItem.GrandChildren)
-						{
-							ProcessingIds.Add(child, cancellationToken);
-						}
+						await Task.Delay(1000);
 					}
+					else
+					{
+						foreach (var item in (getChildren ? buffer.Items : buffer.Items.Where(x => x.Key == id)))
+						{
+							if (item.Value != null)
+							{
+								IItemData itemData = _yamlSerializationService.DeserializeYaml(item.Value, item.Key.ToString());
+								GatheredRemoteItems.Add(itemData, cancellationToken);
+							}
+							else
+							{
+								GatheredRemoteItems.Add(_sitecore.GetItemData(item.Key), cancellationToken);
+							}
+						}
+						if (getChildren && buffer.GrandChildren != null)
+						{
+							foreach (var child in buffer.GrandChildren)
+							{
+								ProcessingIds.Add(child, cancellationToken);
+							}
+						}
+						buffer = null;
+					}
+
 				}
 				catch (OperationCanceledException e)
 				{

@@ -23,6 +23,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScsSitecoreResourceManager"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScsJobManager", "ScsJobManager\ScsJobManager.csproj", "{A5334793-4594-4DA0-9EA6-0E2F5C14CBD4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScsXconnect", "ScsXconnect\ScsXconnect.csproj", "{34E78E2D-B92D-4E3E-A6EC-97111C01C43E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScsXConnectDemo", "ScsXconnect\ScsXConnectDemo\ScsXConnectDemo.csproj", "{1633D2A0-39F2-47C5-A479-9B232A010014}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Source\SitecoreSidekick.Shared\SitecoreSidekick.Shared.projitems*{0da36c4a-1b13-4891-a263-5f994127051c}*SharedItemsImports = 4
@@ -69,6 +73,14 @@ Global
 		{A5334793-4594-4DA0-9EA6-0E2F5C14CBD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A5334793-4594-4DA0-9EA6-0E2F5C14CBD4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A5334793-4594-4DA0-9EA6-0E2F5C14CBD4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{34E78E2D-B92D-4E3E-A6EC-97111C01C43E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{34E78E2D-B92D-4E3E-A6EC-97111C01C43E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{34E78E2D-B92D-4E3E-A6EC-97111C01C43E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{34E78E2D-B92D-4E3E-A6EC-97111C01C43E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1633D2A0-39F2-47C5-A479-9B232A010014}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1633D2A0-39F2-47C5-A479-9B232A010014}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1633D2A0-39F2-47C5-A479-9B232A010014}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1633D2A0-39F2-47C5-A479-9B232A010014}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

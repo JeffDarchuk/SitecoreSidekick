@@ -152,7 +152,7 @@ namespace ScsContentMigrator
 					return null;
 				}
 			}
-			return Content(_migrationManager.StartContentMigration(data));
+			return ScsJson(_migrationManager.StartContentMigration(data).Status);
 		}
 
 		[MchapOrLoggedIn]
@@ -267,6 +267,25 @@ namespace ScsContentMigrator
 			}
 
 			return Content(ret.ToString());
+		}
+
+		[ScsLoggedIn]
+		[ActionName("cmgetpresets.scsvc")]
+		public ActionResult GetPresets(string server)
+		{
+			server = server.ToLower();
+			return ScsJson(_registration.GetScsRegistration<ContentMigrationRegistration>().PresetList.Values.Where(
+				x => !x.BlackList.Contains(server) &&
+					(!x.WhiteList.Any() || x.WhiteList.Contains(server))));
+		}
+
+		[ScsLoggedIn]
+		[ActionName("cmrunpreset.scsvc")]
+		public ActionResult RunPreset(PresetRunModel model)
+		{
+			var preset = _registration.GetScsRegistration<ContentMigrationRegistration>().PresetList[model.Name];
+			preset.Server = model.Server;
+			return StartOperation(preset);
 		}
 
 		private object OperationQueueLength(string operationId)

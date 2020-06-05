@@ -31,7 +31,7 @@ namespace ScsEditingContext.Pipelines.HttpRequestBegin
 		{
 			try
 			{
-				var guidString = args.Context.Request.Form["__PARAMETERS"];
+				var guidString = HttpContext.Current.Request.Form["__PARAMETERS"];
 				if (guidString != null)
 				{
 					int guidStart = guidString.IndexOf('"') + 1;
@@ -39,7 +39,7 @@ namespace ScsEditingContext.Pipelines.HttpRequestBegin
 					if (guidStart != -1 && guidStop > guidStart)
 					{
 						guidString = guidString.Substring(guidStart, guidStop - guidStart);
-						HttpCookie myCookie = args.Context.Request.Cookies["scseditorcontext" + Regex.Replace(Context.GetUserName(), "[^a-zA-Z0-9 -]", string.Empty)];
+						HttpCookie myCookie = HttpContext.Current.Request.Cookies["scseditorcontext" + Regex.Replace(Context.GetUserName(), "[^a-zA-Z0-9 -]", string.Empty)];
 
 						if (!_sitecoreDataAccessService.TryGetItemData(guidString, out IItemData item))
 							return;
@@ -61,14 +61,14 @@ namespace ScsEditingContext.Pipelines.HttpRequestBegin
 							if (list.Count > 10)
 								list.RemoveAt(0);
 							SetValue(myCookie, string.Join(",", list));
-							args.Context.Response.Cookies.Add(myCookie);
+							HttpContext.Current.Response.Cookies.Add(myCookie);
 						}
 						else
 						{
 							myCookie = new HttpCookie("scseditorcontext" + Regex.Replace(Context.GetUserName(), "[^a-zA-Z0-9 -]", string.Empty));
 							SetValue(myCookie, $"{current.Id}|{current.DatabaseName}");
 							myCookie.Expires = DateTime.Now.AddDays(1d);
-							args.Context.Response.Cookies.Add(myCookie);
+							HttpContext.Current.Response.Cookies.Add(myCookie);
 						}
 					}
 				}

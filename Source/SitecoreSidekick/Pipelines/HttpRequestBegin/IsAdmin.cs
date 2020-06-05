@@ -33,7 +33,7 @@ namespace SitecoreSidekick.Pipelines.HttpRequestBegin
 
 		public override void Process(HttpRequestArgs args)
 		{
-			HttpCookie myCookie = args.Context.Request.Cookies[SessionSettings.CookieName];
+			HttpCookie myCookie = HttpContext.Current.Request.Cookies[SessionSettings.CookieName];
 			if (myCookie != null)
 			{
 				UserRoles[myCookie.Value] = Context.User;

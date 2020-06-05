@@ -24,7 +24,7 @@
 						<root>/sitecore/media library</root>
 						<root>/sitecore/system/Marketing Control Panel</root>
 					</roots>
-					
+
 					<!--
 						Configure the remote server(s) that this server may pull content from.
 						For example, you might add the URLs to your production content management server here.
@@ -38,6 +38,40 @@
 						<server>[enter server 1 url here i.e. https://sitecore-qa-cm]</server>
 						<server desc="optional label">[enter server 2 url here i.e. https://sitecore-prod-cm]</server>
 					</servers>
+					<!-- 
+						Add presets to allow for rapid content migration for specific guid sets.
+						For example you may find yourself regularly migrating content from a particular
+						Sitecore site, you can make that as easy as a click of the button.
+						
+						in the first example you can see all of the sync options in their default form.  There is no
+						need to explicitly set the options if they do not differ from these defaults.
+					-->
+					<presets hint="raw:BuildPresetList">
+						<preset
+							name="AllContent"
+							desc="Pull all content from the main Sitecore content node."
+							bulkUpdate="true" 
+							children="true"
+							overwrite="true"
+							eventDisabler="true"
+							pullParent="true"
+							removeLocalNotInRemote="false"
+							ignoreRevId="false"
+							useItemBlaster="true">
+							
+							<serverBlacklist>https://dont.allow.for.this.server</serverBlacklist>
+							<!-- /sitecore/Content -->
+							<source>{0DE95AE4-41AB-4D01-9EB0-67441B7C2450}</source>
+						</preset>
+						<preset name="AllContentAndMarketing" desc="Pull all content and marketing data from Sitecore.">
+							<serverWhitelist>https://allow.for.this.server</serverWhitelist>
+							<serverWhitelist>https://or.also.allow.for.this.server</serverWhitelist>
+							<!-- /sitecore/Content -->
+							<source>{0DE95AE4-41AB-4D01-9EB0-67441B7C2450}</source>
+							<!-- /sitecore/system/Marketing Control Panel -->
+							<source>{33CFB9CA-F565-4D5B-B88A-7CDFE29A6D71}</source>
+						</preset>
+					</presets>
 				</processor>
 			</scsRegister>
 		</pipelines>

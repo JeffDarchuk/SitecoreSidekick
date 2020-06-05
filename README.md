@@ -100,10 +100,15 @@ After installation, you must configure it before using. The package installs `Ap
 * `authenticationSecret` - This is a shared secret that is used to authenticate to remote servers you want to pull content from. It must be at least 32 characters long (use a random string generator), and must be identical locally and remotely.
 * `roots` - This defines which Sitecore paths Content Migrator is allowed to copy. Do not use Content Migrator as a deployment tool for developer items such as templates or renderings; it's for content. Use [Unicorn](https://github.com/kamsar/Unicorn) for that instead.
 * `servers` - This defines which remote servers Content Migrator is allowed to pull from. Remote servers must have the Content Migrator NuGet package installed as well, and an identical `authenticationSecret`.
+* `presets` - This defines predetermined operations to provide a single button push content migration strategy for common migration needs.
 
 Next you will need to deploy Content Migrator to the remote server you wish to pull from. The simplest way to do this is to deploy the installed NuGet package to it, but it is also possible to deploy only the Sidekick assemblies and config patches.
 
 Now you're ready to migrate some content!
+
+### Content Migrator Presets
+![diffing details](doc/presets.png)
+Using the preset xml node in the example configurations you can configure a predetermined operation configuration.  A common usecase for this is if you wanted an SXA site and it's media you can set it up as a preset to enable pulling content from that site as easy as a button click.  During the configuration you can specially design a list of whitelist servers that you want to only allow this operation to run targetting and/or a list of blacklisted servers or servers you don't want to allow this operation to run as.  In addition you can customize any of the common sync options for this preset to give full control of how the sync is performed.  Additionally any number of source items can be added by their IDs.
 
 ### Content Migrator Authorization
 

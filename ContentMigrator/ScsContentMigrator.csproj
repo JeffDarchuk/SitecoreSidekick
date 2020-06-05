@@ -180,6 +180,8 @@
     <Compile Include="Models\ContentTreeModel.cs" />
     <Compile Include="Models\DiffRequestModel.cs" />
     <Compile Include="Models\OperationStatusRequestModel.cs" />
+    <Compile Include="Models\PresetModel.cs" />
+    <Compile Include="Models\PresetRunModel.cs" />
     <Compile Include="Models\PullItemModel.cs" />
     <Compile Include="Core\ContentItemInstaller.cs" />
     <Compile Include="Core\ContentItemPuller.cs" />

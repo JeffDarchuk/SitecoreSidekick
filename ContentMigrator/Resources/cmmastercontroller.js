@@ -85,7 +85,7 @@
 				vm.spinner = true;
 				if (!vm.serverModified && vm.events.selected && vm.events.selectedIds.length > 0)
 					CMfactory.contentTreePullItem(vm.events.selectedIds, vm.events.selected[0].DatabaseName, vm.events.server, vm.children, vm.overwrite, vm.pullParent, vm.mirror, preview, vm.eventDisabler, vm.bulkUpdate, vm.useItemBlaster, vm.ignoreRevId).then(function (response) {
-						vm.streamResults(response.data, vm.events.server, vm.listIds(), vm.listSources(), preview);
+						vm.streamResults(response.data.OperationId, vm.events.server, vm.listIds(), vm.listSources(), preview);
 					}, function (response) {
 						vm.error = response.data;
 					});
@@ -152,6 +152,14 @@
 		}
 		vm.serverModified = true;
 		vm.serverSubmit = function () {
+			CMfactory.getPresets(vm.server).then(function (response) {
+				if (response.data.length === 0) {
+					vm.presets = null;
+				} else {
+					vm.presets = response.data;
+				}
+				
+			});
 			vm.serverModified = true;
 			$timeout(function () { vm.serverModified = false }, 1);
 		}
@@ -256,6 +264,15 @@
 						});
 					}
 				}, 500);
+			}
+		}
+		vm.runPreset = function (preset) {
+			if (confirm("Are you sure you would like to pull content from the items \n" + ((preset.Ids) + "").replace(/,/g, "\n") +"\n\n"+preset.Desc)){
+				CMfactory.runPreset(preset.Name, vm.server).then(function (response) {
+					vm.streamResults(response.data.OperationId, response.data.Server, response.data.RootNodes, response.data.RootNodes, false);
+				}, function (response) {
+					vm.error = response.data;
+				});
 			}
 		}
 		vm.reset = function () {

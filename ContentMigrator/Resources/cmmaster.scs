@@ -4,6 +4,16 @@
 			<legend>Choose a Sitecore server to pull content from</legend>
 			<select ng-model="vm.server" ng-options="key as value for (key, value) in vm.serverList" ng-change="vm.serverSubmit()"> </select>
 		</fieldset>
+		<fieldset class="cmresults" ng-if="vm.presets">
+			<legend>Preset Operations</legend>
+			<a class="btn cmpresets" ng-click="vm.runPreset(item)" ng-repeat="item in vm.presets">
+				<span title="{{item.Desc}}">{{item.Name}}</span>
+				<div ng-repeat="source in item.Ids | limitTo:4">
+					<img width="16px" ng-src="{{vm.server}}/scs/platform/scsicon.scsvc?id={{source}}&icon="></img>
+				</div>
+				<span ng-if="item.rootNodes.length > 4">...</span>
+			</a>
+		</fieldset>
 		<fieldset ng-if="!vm.serverModified">
 			<legend>Select a content item to pull</legend>
 			<div>
@@ -176,7 +186,7 @@
 						</a>
 					</span>
 					<span ng-if="results.name !== 'Error' && results.name !== 'Warning' && vm.isEmptyObject(item.Events)">
-						<a title="Click to open this item in the Content Editor." class="btn cmresult fancybox fancybox.iframe" href="/sitecore/shell/Applications/Content%20Editor.aspx?sc_content=master&fo={{vm.resultId}}">
+						<a title="Click to open this item in the Content Editor." class="btn cmresult fancybox fancybox.iframe" href="/sitecore/shell/Applications/Content%20Editor.aspx?sc_content=master&fo={{item.Id}}">
 							<img ng-src="{{item.Icon}}" />
 							<h4>{{item.Name}}</h4>
 							<div ng-if="vm.showPath">{{item.Path}}</div>

@@ -5,6 +5,7 @@ using Sitecore.SecurityModel;
 using SitecoreSidekick.Core;
 using SitecoreSidekick.Models;
 using SitecoreSidekick.Services.Interface;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -71,7 +72,16 @@ namespace SitecoreSidekick.Handlers
 		[ActionName("scsicon.scsvc")]
 		public ActionResult Icon()
 		{
+			string id = Request.QueryString["id"];
 			string icon = Request.QueryString["icon"];
+			if (string.IsNullOrWhiteSpace(icon) && !string.IsNullOrWhiteSpace(id))
+			{
+				Guid guid = Guid.Empty;
+				if (Guid.TryParse(id, out guid))
+				{
+					icon = _sitecoreDataAccessService.GetIcon(guid);
+				}
+			}
 			if (_iconService.Images.ContainsKey(icon))
 			{
 				return new FileStreamResult(_iconService.Images[icon].Open(), "image/png");

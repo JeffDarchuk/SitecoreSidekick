@@ -11,14 +11,14 @@ namespace ScsContentMigrator.Models
 		public List<string> Ids;
 		public string Database;
 		public string Server;
-		public bool Children;
-		public bool Overwrite;
-		public bool PullParent;
-		public bool RemoveLocalNotInRemote;
-		public bool Preview;
-		public bool EventDisabler;
-		public bool BulkUpdate;
-		public bool UseItemBlaster;
-		public bool IgnoreRevId;
+		public bool Children = true;
+		public bool Overwrite = true;
+		public bool PullParent = true;
+		public bool RemoveLocalNotInRemote = false;
+		public bool Preview = false;
+		public bool EventDisabler = true;
+		public bool BulkUpdate = true;
+		public bool UseItemBlaster = true;
+		public bool IgnoreRevId = false;
 	}
 }

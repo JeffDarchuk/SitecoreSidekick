@@ -48,6 +48,13 @@
 			getDiff: function (id, server) {
 				var data = { "id": id, "server": server };
 				return $http.post("/scs/cm/cmbuilddiff.scsvc", data);
+			},
+			getPresets: function (server) {
+				return $http.post("/scs/cm/cmgetpresets.scsvc", "'" + server + "'");
+			},
+			runPreset: function (name, server) {
+				var data = { "name": name, "server": server };
+				return $http.post("/scs/cm/cmrunpreset.scsvc", data);
 			}
 
 		};

@@ -46,6 +46,12 @@
 	text-decoration: none;
 }
 
+.cmpresets {
+	width: 125px;
+	white-space: normal;
+	text-decoration: none;
+}
+
 .cmloading {
 	width: 29px;
 	display: inline-block;
@@ -53,6 +59,10 @@
 
 .cmresult div {
 	word-wrap: break-word;
+}
+
+.cmpresets div {
+	display: table-cell;
 }
 
 .cmresult img {

@@ -1,10 +1,11 @@
-﻿using Sitecore.Configuration;
+using Sitecore.Configuration;
 using Sitecore.Data;
 using Sitecore.Data.Items;
 using Sitecore.Data.Managers;
 using Sitecore.Diagnostics;
 using Sitecore.Pipelines;
 using Sitecore.SecurityModel;
+using Sitecore.StringExtensions;
 using SitecoreSidekick.Handlers;
 using SitecoreSidekick.Models;
 using SitecoreSidekick.Services;
@@ -92,7 +93,10 @@ namespace SitecoreSidekick.Pipelines.Initialize
 					sk["Display name"] = "Sitecore Sidekick";
 					sk["Message"] = "scs:open";
 					sk["Tool tip"] = "Open the Sitecore Sidekick";
-					sk[FieldIDs.Security] = @"ar|sitecore\Sitecore Client Authoring|pd|+item:read|pe|+item:read|";
+					if (sk[FieldIDs.Security].IsNullOrEmpty())
+					{
+						sk[FieldIDs.Security] = @"ar|sitecore\Sitecore Client Authoring|pd|+item:read|pe|+item:read|";
+					}
 				}
 			}
 		}
@@ -110,7 +114,7 @@ namespace SitecoreSidekick.Pipelines.Initialize
 				sk["Display name"] == "Sitecore Sidekick" &&
 				sk["Message"] == "scs:open" &&
 				sk["Tool tip"] == "Open the Sitecore Sidekick" &&
-				sk[FieldIDs.Security] == @"ar|sitecore\Sitecore Client Authoring|pd|+item:read|pe|+item:read|";
+				!sk[FieldIDs.Security].IsNullOrEmpty();
 		}
 
 		private static bool IsGreaterThanSc7()

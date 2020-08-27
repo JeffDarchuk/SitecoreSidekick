@@ -118,7 +118,7 @@ namespace SitecoreSidekick.Pipelines.Initialize
 			XmlDocument doc = new XmlDocument();
 			doc.Load(HttpRuntime.AppDomainAppPath + "/sitecore/shell/sitecore.version.xml");
 			var selectSingleNode = doc.SelectSingleNode("/information/version/major");
-			return selectSingleNode != null && (selectSingleNode.InnerText == "8" || selectSingleNode.InnerText == "9");
+			return selectSingleNode != null && (selectSingleNode.InnerText != "7");
 		}
 
 		public void RegisterRoutes(string route)

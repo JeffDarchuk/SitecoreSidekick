@@ -119,14 +119,20 @@ namespace ScsContentMigrator.Core
 					{
 						running.Add(Task.Run(() => { ItemInstaller(args, itemsToInstall, cancellationToken); }, cancellationToken));
 					}
-
-					Task.Run(() => { ItemCreator(args, cancellationToken); }, cancellationToken);
+					Task itemBlasterTask = null;
+					if (args.UseItemBlaster)
+					{
+						itemBlasterTask = Task.Run(() => { ItemCreator(args, cancellationToken); }, cancellationToken);
+					}
 					foreach (var t in running)
 					{
 						t.Wait(cancellationToken);
 					}
-
 					_itemsToCreate.CompleteAdding();
+					if (itemBlasterTask != null)
+					{
+						itemBlasterTask.Wait();
+					}
 				}
 				catch (OperationCanceledException)
 				{

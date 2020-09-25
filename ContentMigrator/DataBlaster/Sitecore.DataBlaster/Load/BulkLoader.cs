@@ -94,7 +94,7 @@ namespace ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Load
             if (context == null) throw new ArgumentNullException(nameof(context));
             if (items == null) throw new ArgumentNullException(nameof(items));
 
-	        items = OnItemProcessing.Execute(items, (p, itms) => p.Process(context, itms));
+	        //items = OnItemProcessing.Execute(items, (p, itms) => p.Process(context, itms));
 
             var db = Factory.GetDatabase(context.Database, true);
             var connectionString = ConfigurationManager.ConnectionStrings[db.ConnectionStringName].ConnectionString;
@@ -171,7 +171,7 @@ namespace ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Load
             var sql = sqlContext.GetEmbeddedSql(loadContext, "Sql.01.CreateTempTable.sql");
 
             // Cleanup left-over staging tables.
-            if (loadContext.StageDataWithoutProcessing) sqlContext.DropStageTables();
+            sqlContext.DropStageTables();
 
 			// Create temp table.
 			// We don't use table valued parameters because we don't want to change the database schema.
@@ -388,31 +388,31 @@ namespace ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Load
                 if (!HasBlobFields && Current.IsBlob)
                     HasBlobFields = true;
 
-                BulkLoadAction fieldAction;
-                switch (item.LoadAction)
-                {
-                    case BulkLoadAction.AddOnly:
-                        fieldAction = BulkLoadAction.AddOnly;
-                        break;
-					case BulkLoadAction.AddItemOnly:
-						fieldAction = BulkLoadAction.AddItemOnly;
-						break;
-					case BulkLoadAction.Update:
-                        fieldAction = BulkLoadAction.Update;
-                        break;
-                    case BulkLoadAction.UpdateExistingItem:
-                        fieldAction = BulkLoadAction.Update;
-                        break;
-                    case BulkLoadAction.Revert:
-                        fieldAction = BulkLoadAction.Update;
-                        break;
-                    case BulkLoadAction.RevertTree:
-                        fieldAction = BulkLoadAction.Update;
-                        break;
-                    default:
-                        fieldAction = BulkLoadAction.Update;
-                        break;
-                }
+                BulkLoadAction fieldAction = BulkLoadAction.AddOnly;
+     //           switch (item.LoadAction)
+     //           {
+     //               case BulkLoadAction.AddOnly:
+     //                   fieldAction = BulkLoadAction.AddOnly;
+     //                   break;
+					//case BulkLoadAction.AddItemOnly:
+					//	fieldAction = BulkLoadAction.AddItemOnly;
+					//	break;
+					//case BulkLoadAction.Update:
+     //                   fieldAction = BulkLoadAction.Update;
+     //                   break;
+     //               case BulkLoadAction.UpdateExistingItem:
+     //                   fieldAction = BulkLoadAction.Update;
+     //                   break;
+     //               case BulkLoadAction.Revert:
+     //                   fieldAction = BulkLoadAction.Update;
+     //                   break;
+     //               case BulkLoadAction.RevertTree:
+     //                   fieldAction = BulkLoadAction.Update;
+     //                   break;
+     //               default:
+     //                   fieldAction = BulkLoadAction.Update;
+     //                   break;
+     //           }
 
                 var unversioned = Current as UnversionedBulkField;
                 var versioned = Current as VersionedBulkField;

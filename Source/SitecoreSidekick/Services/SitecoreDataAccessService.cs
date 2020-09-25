@@ -134,8 +134,11 @@ namespace SitecoreSidekick.Services
 
 		public void RecycleItem(string id)
 		{
-			Item item = GetItem(id);
-			item?.Recycle();
+			using (new SecurityDisabler()) 
+			{
+				Item item = GetItem(id);
+				item?.Recycle();
+			}
 		}
 		
 		public string GetItemYaml(Guid idataId, Func<object, string> serializationFunc) => GetItemYaml(new ID(idataId).ToString(), serializationFunc);

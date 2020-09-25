@@ -10,7 +10,6 @@ using Sitecore.Data;
 using Sitecore.Data.Managers;
 using Sitecore.Events;
 using Sitecore.Globalization;
-using Sitecore.Jobs;
 
 namespace ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Load.Processors
 {
@@ -49,36 +48,34 @@ namespace ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Load.Processors
         protected virtual void UpdateIndex(BulkLoadContext context, ICollection<ItemChange> itemChanges, 
             Database database, ISearchIndex index)
         {
-            Job job = null;
+            //if (!context.ShouldUpdateIndex(index))
+            //{
+            //    context.Log.Warn($"Skipping updating index '{index.Name}' because its empty.");
+            //    return;
+            //}
 
-            if (!context.ShouldUpdateIndex(index))
-            {
-                context.Log.Warn($"Skipping updating index '{index.Name}' because its empty.");
-                return;
-            }
-
-            var touchedPercentage = (uint)Math.Ceiling((double)itemChanges.Count / Math.Max(1, index.Summary.NumberOfDocuments) * 100);
-            if (context.IndexRebuildThresholdPercentage.HasValue
-                && touchedPercentage > context.IndexRebuildThresholdPercentage.Value)
-            {
-                context.Log.Info($"Rebuilding index '{index.Name}' because {touchedPercentage}% is changed.");
-                job = IndexCustodian.FullRebuild(index);
-            }
-            else if (context.Destination != null
-                     && !itemChanges.Any(ic => ic.Deleted)   // Refresh doesn't do deletes.
-                     && context.IndexRefreshThresholdPercentage.HasValue
-                     && touchedPercentage > context.IndexRefreshThresholdPercentage.Value)
-            {
-                context.Log.Info($"Refreshing index '{index.Name}' from '{context.Destination.ItemPath}' because {touchedPercentage}% is changed.");
-                job = IndexCustodian.Refresh(index, new SitecoreIndexableItem(database.GetItem(new ID(context.Destination.ItemId))));
-            }
-            else
-            {
-                var sitecoreIds = GetItemsToIndex(itemChanges, database);
-                context.Log.Info($"Updating index '{index.Name}' with {sitecoreIds.Count} items.");
-                job = IndexCustodian.IncrementalUpdate(index, sitecoreIds);
-            }
-            job.Wait();
+            //var touchedPercentage = (uint)Math.Ceiling((double)itemChanges.Count / Math.Max(1, index.Summary.NumberOfDocuments) * 100);
+            //if (context.IndexRebuildThresholdPercentage.HasValue
+            //    && touchedPercentage > context.IndexRebuildThresholdPercentage.Value)
+            //{
+            //    context.Log.Info($"Rebuilding index '{index.Name}' because {touchedPercentage}% is changed.");
+            //    job = IndexCustodian.FullRebuild(index);
+            //}
+            //else if (context.Destination != null
+            //         && !itemChanges.Any(ic => ic.Deleted)   // Refresh doesn't do deletes.
+            //         && context.IndexRefreshThresholdPercentage.HasValue
+            //         && touchedPercentage > context.IndexRefreshThresholdPercentage.Value)
+            //{
+            //    context.Log.Info($"Refreshing index '{index.Name}' from '{context.Destination.ItemPath}' because {touchedPercentage}% is changed.");
+            //    job = IndexCustodian.Refresh(index, new SitecoreIndexableItem(database.GetItem(new ID(context.Destination.ItemId))));
+            //}
+            //else
+            //{
+            //    var sitecoreIds = GetItemsToIndex(itemChanges, database);
+            //    context.Log.Info($"Updating index '{index.Name}' with {sitecoreIds.Count} items.");
+            //    job = IndexCustodian.IncrementalUpdate(index, sitecoreIds);
+            //}
+            //job.Wait();
         }
 
         protected virtual IList<SitecoreItemUniqueId> GetItemsToIndex(ICollection<ItemChange> itemChanges, Database db)

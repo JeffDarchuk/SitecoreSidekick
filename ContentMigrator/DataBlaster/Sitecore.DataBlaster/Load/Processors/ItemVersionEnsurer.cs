@@ -9,7 +9,7 @@ namespace ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Load.Processors
             // Statistic fields need to be present to represent the item versions.
             foreach (var item in items)
             {
-                item.EnsureLanguageVersions(forceUpdate: context.ForceUpdates);
+                //item.EnsureLanguageVersions(forceUpdate: context.ForceUpdates);
                 yield return item;
             }
         }

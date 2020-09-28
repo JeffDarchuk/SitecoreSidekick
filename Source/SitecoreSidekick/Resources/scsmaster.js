@@ -70,6 +70,10 @@ $(document).click(function (event) {
 		window.top.document.getElementById("scs").style.display = "none";
 		window.top.document.body.style.overflow = "";
 	}
-	window.top.popups[0].remove();
+	if (window.top.popups && window.top.popups.length > 0 && window.top.popups[0].parentNode) {
+		window.top.popups[0].remove();
+	}
 });
-window.top.popups[0].remove();
+if (window.top.popups && window.top.popups.length > 0 && window.top.popups[0].parentNode) {
+	window.top.popups[0].remove();
+}

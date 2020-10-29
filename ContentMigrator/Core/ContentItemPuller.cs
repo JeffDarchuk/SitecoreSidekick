@@ -63,6 +63,10 @@ namespace ScsContentMigrator.Core
 			{
 				try
 				{
+					if (GatheredRemoteItems.Count >= _maxQueue)
+					{
+						await Task.Delay(1000);
+					}
 					Guid id;
 					if (!ProcessingIds.TryTake(out id, int.MaxValue, cancellationToken))
 					{
@@ -74,34 +78,27 @@ namespace ScsContentMigrator.Core
 					{
 						buffer = _remoteContent.GetRemoteItemDataWithChildren(id, server, ignoreRevId ? null : _sitecore.GetItemAndChildrenRevision(id));
 					}
-					if (GatheredRemoteItems.Count >= _maxQueue)
-					{
-						await Task.Delay(1000);
-					}
-					else
-					{
-						foreach (var item in (getChildren ? buffer.Items : buffer.Items.Where(x => x.Key == id)))
-						{
-							if (item.Value != null)
-							{
-								IItemData itemData = _yamlSerializationService.DeserializeYaml(item.Value, item.Key.ToString());
-								GatheredRemoteItems.Add(itemData, cancellationToken);
-							}
-							else
-							{
-								GatheredRemoteItems.Add(_sitecore.GetItemData(item.Key), cancellationToken);
-							}
-						}
-						if (getChildren && buffer.GrandChildren != null)
-						{
-							foreach (var child in buffer.GrandChildren)
-							{
-								ProcessingIds.Add(child, cancellationToken);
-							}
-						}
-						buffer = null;
-					}
 
+					foreach (var item in (getChildren ? buffer.Items : buffer.Items.Where(x => x.Key == id)))
+					{
+						if (item.Value != null)
+						{
+							IItemData itemData = _yamlSerializationService.DeserializeYaml(item.Value, item.Key.ToString());
+							GatheredRemoteItems.Add(itemData, cancellationToken);
+						}
+						else
+						{
+							GatheredRemoteItems.Add(_sitecore.GetItemData(item.Key), cancellationToken);
+						}
+					}
+					if (getChildren && buffer.GrandChildren != null)
+					{
+						foreach (var child in buffer.GrandChildren)
+						{
+							ProcessingIds.Add(child, cancellationToken);
+						}
+					}
+					buffer = null;
 				}
 				catch (OperationCanceledException e)
 				{

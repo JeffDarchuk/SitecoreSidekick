@@ -205,7 +205,7 @@ namespace ScsContentMigrator.UnitTests.Core
 
 			contentItemInstaller.ProcessItem(new PullItemModel { Overwrite = false }, remoteData, remoteData);
 
-			GetSubstitute<IDataStore>().Received(0).Save(Arg.Any<IItemData>());
+			GetSubstitute<IDataStore>().Received(0).Save(Arg.Any<IItemData>(), GetSubstitute<IFieldValueManipulator>());
 		}
 
 		[Fact]
@@ -237,7 +237,7 @@ namespace ScsContentMigrator.UnitTests.Core
 
 			contentItemInstaller.ProcessItem(new PullItemModel { Overwrite = true }, remoteData, remoteData);
 
-			GetSubstitute<IDataStore>().Received(0).Save(Arg.Any<IItemData>());
+			GetSubstitute<IDataStore>().Received(0).Save(Arg.Any<IItemData>(), GetSubstitute<IFieldValueManipulator>());
 		}
 
 		[Fact]
@@ -269,7 +269,7 @@ namespace ScsContentMigrator.UnitTests.Core
 
 			contentItemInstaller.ProcessItem(new PullItemModel {  }, remoteData, remoteData);
 
-			GetSubstitute<IDataStore>().Received(0).Save(Arg.Any<IItemData>());
+			GetSubstitute<IDataStore>().Received(0).Save(Arg.Any<IItemData>(), GetSubstitute<IFieldValueManipulator>());
 		}
 
 		[Fact]
@@ -286,7 +286,7 @@ namespace ScsContentMigrator.UnitTests.Core
 
 			contentItemInstaller.ProcessItem(new PullItemModel { }, null, remoteData);
 
-			GetSubstitute<IDataStore>().Received(0).Save(Arg.Any<IItemData>());
+			GetSubstitute<IDataStore>().Received(0).Save(Arg.Any<IItemData>(), GetSubstitute<IFieldValueManipulator>());
 		}
 
 		[Fact]
@@ -318,7 +318,7 @@ namespace ScsContentMigrator.UnitTests.Core
 
 			contentItemInstaller.ProcessItem(new PullItemModel { Overwrite = true }, remoteData, remoteData);
 
-			GetSubstitute<IDataStore>().Received(1).Save(Arg.Any<IItemData>());
+			GetSubstitute<IDataStore>().Received(1).Save(Arg.Any<IItemData>(), GetSubstitute<IFieldValueManipulator>());
 		}
 
 		[Fact]
@@ -350,7 +350,7 @@ namespace ScsContentMigrator.UnitTests.Core
 
 			contentItemInstaller.ProcessItem(new PullItemModel { Overwrite = true }, null, remoteData);
 
-			GetSubstitute<IDataStore>().Received(1).Save(Arg.Any<IItemData>());
+			GetSubstitute<IDataStore>().Received(1).Save(Arg.Any<IItemData>(), GetSubstitute<IFieldValueManipulator>());
 		}
 
 

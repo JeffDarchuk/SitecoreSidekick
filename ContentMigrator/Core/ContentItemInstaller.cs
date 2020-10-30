@@ -256,7 +256,7 @@ namespace ScsContentMigrator.Core
 
 		private void Finalize(int items, PullItemModel args)
 		{
-			if (args.RemoveLocalNotInRemote)
+			if (args.RemoveLocalNotInRemote && !Status.Cancelled)
 				CleanUnwantedLocalItems();
 			Completed = true;
 			Status.FinishedTime = DateTime.Now;

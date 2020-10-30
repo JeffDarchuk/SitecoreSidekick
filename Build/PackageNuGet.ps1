@@ -34,8 +34,8 @@ $targetAssemblyVersion = $tmAssembly.ProductVersion
 
 & $nuGet pack "$scriptRoot\SitecoreSidekick.nuget\SitecoreSidekick.nuspec" -version $targetAssemblyVersion
 
-& $nuGet pack "$scriptRoot\..\Source\SitecoreSidekick\SitecoreSidekick.csproj" -Symbols -Prop "Configuration=Release"
-& $nuGet pack "$scriptRoot\..\ScsAuditLog\ScsAuditLog.csproj" -Symbols -Prop "Configuration=Release"
-& $nuGet pack "$scriptRoot\..\ScsEditingContext\ScsEditingContext.csproj" -Symbols -Prop "Configuration=Release"
-& $nuGet pack "$scriptRoot\..\ContentMigrator\ScsContentMigrator.csproj" -Symbols -Prop "Configuration=Release"
-& $nuGet pack "$scriptRoot\..\ScsSitecoreResourceManager\ScsSitecoreResourceManager.csproj" -Symbols -Prop "Configuration=Release"
+& $nuGet pack "$scriptRoot\..\Source\SitecoreSidekick\SitecoreSidekick.csproj" -Symbols -Prop "Configuration=Release" -version $targetAssemblyVersion
+& $nuGet pack "$scriptRoot\..\ScsAuditLog\ScsAuditLog.csproj" -Symbols -Prop "Configuration=Release" -version $targetAssemblyVersion
+& $nuGet pack "$scriptRoot\..\ScsEditingContext\ScsEditingContext.csproj" -Symbols -Prop "Configuration=Release" -version $targetAssemblyVersion
+& $nuGet pack "$scriptRoot\..\ContentMigrator\ScsContentMigrator.csproj" -Symbols -Prop "Configuration=Release" -version $targetAssemblyVersion
+& $nuGet pack "$scriptRoot\..\ScsSitecoreResourceManager\ScsSitecoreResourceManager.csproj" -Symbols -Prop "Configuration=Release" -version $targetAssemblyVersion

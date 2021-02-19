@@ -1,31 +1,27 @@
-﻿using Rainbow.Diff;
-using Rainbow.Model;
-using Rainbow.Storage;
-using Rainbow.Storage.Sc.Deserialization;
-using ScsContentMigrator.CMRainbow;
-using ScsContentMigrator.Core.Interface;
-using ScsContentMigrator.Models;
-using ScsContentMigrator.Services.Interface;
-using Sitecore.Data;
-using Sitecore.Data.Events;
-using Sitecore.Data.Items;
-using Sitecore.Data.Managers;
-using Sitecore.Data.Serialization.Exceptions;
-using Sitecore.Diagnostics;
-using Sitecore.SecurityModel;
-using SitecoreSidekick;
-using SitecoreSidekick.ContentTree;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Rainbow.Diff;
+using Rainbow.Model;
+using Rainbow.Storage;
+using Rainbow.Storage.Sc.Deserialization;
+using ScsContentMigrator.CMRainbow;
 using ScsContentMigrator.CMRainbow.Interface;
+using ScsContentMigrator.Core.Interface;
 using ScsContentMigrator.DataBlaster;
 using ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Load;
+using ScsContentMigrator.Models;
+using ScsContentMigrator.Services.Interface;
+using Sitecore.Data;
 using Sitecore.Data.Engines;
-using Sitecore.Data.Proxies;
+using Sitecore.Data.Events;
+using Sitecore.Data.Serialization.Exceptions;
+using Sitecore.Diagnostics;
+using Sitecore.SecurityModel;
+using SitecoreSidekick.ContentTree;
 using SitecoreSidekick.Services.Interface;
 
 namespace ScsContentMigrator.Core
@@ -365,8 +361,16 @@ namespace ScsContentMigrator.Core
 					}
 					catch (Exception e)
 					{
-						Errors.Add(remoteData.Id);
-						_logger.BeginEvent(new ErrorItemData() { Name = remoteData?.Name ?? "Unknown item", Path = e.ToString() }, LogStatus.Error, "", false);
+						var tm = e.InnerException as TemplateMissingFieldException;
+						if (tm != null)
+						{
+							_logger.BeginEvent(new ErrorItemData() { Name = remoteData.Name, Path = tm.ToString() }, LogStatus.Warning, "", false);
+						}
+						else
+						{
+							Errors.Add(remoteData.Id);
+							_logger.BeginEvent(new ErrorItemData() { Name = remoteData?.Name ?? "Unknown item", Path = e.ToString() }, LogStatus.Error, "", false);
+						}
 					}
 					if (localData != null)
 					{

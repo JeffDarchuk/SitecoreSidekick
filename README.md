@@ -1,5 +1,7 @@
 # Sitecore Sidekick
 
+![Nuget](https://img.shields.io/nuget/vpre/SitecoreSidekickCore?logo=nuget&link=https://www.nuget.org/packages/SitecoreSidekickCore)
+
 A modular toolkit for Sitecore that is an administrator or author's handy little sidekick.
 
 Like videos? Check out the [Sitecore Sidekick presentation](https://www.youtube.com/watch?v=x9foAgxGQDc) at the Portland Sitecore User's Group, which goes over the main Sidekick features and how to use them. NOTE: the version in the presentation is slightly out of date, but it is still accurate.

@@ -16,6 +16,7 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using System.Xml;
 using Sitecore;
+using System.Threading.Tasks;
 
 namespace SitecoreSidekick.Pipelines.Initialize
 {
@@ -40,19 +41,22 @@ namespace SitecoreSidekick.Pipelines.Initialize
 		{
 
 			Assert.ArgumentNotNull(args, "args");
-			if (DisableItemGeneration?.ToLower() != "true")
+			Task.Run(() =>
 			{
-				EnsureDesktopButton();
-			}
-			if (Factory.GetDatabase("master", false) != null)
-			{
-				ScsMainRegistration maintmp = new ScsMainRegistration("", "", "");
-				_registration.RegisterSidekick(maintmp);
-				_registration.RegisterSidekick(maintmp.Controller, maintmp);
-				var pipeline = CorePipelineFactory.GetPipeline("scsRegister", string.Empty);
-				pipeline.Run(new PipelineArgs());
-				RegisterRoutes("scs");
-			}
+				if (DisableItemGeneration?.ToLower() != "true")
+				{
+					EnsureDesktopButton();
+				}
+				if (Factory.GetDatabase("master", false) != null)
+				{
+					ScsMainRegistration maintmp = new ScsMainRegistration("", "", "");
+					_registration.RegisterSidekick(maintmp);
+					_registration.RegisterSidekick(maintmp.Controller, maintmp);
+					var pipeline = CorePipelineFactory.GetPipeline("scsRegister", string.Empty);
+					pipeline.Run(new PipelineArgs());
+					RegisterRoutes("scs");
+				}
+			});
 		}
 
 		public static void EnsureDesktopButton()

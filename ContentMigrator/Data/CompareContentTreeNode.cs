@@ -123,7 +123,7 @@ namespace ScsContentMigrator.Data
 						}
 						Compare[key].Add(verfield.BlobId != null
 							? new Tuple<string, string>(verfield.NameHint, "Blob value changed")
-							: new Tuple<string, string>(verfield.NameHint, HtmlDiff.HtmlDiff.Execute(HttpUtility.HtmlEncode(localItem[new ID(verfield.FieldId)].Replace("\r", "")), HttpUtility.HtmlEncode(verfield.Value.Replace("\r", "")))));
+							: new Tuple<string, string>(verfield.NameHint, HtmlDiff.HtmlDiff.Execute(HttpUtility.HtmlEncode(verItem[new ID(verfield.FieldId)].Replace("\r", "")), HttpUtility.HtmlEncode(verfield.Value.Replace("\r", "")))));
 					}
 
 					foreach (Field field in verItem.Fields.Where(x => !x.Unversioned && !x.Shared).Where(x => !fieldsProcessed.Contains(x.ID.Guid) && !string.IsNullOrWhiteSpace(x.Value)))
@@ -135,7 +135,7 @@ namespace ScsContentMigrator.Data
 						}
 						Compare[key].Add(field.HasBlobStream
 							? new Tuple<string, string>(field.DisplayName, "Blob value changed")
-							: new Tuple<string, string>(field.DisplayName, HtmlDiff.HtmlDiff.Execute(HttpUtility.HtmlEncode(localItem[field.ID].Replace("\r", "")), "")));
+							: new Tuple<string, string>(field.DisplayName, HtmlDiff.HtmlDiff.Execute(HttpUtility.HtmlEncode(verItem[field.ID].Replace("\r", "")), "")));
 
 					}
 				}
@@ -183,7 +183,7 @@ namespace ScsContentMigrator.Data
 						}
 						Compare[unver.Language.Name].Add(unverfield.BlobId != null
 							? new Tuple<string, string>(unverfield.NameHint, "Blob value changed")
-							: new Tuple<string, string>(unverfield.NameHint, HtmlDiff.HtmlDiff.Execute(HttpUtility.HtmlEncode(localItem[new ID(unverfield.FieldId)].Replace("\r", "")), HttpUtility.HtmlEncode(unverfield.Value.Replace("\r", "")))));
+							: new Tuple<string, string>(unverfield.NameHint, HtmlDiff.HtmlDiff.Execute(HttpUtility.HtmlEncode(verItem[new ID(unverfield.FieldId)].Replace("\r", "")), HttpUtility.HtmlEncode(unverfield.Value.Replace("\r", "")))));
 					}
 				}
 			}

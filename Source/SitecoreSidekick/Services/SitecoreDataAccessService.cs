@@ -57,19 +57,17 @@ namespace SitecoreSidekick.Services
 
 		public string GetItemRevision(Guid idataId, string database = null)
 		{
-			var item = GetItem(idataId, database);
-			return item?[FieldIDs.Revision];
+			return GetItemRevision(GetItem(idataId, database));
 		}
-
 
 		public Dictionary<Guid, string> GetItemAndChildrenRevision(Guid idataId, string database = null)
 		{
 			using (new SecurityDisabler())
 			{
 				var item = GetItem(idataId, database);
-				var revs = item?.GetChildren().ToDictionary(x => x.ID.Guid, x => x[FieldIDs.Revision]);
+				var revs = item?.GetChildren().ToDictionary(x => x.ID.Guid, x => GetItemRevision(x));
 				if (revs == null) return null;
-				revs.Add(item.ID.Guid, item?[FieldIDs.Revision]);
+				revs.Add(item.ID.Guid, GetItemRevision(item));
 				return revs;
 			}
 		}
@@ -149,7 +147,12 @@ namespace SitecoreSidekick.Services
 				return null;
 			return serializationFunc?.Invoke(item);			
 		}
+		private string GetItemRevision(Item item)
+		{
+			var ret = item.Languages.Aggregate(new StringBuilder(), (sb, lang) => sb.Append(GetItem(item.ID.Guid, null, lang, Version.Latest).Versions.GetVersions().Aggregate(new StringBuilder(), (sb2, version) => sb2.Append(version[FieldIDs.Revision])).ToString())).ToString().GetHashCode().ToString();
 
+			return ret;
+		}
 		private Item GetItem(Guid id, string database = null, Language language = null, Version version = null) =>
 			GetItem(new ID(id).ToString(), database, language, version);
 

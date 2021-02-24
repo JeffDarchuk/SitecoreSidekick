@@ -11,63 +11,66 @@ namespace ScsContentMigrator.Data
 {
 	public class Checksum
 	{
-		internal readonly Dictionary<string, SortedSet<string>> _checksumTracker = new Dictionary<string, SortedSet<string>>();
-		internal readonly Dictionary<string, string> _revTracker = new Dictionary<string, string>();
-		internal readonly Dictionary<string, List<string>> _childTracker = new Dictionary<string, List<string>>();
-		internal readonly Dictionary<string,string> _parentTracker = new Dictionary<string, string>();
-		internal readonly HashSet<string> _leafTracker = new HashSet<string>();
-		internal readonly Dictionary<string, int> _checksum = new Dictionary<string, int>();
+		internal readonly Dictionary<Guid, SortedSet<short>> _checksumTracker = new Dictionary<Guid, SortedSet<short>>();
+		internal readonly Dictionary<Guid, Guid> _revTracker = new Dictionary<Guid, Guid>();
+		internal readonly Dictionary<Guid, List<Guid>> _childTracker = new Dictionary<Guid, List<Guid>>();
+		internal readonly Dictionary<Guid, Guid> _parentTracker = new Dictionary<Guid, Guid>();
+		internal readonly HashSet<Guid> _leafTracker = new HashSet<Guid>();
+		internal readonly Dictionary<Guid, short> _checksum = new Dictionary<Guid, short>();
 		//t.ID, t.Name, t.TemplateID, t.MasterID, t.ParentID, v.Value
 		public void LoadRow(string id, string parentId, string value)
 		{
-			if (_parentTracker.ContainsKey(id)) return;
-			_parentTracker[id] = parentId;
-			if (!_childTracker.ContainsKey(parentId))
+			var idGuid = Guid.Parse(id);
+			var parentGuid = Guid.Parse(parentId);
+			var valueGuid = Guid.Parse(value);
+			if (_parentTracker.ContainsKey(idGuid)) return;
+			_parentTracker[idGuid] = parentGuid;
+			if (!_childTracker.ContainsKey(parentGuid))
 			{
-				_childTracker[parentId] = new List<string>();
+				_childTracker[parentGuid] = new List<Guid>();
 			}
-			_childTracker[parentId].Add(id);
-			if (!_checksumTracker.ContainsKey(id))
+			_childTracker[parentGuid].Add(idGuid);
+			if (!_checksumTracker.ContainsKey(idGuid))
 			{
-				_checksumTracker[id] = new SortedSet<string>();
+				_checksumTracker[idGuid] = new SortedSet<short>();
 			}
-			_revTracker[id] = value;
-			if (!_childTracker.ContainsKey(id))
-				_leafTracker.Add(id);
-			_leafTracker.Remove(parentId);
+			_revTracker[idGuid] = valueGuid;
+			if (!_childTracker.ContainsKey(idGuid))
+				_leafTracker.Add(idGuid);
+			_leafTracker.Remove(parentGuid);
 		}
 
 		public int GetChecksum(string id)
 		{
+			
 			if (!Guid.TryParse(id, out Guid result)) return -1;
-			string key = result.ToString();
-			if (_checksum.ContainsKey(key))
-				return _checksum[key];
+			if (_checksum.ContainsKey(result))
+				return _checksum[result];
 			return -1;
 		}
 
 		public void Generate()
 		{
-			Queue<string> processing = new Queue<string>(_leafTracker);
+			Queue<Guid> processing = new Queue<Guid>(_leafTracker);
 			while (processing.Any())
 			{
-				string id = processing.Dequeue();
+				Guid id = processing.Dequeue();
 				if (_checksumTracker[id].Count == 0)
 				{
 					if (_checksumTracker.ContainsKey(_parentTracker[id]))
 					{
-						_checksumTracker[_parentTracker[id]].Add(GetHashCode32(_revTracker[id]+id).ToString());
+						_checksumTracker[_parentTracker[id]].Add(GetHashCode16(_revTracker[id].ToString("N")+id));
 					}
 				}
 				else
 				{
-					_checksum[id] = GetHashCode32(string.Join("", _checksumTracker[id]));
+					_checksum[id] = GetHashCode16(string.Join("", _checksumTracker[id]));
 					if (_checksumTracker.ContainsKey(_parentTracker[id]))
 					{
-						_checksumTracker[_parentTracker[id]].Add(_checksum[id].ToString());
+						_checksumTracker[_parentTracker[id]].Add(_checksum[id]);
 					}
 				}
-				if (_checksumTracker.ContainsKey(_parentTracker[id]) && _checksumTracker[_parentTracker[id]].Count >= _childTracker[_parentTracker[id]].Count)
+				if (_checksumTracker.ContainsKey(_parentTracker[id]))
 				{
 					processing.Enqueue(_parentTracker[id]);
 				}
@@ -77,7 +80,7 @@ namespace ScsContentMigrator.Data
 			_parentTracker.Clear();
 			_leafTracker.Clear();
 		}
-		public int GetHashCode32(string s)
+		public short GetHashCode16(string s)
 		{
 			var chars = s.ToCharArray();
 			var lastCharInd = chars.Length - 1;
@@ -94,7 +97,7 @@ namespace ScsContentMigrator.Data
 				nextCh = ++ind > lastCharInd ? '\0' : chars[ind++];
 				num2 = (((num2 << 5) + num2) + (num2 >> 0x1b)) ^ (nextCh << 16 | ch);
 			}
-			return num1 + num2 * 0x5d588b65;
+			return (short)((num1 + num2 * 0x5d588b65) & 0xFFFF);
 		}
 	}
 }

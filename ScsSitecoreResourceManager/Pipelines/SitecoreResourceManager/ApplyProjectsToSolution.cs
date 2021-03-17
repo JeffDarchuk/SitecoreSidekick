@@ -1,5 +1,5 @@
-﻿using ScsSitecoreResourceManager.Data.Properties;
-using ScsSitecoreResourceManager.Data.Properties.Collectors;
+﻿using Sidekick.SitecoreResourceManager.Data.Properties;
+using Sidekick.SitecoreResourceManager.Data.Properties.Collectors;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 
-namespace ScsSitecoreResourceManager.Pipelines.SitecoreResourceManager
+namespace Sidekick.SitecoreResourceManager.Pipelines.SitecoreResourceManager
 {
 	public class ApplyProjectsToSolution
 	{

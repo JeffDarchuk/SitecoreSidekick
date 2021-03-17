@@ -108,9 +108,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SitecoreSidekick\SitecoreSidekick.csproj">
+    <ProjectReference Include="..\SitecoreSidekick\Sidekick.Core.csproj">
       <Project>{0DA36C4A-1B13-4891-A263-5F994127051C}</Project>
-      <Name>SitecoreSidekick</Name>
+      <Name>Sidekick.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />

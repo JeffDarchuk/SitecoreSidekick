@@ -4,30 +4,29 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Web;
-using ScsAuditLog.Model;
-using SitecoreSidekick.Handlers;
+using Sidekick.AuditLog.Model;
+using Sidekick.Core.Handlers;
 using System.Dynamic;
 using System.Reflection;
 using System.Web.Mvc;
 using System.Xml;
 using Lucene.Net.Search;
-using ScsAuditLog.Core;
-using ScsAuditLog.Model.Interface;
-using SitecoreSidekick.ContentTree;
+using Sidekick.AuditLog.Core;
+using Sidekick.AuditLog.Model.Interface;
+using Sidekick.Core.ContentTree;
 using Sitecore.Configuration;
 using Sitecore.Data;
 using Sitecore.Data.Items;
 using Sitecore.Events;
-using SitecoreSidekick;
-using SitecoreSidekick.Core;
+using Sidekick.Core;
 
-namespace ScsAuditLog
+namespace Sidekick.AuditLog
 {
 	public class AuditLogRegistration : ScsRegistration
 	{
 		public override string Directive => "aldirective";
 		public override NameValueCollection DirectiveAttributes { get; set; }
-		public override string ResourcesPath => "ScsAuditLog.Resources";
+		public override string ResourcesPath => "Sidekick.AuditLog.Resources";
 		public override Type Controller => typeof(AuditLogController);
 		public override string Icon { get; } = "/scs/al/resources/alportfoliofolder.png";
 		public override string Name { get; } = "Audit Log";
@@ -42,7 +41,7 @@ namespace ScsAuditLog
 				backup = 0;
 			if (!int.TryParse(keepRecords, out duration))
 				duration = 0;
-			AuditLogger.Log = new AuditLog(backup, duration);
+			AuditLogger.Log = new Core.AuditLog(backup, duration);
 		}
 		public void RegisterCustomEventType(XmlNode node)
 		{

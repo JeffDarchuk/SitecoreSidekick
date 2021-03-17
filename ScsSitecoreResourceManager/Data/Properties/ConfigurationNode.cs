@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ScsSitecoreResourceManager.Data.Properties
+namespace Sidekick.SitecoreResourceManager.Data.Properties
 {
 	public class ConfigurationNode
 	{

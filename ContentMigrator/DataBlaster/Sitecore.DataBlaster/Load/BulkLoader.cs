@@ -7,15 +7,15 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
-using ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Load.Processors;
-using ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Load.Sql;
-using ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Util;
-using ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Util.Sql;
+using Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster.Load.Processors;
+using Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster.Load.Sql;
+using Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster.Util;
+using Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster.Util.Sql;
 using Sitecore.Configuration;
 using Sitecore.Data.Managers;
 using Sitecore.Events;
 
-namespace ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Load
+namespace Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster.Load
 {
     public class BulkLoader
     {

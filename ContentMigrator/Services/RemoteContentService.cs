@@ -1,29 +1,29 @@
 ﻿using MicroCHAP;
 using Rainbow.Model;
 using Rainbow.Storage.Yaml;
-using ScsContentMigrator.Args;
-using ScsContentMigrator.Data;
-using ScsContentMigrator.Models;
-using ScsContentMigrator.Security;
-using ScsContentMigrator.Services.Interface;
+using Sidekick.ContentMigrator.Args;
+using Sidekick.ContentMigrator.Data;
+using Sidekick.ContentMigrator.Models;
+using Sidekick.ContentMigrator.Security;
+using Sidekick.ContentMigrator.Services.Interface;
 using Sitecore.Diagnostics;
-using SitecoreSidekick;
-using SitecoreSidekick.Services.Interface;
+using Sidekick.Core;
+using Sidekick.Core.Services.Interface;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
 
-namespace ScsContentMigrator.Services
+namespace Sidekick.ContentMigrator.Services
 {
 	public class RemoteContentService : IRemoteContentService
 	{
 		private ISignatureService _ss;
 		private readonly IScsRegistrationService _registration;
 		private readonly IJsonSerializationService _jsonSerializationService;
-		private ScsHmacServer _hmacServer;
-		public ScsHmacServer HmacServer
+		private HmacServer _hmacServer;
+		public HmacServer HmacServer
 		{
 			get
 			{
@@ -32,7 +32,7 @@ namespace ScsContentMigrator.Services
 					_ss = new SignatureService(_registration.GetScsRegistration<ContentMigrationRegistration>().AuthenticationSecret);
 
 				}
-				return _hmacServer ?? (_hmacServer = new ScsHmacServer(_ss, new UniqueChallengeStore()));
+				return _hmacServer ?? (_hmacServer = new HmacServer(_ss, new UniqueChallengeStore()));
 			}
 			private set { _hmacServer = value; }
 		}

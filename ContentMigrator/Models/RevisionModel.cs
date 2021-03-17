@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ScsContentMigrator.Models
+namespace Sidekick.ContentMigrator.Models
 {
 	public class RevisionModel
 	{

@@ -1,0 +1,30 @@
+.xccontent {
+	color: green;
+	padding-left: 13px;
+	font-weight: bold;
+	font-size: 20px;
+	padding: 10px;
+}
+.xcnamespace {
+	font-size: 8px;
+	font-style: italic;
+	color: grey;
+}
+.xcmodel {
+	width: 500px;
+	border: thin solid black;
+	padding: 5px;
+	border-left: 5px solid blue;
+	background-color: cornsilk;
+	margin-bottom: 10px;
+}
+.xcdescription > div > pre {
+	background-color: lightyellow;
+	border: thin solid grey;
+	padding: 10px;
+	tab-size: 3;
+	margin-top: 0px
+}
+.xcspinner {
+	margin: 20px;
+}

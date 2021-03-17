@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using SitecoreSidekick.Core;
+using Sidekick.Core;
 
-namespace SitecoreSidekick.Services.Interface
+namespace Sidekick.Core.Services.Interface
 {
 	public interface IScsRegistrationService
 	{

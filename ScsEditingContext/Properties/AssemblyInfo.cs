@@ -1,4 +1,4 @@
 ﻿using System.Reflection;
 
-[assembly: AssemblyTitle("ScsEditingContext")]
+[assembly: AssemblyTitle("Sidekick.EditingContext")]
 

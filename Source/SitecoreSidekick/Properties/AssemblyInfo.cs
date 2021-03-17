@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 
-[assembly: AssemblyTitle("SitecoreSidekick")]
-[assembly: InternalsVisibleTo("SitecoreSidekick.UnitTests")]
+[assembly: AssemblyTitle("Sidekick.Core")]
+[assembly: InternalsVisibleTo("Sidekick.Core.UnitTests")]
 

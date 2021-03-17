@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Util;
+using Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster.Util;
 using Sitecore.Data.Templates;
 
-namespace ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Load.Paths
+namespace Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster.Load.Paths
 {
 	/// <summary>
 	/// Allows generating ancestor in a stream of bulk items.

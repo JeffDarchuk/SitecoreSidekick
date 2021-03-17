@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ScsEditingContext.Services;
-using ScsEditingContext.Services.Interface;
-using SitecoreSidekick.Shared.IoC;
+using Sidekick.EditingContext.Services;
+using Sidekick.EditingContext.Services.Interface;
+using Sidekick.Core.Shared.IoC;
 
-namespace ScsEditingContext
+namespace Sidekick.EditingContext
 {
 	public class Bootstrap
 	{
@@ -37,7 +37,7 @@ namespace ScsEditingContext
 
 		private static Container InitializeContainer()
 		{
-			Container container = SitecoreSidekick.Bootstrap.Container;
+			Container container = Sidekick.Core.Bootstrap.Container;
 
 			// Register components here
 			container.Register<ISitecoreDataAccessService, SitecoreDataAccessService>();

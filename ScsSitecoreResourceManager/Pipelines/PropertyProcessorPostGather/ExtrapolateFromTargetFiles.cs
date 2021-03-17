@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using ScsSitecoreResourceManager.Pipelines.SitecoreResourceManager;
+using Sidekick.SitecoreResourceManager.Pipelines.SitecoreResourceManager;
 
-namespace ScsSitecoreResourceManager.Pipelines.PropertyProcessorPostGather
+namespace Sidekick.SitecoreResourceManager.Pipelines.PropertyProcessorPostGather
 {
 	public class ExtrapolateFromTargetFiles
 	{

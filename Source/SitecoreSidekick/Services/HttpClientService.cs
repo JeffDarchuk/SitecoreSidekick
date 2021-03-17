@@ -4,9 +4,9 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using SitecoreSidekick.Services.Interface;
+using Sidekick.Core.Services.Interface;
 
-namespace SitecoreSidekick.Services
+namespace Sidekick.Core.Services
 {
 	public class HttpClientService : IHttpClientService
 	{

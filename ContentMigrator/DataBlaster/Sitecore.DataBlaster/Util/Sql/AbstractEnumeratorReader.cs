@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data.Common;
 
-namespace ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Util.Sql
+namespace Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster.Util.Sql
 {
     /// <summary>
     /// Helps mapping an IEnumerator to an IDataReader so it can e.g. be used in bulk copy.

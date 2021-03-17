@@ -6,7 +6,7 @@ using Sitecore;
 using Sitecore.Data.Managers;
 using Sitecore.Data.Templates;
 
-namespace ScsContentMigrator.DataBlaster.Sitecore.DataBlaster
+namespace Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster
 {
 	public class BulkItem
 	{

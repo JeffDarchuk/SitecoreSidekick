@@ -1,6 +1,6 @@
 ﻿using Sitecore.Publishing.Pipelines.PublishItem;
 
-namespace ScsAuditLog.Pipelines.Publish
+namespace Sidekick.AuditLog.Pipelines.Publish
 {
 	public class AuditPublishItem : PublishItemProcessor
 	{

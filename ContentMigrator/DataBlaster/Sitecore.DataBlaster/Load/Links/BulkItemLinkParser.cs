@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Sitecore.Data;
 
-namespace ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Load.Links
+namespace Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster.Load.Links
 {
 	/// <summary>
 	/// Parses out links in content of bulk items.

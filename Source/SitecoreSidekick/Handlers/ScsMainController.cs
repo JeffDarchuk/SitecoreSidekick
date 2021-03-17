@@ -2,9 +2,9 @@
 using Sitecore.Configuration;
 using Sitecore.Data.Items;
 using Sitecore.SecurityModel;
-using SitecoreSidekick.Core;
-using SitecoreSidekick.Models;
-using SitecoreSidekick.Services.Interface;
+using Sidekick.Core;
+using Sidekick.Core.Models;
+using Sidekick.Core.Services.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 
-namespace SitecoreSidekick.Handlers
+namespace Sidekick.Core.Handlers
 {
 	public class ScsMainController : ScsController
 	{
@@ -46,7 +46,7 @@ namespace SitecoreSidekick.Handlers
 			}
 			return ScsJson(true);
 		}
-		[ScsLoggedIn]
+		[LoggedIn]
 		[ActionName("scs.scs")]
 		public ActionResult ScsMain()
 		{

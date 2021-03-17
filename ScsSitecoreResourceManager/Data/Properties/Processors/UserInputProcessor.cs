@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ScsSitecoreResourceManager.Data.Properties.Processors
+namespace Sidekick.SitecoreResourceManager.Data.Properties.Processors
 {
 	public class UserInputProcessor : PropertyProcessor
 	{

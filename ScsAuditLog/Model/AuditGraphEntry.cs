@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Lucene.Net.Support;
 
-namespace ScsAuditLog.Model
+namespace Sidekick.AuditLog.Model
 {
 	public class AuditGraphEntry
 	{

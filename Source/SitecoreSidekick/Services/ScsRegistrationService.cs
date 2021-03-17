@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SitecoreSidekick.Core;
-using SitecoreSidekick.Services.Interface;
+using Sidekick.Core;
+using Sidekick.Core.Services.Interface;
 
-namespace SitecoreSidekick.Services
+namespace Sidekick.Core.Services
 {
 	public class ScsRegistrationService : IScsRegistrationService
 	{

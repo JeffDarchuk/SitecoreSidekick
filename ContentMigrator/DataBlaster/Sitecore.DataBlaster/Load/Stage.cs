@@ -1,4 +1,4 @@
-namespace ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Load
+namespace Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster.Load
 {
     public enum Stage
     {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ScsAuditLog.Model
+namespace Sidekick.AuditLog.Model
 {
 	public class ActivityDataModel
 	{

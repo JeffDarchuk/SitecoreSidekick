@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ScsSitecoreResourceManager.Pipelines.SitecoreResourceManager;
+using Sidekick.SitecoreResourceManager.Pipelines.SitecoreResourceManager;
 
-namespace ScsSitecoreResourceManager.Pipelines.PropertyProcessorPostGather
+namespace Sidekick.SitecoreResourceManager.Pipelines.PropertyProcessorPostGather
 {
 	public class PropertyLayeredTokenReplacer
 	{

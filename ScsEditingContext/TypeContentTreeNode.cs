@@ -1,9 +1,9 @@
 ﻿using System;
 using Rainbow.Model;
 using Sitecore.Data.Items;
-using SitecoreSidekick.ContentTree;
+using Sidekick.Core.ContentTree;
 
-namespace ScsEditingContext
+namespace Sidekick.EditingContext
 {
 	public class TypeContentTreeNode : ContentTreeNode
 	{

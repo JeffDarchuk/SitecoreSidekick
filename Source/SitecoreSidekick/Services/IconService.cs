@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Web;
-using SitecoreSidekick.Services.Interface;
+using Sidekick.Core.Services.Interface;
 
-namespace SitecoreSidekick.Services
+namespace Sidekick.Core.Services
 {
 	public class IconService : IIconService
 	{

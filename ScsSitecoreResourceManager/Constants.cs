@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ScsSitecoreResourceManager
+namespace Sidekick.SitecoreResourceManager
 {
 	public static class Constants
 	{

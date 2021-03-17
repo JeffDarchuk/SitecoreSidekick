@@ -2,7 +2,7 @@
 using System.IO;
 using System.Linq;
 
-namespace ScsSitecoreResourceManager.Pipelines.SitecoreResourceManager
+namespace Sidekick.SitecoreResourceManager.Pipelines.SitecoreResourceManager
 {
 
 	public class InsertIntoCsMethod

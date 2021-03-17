@@ -4,13 +4,13 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Load.Links;
-using ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Load.Sql;
-using ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Util.Sql;
+using Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster.Load.Links;
+using Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster.Load.Sql;
+using Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster.Util.Sql;
 using Sitecore.Configuration;
 using Sitecore.Data.SqlServer;
 
-namespace ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Load.Processors
+namespace Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster.Load.Processors
 {
 	public class ItemLinker : IItemProcessor, IChangeProcessor
 	{

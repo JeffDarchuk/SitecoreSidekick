@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ScsContentMigrator.Models
+namespace Sidekick.ContentMigrator.Models
 {
 	public class PullItemModel
 	{
@@ -18,7 +18,19 @@ namespace ScsContentMigrator.Models
 		public bool Preview = false;
 		public bool EventDisabler = true;
 		public bool BulkUpdate = true;
-		public bool UseItemBlaster = true;
+		public bool UseItemBlaster = false;
 		public bool IgnoreRevId = false;
+		public PullItemModel() { }
+		public PullItemModel(ContentMigrationRegistration registration) {
+			Children = registration.DefaultChildren;
+			Overwrite = registration.DefaultOverwrite;
+			PullParent = registration.DefaultPullParent;
+			RemoveLocalNotInRemote = registration.DefaultRemoveLocalNotInRemote;
+			EventDisabler = registration.DefaultEventDisabler;
+			BulkUpdate = registration.DefaultBulkUpdate;
+			UseItemBlaster = registration.DefaultUseItemBlaster;
+			IgnoreRevId = registration.DefaultIgnoreRevId;
+		}
+
 	}
 }

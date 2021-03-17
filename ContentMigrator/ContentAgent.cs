@@ -1,9 +1,9 @@
-﻿using ScsContentMigrator.Models;
-using ScsContentMigrator.Services;
-using ScsContentMigrator.Services.Interface;
+﻿using Sidekick.ContentMigrator.Models;
+using Sidekick.ContentMigrator.Services;
+using Sidekick.ContentMigrator.Services.Interface;
 using System.Collections.Generic;
 
-namespace ScsContentMigrator
+namespace Sidekick.ContentMigrator
 {
 	public class ContentAgent
 	{

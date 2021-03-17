@@ -2,4 +2,4 @@
 using System.Runtime.CompilerServices;
 
 [assembly: AssemblyTitle("ContentMigrator")]
-[assembly: InternalsVisibleTo("ScsContentMigrator.UnitTests")]
+[assembly: InternalsVisibleTo("Sidekick.ContentMigrator.UnitTests")]

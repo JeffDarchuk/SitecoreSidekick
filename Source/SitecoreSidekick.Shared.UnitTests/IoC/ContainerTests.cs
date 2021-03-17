@@ -1,11 +1,11 @@
 ﻿using FluentAssertions;
-using SitecoreSidekick.Shared.IoC;
+using Sidekick.Core.Shared.IoC;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
-namespace SitecoreSidekick.Shared.UnitTests.IoC
+namespace Sidekick.Core.Shared.UnitTests.IoC
 {
 	public class containerTests
 	{

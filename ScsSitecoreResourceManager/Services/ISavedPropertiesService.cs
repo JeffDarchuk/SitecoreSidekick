@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ScsSitecoreResourceManager.Services
+namespace Sidekick.SitecoreResourceManager.Services
 {
 	interface ISavedPropertiesService
 	{

@@ -55,6 +55,9 @@
 			runPreset: function (name, server) {
 				var data = { "name": name, "server": server };
 				return $http.post("/scs/cm/cmrunpreset.scsvc", data);
+			},
+			getDefaultOptions: function () {
+				return $http.get("/scs/cm/cmdefaultoperationparameters.scsvc")
 			}
 
 		};

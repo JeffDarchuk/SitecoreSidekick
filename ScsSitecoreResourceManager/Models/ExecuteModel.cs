@@ -1,11 +1,11 @@
-﻿using ScsSitecoreResourceManager.Data.Properties.Collectors;
+﻿using Sidekick.SitecoreResourceManager.Data.Properties.Collectors;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ScsSitecoreResourceManager.Models
+namespace Sidekick.SitecoreResourceManager.Models
 {
 	public class ExecuteModel : TargetModel
 	{

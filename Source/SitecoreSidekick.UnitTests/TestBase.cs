@@ -1,5 +1,5 @@
 ﻿using NSubstitute;
-using SitecoreSidekick.Shared.IoC;
+using Sidekick.Core.Shared.IoC;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +8,7 @@ using System.Threading;
 using System.Web;
 using System.Web.Mvc;
 
-namespace SitecoreSidekick.UnitTests
+namespace Sidekick.Core.UnitTests
 {
 	public static class TestLocker
 	{

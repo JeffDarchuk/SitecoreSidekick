@@ -1,4 +1,4 @@
-﻿namespace ScsAuditLog.Model.Interface
+﻿namespace Sidekick.AuditLog.Model.Interface
 {
 	public interface IEventType
 	{

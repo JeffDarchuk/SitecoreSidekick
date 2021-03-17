@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Rainbow.Model;
 using Rainbow.Storage;
 
-namespace ScsContentMigrator.Services.Interface
+namespace Sidekick.ContentMigrator.Services.Interface
 {
 	interface IDatastoreSaver
 	{

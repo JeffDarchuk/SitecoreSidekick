@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Sitecore.DependencyInjection;
-using SitecoreSidekick.Services;
-using SitecoreSidekick.Services.Interface;
-using SitecoreSidekick.Shared.IoC;
+using Sidekick.Core.Services;
+using Sidekick.Core.Services.Interface;
+using Sidekick.Core.Shared.IoC;
 
-namespace ScsAuditLog
+namespace Sidekick.AuditLog
 {
 	public class Bootstrap
 	{
@@ -38,7 +38,7 @@ namespace ScsAuditLog
 
 		private static Container InitializeContainer()
 		{
-			Container container = SitecoreSidekick.Bootstrap.Container;
+			Container container = Sidekick.Core.Bootstrap.Container;
 
 			// Register components here
 			container.Register<ISitecoreDataAccessService, SitecoreDataAccessService>();

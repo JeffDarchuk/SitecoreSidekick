@@ -11,18 +11,18 @@ using System.Xml;
 using Sitecore.Data;
 using Sitecore.Data.Managers;
 using Sitecore.SecurityModel;
-using SitecoreSidekick;
-using SitecoreSidekick.ContentTree;
-using SitecoreSidekick.Core;
-using SitecoreSidekick.Pipelines.HttpRequestBegin;
-using SitecoreSidekick.Services.Interface;
-using SitecoreSidekick.Shared.IoC;
+using Sidekick.Core;
+using Sidekick.Core.ContentTree;
+using Sidekick.Core;
+using Sidekick.Core.Pipelines.HttpRequestBegin;
+using Sidekick.Core.Services.Interface;
+using Sidekick.Core.Shared.IoC;
 using System.Web.Configuration;
 using System.Configuration;
 using System.Text.RegularExpressions;
 using Sitecore.Diagnostics;
 
-namespace ScsEditingContext
+namespace Sidekick.EditingContext
 {
 	public class EditingContextController: ScsController
 	{
@@ -40,21 +40,21 @@ namespace ScsEditingContext
 		{
 			_registration = registration;
 		}
-		[ScsLoggedIn]
+		[LoggedIn]
 		[ActionName("getcommonlocations.json")]
 		public ActionResult CommonLocations()
 		{
 			return ScsJson(GetCommonLocations());
 		}
 
-		[ScsLoggedIn]
+		[LoggedIn]
 		[ActionName("getrelated.json")]
 		public ActionResult RelatedItems()
 		{
 			return ScsJson(GetReferences());
 		}
 
-		[ScsLoggedIn]
+		[LoggedIn]
 		[ActionName("getreferrers.json")]
 		public ActionResult ReferrerItems()
 		{

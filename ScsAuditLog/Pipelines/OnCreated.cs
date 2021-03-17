@@ -1,10 +1,10 @@
 ﻿using System;
-using ScsAuditLog.Model;
+using Sidekick.AuditLog.Model;
 using Sitecore.Diagnostics;
 using Sitecore.Events;
 using Sitecore.Data.Events;
 
-namespace ScsAuditLog.Pipelines
+namespace Sidekick.AuditLog.Pipelines
 {
 	public class OnCreated : AuditEventType
 	{

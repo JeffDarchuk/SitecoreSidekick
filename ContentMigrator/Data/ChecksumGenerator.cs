@@ -7,7 +7,7 @@ using Sitecore;
 using Sitecore.Data;
 using Sitecore.Diagnostics;
 
-namespace ScsContentMigrator.Data
+namespace Sidekick.ContentMigrator.Data
 {
 	public class ChecksumGenerator
 	{
@@ -27,7 +27,7 @@ namespace ScsContentMigrator.Data
 							var checksum = new Checksum();
 							while (reader.Read())
 							{
-								checksum.LoadRow(reader["ID"].ToString(), reader["ParentID"].ToString(), reader["Value"].ToString());
+								checksum.LoadRow(reader["ID"].ToString(), reader["ParentID"].ToString(), reader["Value"].ToString(), reader["Language"].ToString(), reader["Version"] as int?);
 							}
 
 							checksum.Generate();
@@ -71,7 +71,7 @@ namespace ScsContentMigrator.Data
 					WITH (NOLOCK)
 					INNER JOIN tree t ON y.ParentID = t.ID
 				)
-				SELECT t.ID, t.ParentID, v.Value
+				SELECT t.ID, t.ParentID, v.Value, v.Language, v.Version
 				FROM tree t
 				WITH (NOLOCK)
 				inner join VersionedFields v on v.ItemId = t.ID

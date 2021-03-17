@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Read
+namespace Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster.Read
 {
     /// <summary>
     /// Describes a specific version of an item.

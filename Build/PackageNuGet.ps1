@@ -29,13 +29,13 @@ $solution = "$scriptRoot\..\SitecoreSidekick.sln"
 & $nuGet restore $solution
 & $msBuild $solution /p:Configuration=Release /t:Rebuild /m
 
-$tmAssembly = Get-Item "$scriptRoot\..\Source\SitecoreSidekick\bin\Release\SitecoreSidekick.dll" | Select-Object -ExpandProperty VersionInfo
+$tmAssembly = Get-Item "$scriptRoot\..\Source\SitecoreSidekick\bin\Release\Sidekick.Core.dll" | Select-Object -ExpandProperty VersionInfo
 $targetAssemblyVersion = $tmAssembly.ProductVersion
 
 & $nuGet pack "$scriptRoot\SitecoreSidekick.nuget\SitecoreSidekick.nuspec" -version $targetAssemblyVersion
 
-& $nuGet pack "$scriptRoot\..\Source\SitecoreSidekick\SitecoreSidekick.csproj" -Symbols -Prop "Configuration=Release" -version $targetAssemblyVersion
-& $nuGet pack "$scriptRoot\..\ScsAuditLog\ScsAuditLog.csproj" -Symbols -Prop "Configuration=Release" -version $targetAssemblyVersion
-& $nuGet pack "$scriptRoot\..\ScsEditingContext\ScsEditingContext.csproj" -Symbols -Prop "Configuration=Release" -version $targetAssemblyVersion
-& $nuGet pack "$scriptRoot\..\ContentMigrator\ScsContentMigrator.csproj" -Symbols -Prop "Configuration=Release" -version $targetAssemblyVersion
-& $nuGet pack "$scriptRoot\..\ScsSitecoreResourceManager\ScsSitecoreResourceManager.csproj" -Symbols -Prop "Configuration=Release" -version $targetAssemblyVersion
+& $nuGet pack "$scriptRoot\..\Source\SitecoreSidekick\Sidekick.Core.csproj" -Symbols -Prop "Configuration=Release" -version $targetAssemblyVersion -Properties id=SitecoreSidekickCore
+& $nuGet pack "$scriptRoot\..\ScsAuditLog\Sidekick.AuditLog.csproj" -Symbols -Prop "Configuration=Release" -version $targetAssemblyVersion -Properties id=SitecoreSidekickAuditLog
+& $nuGet pack "$scriptRoot\..\ScsEditingContext\Sidekick.EditingContext.csproj" -Symbols -Prop "Configuration=Release" -version $targetAssemblyVersion -Properties id=SitecoreSidekickEditingContext
+& $nuGet pack "$scriptRoot\..\ContentMigrator\Sidekick.ContentMigrator.csproj" -Symbols -Prop "Configuration=Release" -version $targetAssemblyVersion -Properties id=SitecoreSidekickContentMigrator
+& $nuGet pack "$scriptRoot\..\ScsSitecoreResourceManager\Sidekick.SitecoreResourceManager.csproj" -Symbols -Prop "Configuration=Release" -version $targetAssemblyVersion -Properties id=SitecoreSidekickResourceManager

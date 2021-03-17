@@ -12,18 +12,18 @@ using Lucene.Net.Analysis;
 using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
-using ScsAuditLog.Model;
-using ScsAuditLog.Model.Interface;
+using Sidekick.AuditLog.Model;
+using Sidekick.AuditLog.Model.Interface;
 using Sitecore.Configuration;
 using Sitecore.Data.Items;
 using Lucene.Net.QueryParsers;
 using Lucene.Net.Search;
 using Lucene.Net.Store;
-using SitecoreSidekick.Services.Interface;
+using Sidekick.Core.Services.Interface;
 using Directory = Lucene.Net.Store.Directory;
 using Version = Lucene.Net.Util.Version;
 
-namespace ScsAuditLog.Core
+namespace Sidekick.AuditLog.Core
 {
 	public class AuditLog
 	{

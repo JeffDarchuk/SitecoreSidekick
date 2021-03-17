@@ -1,0 +1,279 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{F016480C-DC54-4134-9903-3D30635EF687}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Sidekick.ContentMigrator</RootNamespace>
+    <AssemblyName>Sidekick.ContentMigrator</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="HtmlDiff, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\htmldiff.net.1.3\lib\net35\HtmlDiff.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="MicroCHAP, Version=1.2.2.2, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MicroCHAP.1.2.2.2\lib\net45\MicroCHAP.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Rainbow, Version=2.1.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Rainbow.Core.2.1.2\lib\net452\Rainbow.dll</HintPath>
+    </Reference>
+    <Reference Include="Rainbow.Storage.Sc, Version=2.1.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Rainbow.Storage.Sc.2.1.2\lib\net452\Rainbow.Storage.Sc.dll</HintPath>
+    </Reference>
+    <Reference Include="Rainbow.Storage.Yaml, Version=2.1.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Rainbow.Storage.Yaml.2.1.2\lib\net452\Rainbow.Storage.Yaml.dll</HintPath>
+    </Reference>
+    <Reference Include="Sitecore.Buckets, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Sitecore.Buckets.NoReferences.8.2.170407\lib\NET452\Sitecore.Buckets.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Sitecore.ContentSearch, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Sitecore.ContentSearch.NoReferences.8.2.170407\lib\NET452\Sitecore.ContentSearch.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Sitecore.Kernel, Version=10.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Sitecore.Kernel.NoReferences.8.2.170407\lib\NET452\Sitecore.Kernel.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Sitecore.Logging, Version=10.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Sitecore.Logging.NoReferences.8.2.170407\lib\NET452\Sitecore.Logging.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.1.2\lib\net45\System.Web.Helpers.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=5.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.1.2\lib\net45\System.Web.Mvc.dll</HintPath>
+      <Private>True</Private>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Razor.3.1.2\lib\net45\System.Web.Razor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Web.WebPages, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.1.2\lib\net45\System.Web.WebPages.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Deployment, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.1.2\lib\net45\System.Web.WebPages.Deployment.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.1.2\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="Args\RemoteContentTreeArgs.cs" />
+    <Compile Include="Bootstrap.cs" />
+    <Compile Include="CMRainbow\DefaultItemComparer.cs" />
+    <Compile Include="CMRainbow\Interface\IDefaultLogger.cs" />
+    <Compile Include="CMRainbow\LogStatus.cs" />
+    <Compile Include="ConcurrentHashSet.cs" />
+    <Compile Include="ContentAgent.cs" />
+    <Compile Include="ContentMigrationController.cs" />
+    <Compile Include="ContentMigrationRegistration.cs" />
+    <Compile Include="Core\ChecksumManager.cs" />
+    <Compile Include="Core\Interface\IChecksumManager.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\BulkField.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\BulkItem.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\ItemReference.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\BulkLoadAction.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\BulkLoadContext.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\BulkLoader.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\BulkLoadItem.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\FieldRule.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\ItemChange.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\Links\BulkItemLink.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\Links\BulkItemLinkParser.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\Paths\AncestorGenerator.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\Processors\ChangeCacheClearer.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\Processors\ChangeIndexer.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\Processors\ChangeLogger.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\Processors\IChangeProcessor.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\Processors\IItemProcessor.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\Processors\ISyncInTransaction.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\Processors\ItemBucketer.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\Processors\ItemLinker.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\Processors\ItemValidator.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\Processors\ItemVersionEnsurer.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\Processors\IValidateStagedData.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\Processors\SyncHistoryTable.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\Processors\SyncPublishQueue.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\Processors\ValidateDataIntegrity.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\Processors\ValidateNoDuplicates.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\Sql\BulkLoadSqlContext.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\Stage.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Load\StageResult.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Read\BulkReader.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Read\ItemHeader.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Read\ItemVersionHeader.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\SharedBulkField.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\UnversionedBulkField.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Util\CacheUtil.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Util\Chain.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Util\GuidUtility.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Util\LogExtensions.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Util\Sql\AbstractEnumeratorReader.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Util\Sql\SqlContext.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Util\Sql\SqlContextExtensions.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\Util\Sql\SqlLine.cs" />
+    <Compile Include="DataBlaster\Sitecore.DataBlaster\VersionedBulkField.cs" />
+    <Compile Include="DataBlaster\ItemMapper.cs" />
+    <Compile Include="Data\Checksum.cs" />
+    <Compile Include="Data\ChecksumGenerator.cs" />
+    <Compile Include="Models\ChildrenItemDataModel.cs" />
+    <Compile Include="Data\CompareContentTreeNode.cs" />
+    <Compile Include="ErrorItemData.cs" />
+    <Compile Include="MchapOrLoggedInAttribute.cs" />
+    <Compile Include="Models\ContentMigrationOperationStatus.cs" />
+    <Compile Include="Models\ContentTreeModel.cs" />
+    <Compile Include="Models\DiffRequestModel.cs" />
+    <Compile Include="Models\OperationStatusRequestModel.cs" />
+    <Compile Include="Models\PresetModel.cs" />
+    <Compile Include="Models\PresetRunModel.cs" />
+    <Compile Include="Models\PullItemModel.cs" />
+    <Compile Include="Core\ContentItemInstaller.cs" />
+    <Compile Include="Core\ContentItemPuller.cs" />
+    <Compile Include="Core\ContentMigration.cs" />
+    <Compile Include="Core\Interface\IContentItemInstaller.cs" />
+    <Compile Include="Core\Interface\IContentItemPuller.cs" />
+    <Compile Include="Core\Interface\IContentMigration.cs" />
+    <Compile Include="Models\RevisionModel.cs" />
+    <Compile Include="Services\DatastoreSaver.cs" />
+    <Compile Include="Services\Interface\IDatastoreSaver.cs" />
+    <Compile Include="Services\Interface\ILoggingService.cs" />
+    <Compile Include="Services\Interface\IRemoteContentService.cs" />
+    <Compile Include="ItemExtensions.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="CMRainbow\DefaultFieldFilter.cs" />
+    <Compile Include="CMRainbow\DefaultLogger.cs" />
+    <Compile Include="Security\HmacServer.cs" />
+    <Compile Include="Security\UniqueChallengeStore.cs" />
+    <Compile Include="Services\ContentMigrationManagerService.cs" />
+    <Compile Include="Services\Interface\IContentMigrationManagerService.cs" />
+    <Compile Include="Services\Interface\IYamlSerializationService.cs" />
+    <Compile Include="Services\LoggingService.cs" />
+    <Compile Include="Services\RemoteContentService.cs" />
+    <Compile Include="Services\YamlSerializationService.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Source\SitecoreSidekick\Sidekick.Core.csproj">
+      <Project>{0da36c4a-1b13-4891-a263-5f994127051c}</Project>
+      <Name>Sidekick.Core</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\cmcontenttree.scs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\cmcontenttreecontroller.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\cmcontenttreedirective.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\cmfactory.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+    <EmbeddedResource Include="Resources\cm.css" />
+    <None Include="Standard Config Files\Sidekick.ContentMigrator.Local.config.example">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Standard Config Files\Sidekick.ContentMigrator.config">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\cmmaster.scs" />
+    <EmbeddedResource Include="Resources\cmmastercontroller.js" />
+    <EmbeddedResource Include="Resources\cmmasterdirective.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\cmcollapsed.png" />
+    <EmbeddedResource Include="Resources\cmexpanded.png" />
+    <EmbeddedResource Include="Resources\cmspinner.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\cm.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\cmphoto_scenery.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="DataBlaster\Sitecore.DataBlaster\Load\Sql\01.CreateTempTable.sql" />
+    <EmbeddedResource Include="DataBlaster\Sitecore.DataBlaster\Load\Sql\02.LookupBlobs.sql" />
+    <EmbeddedResource Include="DataBlaster\Sitecore.DataBlaster\Load\Sql\03.LookupItems.sql" />
+    <EmbeddedResource Include="DataBlaster\Sitecore.DataBlaster\Load\Sql\04.SplitTempTable.sql" />
+    <EmbeddedResource Include="DataBlaster\Sitecore.DataBlaster\Load\Sql\05.CheckDuplicates.sql" />
+    <EmbeddedResource Include="DataBlaster\Sitecore.DataBlaster\Load\Sql\06.CreateIndexes.sql" />
+    <EmbeddedResource Include="DataBlaster\Sitecore.DataBlaster\Load\Sql\07.CheckTempData.sql" />
+    <EmbeddedResource Include="DataBlaster\Sitecore.DataBlaster\Load\Sql\08.MergeTempData.sql" />
+    <EmbeddedResource Include="DataBlaster\Sitecore.DataBlaster\Load\Sql\09.UpdateHistory.sql" />
+    <EmbeddedResource Include="DataBlaster\Sitecore.DataBlaster\Load\Sql\10.UpdatePublishQueue.sql" />
+    <EmbeddedResource Include="DataBlaster\Sitecore.DataBlaster\Load\Sql\20.CreateLinkTempTable.sql" />
+    <EmbeddedResource Include="DataBlaster\Sitecore.DataBlaster\Load\Sql\21.MergeLinkTempData.sql" />
+    <EmbeddedResource Include="DataBlaster\Sitecore.DataBlaster\Read\Sql\GetDescendantHeaders.sql" />
+    <EmbeddedResource Include="DataBlaster\Sitecore.DataBlaster\Read\Sql\GetDescendants.sql" />
+    <EmbeddedResource Include="DataBlaster\Sitecore.DataBlaster\Read\Sql\GetDescendantVersionHeaders.sql" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target> -->
+</Project>

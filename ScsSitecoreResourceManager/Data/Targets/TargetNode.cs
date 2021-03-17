@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ScsSitecoreResourceManager.Data.Targets
+namespace Sidekick.SitecoreResourceManager.Data.Targets
 {
 	public class TargetNode
 	{

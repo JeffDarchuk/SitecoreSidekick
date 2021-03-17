@@ -10,7 +10,7 @@ using System.Web.Configuration;
 using System.Configuration;
 using Sitecore.Pipelines;
 
-namespace SitecoreSidekick.Pipelines.HttpRequestBegin
+namespace Sidekick.Core.Pipelines.HttpRequestBegin
 {
 	public class CheckScs
 	{

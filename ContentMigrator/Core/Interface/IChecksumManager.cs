@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ScsContentMigrator.Core.Interface
+namespace Sidekick.ContentMigrator.Core.Interface
 {
 	interface IChecksumManager
 	{

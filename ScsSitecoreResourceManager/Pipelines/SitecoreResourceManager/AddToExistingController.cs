@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Sitecore.Diagnostics;
 using Sitecore.StringExtensions;
 
-namespace ScsSitecoreResourceManager.Pipelines.SitecoreResourceManager
+namespace Sidekick.SitecoreResourceManager.Pipelines.SitecoreResourceManager
 {
 	public class AddToExistingController
 	{

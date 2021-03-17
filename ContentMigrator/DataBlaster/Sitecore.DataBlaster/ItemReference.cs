@@ -1,6 +1,6 @@
 using System;
 
-namespace ScsContentMigrator.DataBlaster.Sitecore.DataBlaster
+namespace Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster
 {
     /// <summary>
     /// Reference to an item by id and path.

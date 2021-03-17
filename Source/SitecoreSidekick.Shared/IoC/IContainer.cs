@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace SitecoreSidekick.Shared.IoC
+namespace Sidekick.Core.Shared.IoC
 {
 	public interface IContainer
 	{

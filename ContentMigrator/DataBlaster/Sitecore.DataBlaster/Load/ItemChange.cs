@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Data;
 using System.Linq;
-using ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Read;
+using Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster.Read;
 
-namespace ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Load
+namespace Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster.Load
 {
     public class ItemChange
     {

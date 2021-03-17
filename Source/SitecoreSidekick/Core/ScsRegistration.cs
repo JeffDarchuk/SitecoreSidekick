@@ -1,7 +1,7 @@
 ﻿using Sitecore.Mvc.Extensions;
 using Sitecore.Pipelines;
-using SitecoreSidekick.Pipelines.HttpRequestBegin;
-using SitecoreSidekick.Services.Interface;
+using Sidekick.Core.Pipelines.HttpRequestBegin;
+using Sidekick.Core.Services.Interface;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -11,7 +11,7 @@ using System.Text;
 using System.Web.Mvc;
 using System.Web.Routing;
 
-namespace SitecoreSidekick.Core
+namespace Sidekick.Core
 {
 
 	public abstract class ScsRegistration : IScsRegistration

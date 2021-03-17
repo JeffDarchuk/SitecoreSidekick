@@ -1,10 +1,10 @@
 
-using ScsSitecoreResourceManager.Services;
-using SitecoreSidekick.Services;
-using SitecoreSidekick.Services.Interface;
-using SitecoreSidekick.Shared.IoC;
+using Sidekick.SitecoreResourceManager.Services;
+using Sidekick.Core.Services;
+using Sidekick.Core.Services.Interface;
+using Sidekick.Core.Shared.IoC;
 
-namespace ScsSitecoreResourceManager
+namespace Sidekick.SitecoreResourceManager
 {
 	public class Bootstrap
 	{

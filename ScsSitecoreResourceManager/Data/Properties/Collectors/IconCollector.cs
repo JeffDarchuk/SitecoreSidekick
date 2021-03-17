@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 
-namespace ScsSitecoreResourceManager.Data.Properties.Collectors
+namespace Sidekick.SitecoreResourceManager.Data.Properties.Collectors
 {
 	public class IconCollector : IPropertyCollector
 	{

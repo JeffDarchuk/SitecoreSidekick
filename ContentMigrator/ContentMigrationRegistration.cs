@@ -1,11 +1,11 @@
-﻿using ScsContentMigrator.Data;
-using ScsContentMigrator.Security;
+﻿using Sidekick.ContentMigrator.Data;
+using Sidekick.ContentMigrator.Security;
 using Sitecore.Configuration;
 using Sitecore.Data;
 using Sitecore.Pipelines;
 using Sitecore.SecurityModel;
-using SitecoreSidekick.ContentTree;
-using SitecoreSidekick.Core;
+using Sidekick.Core.ContentTree;
+using Sidekick.Core;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -14,13 +14,13 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Xml;
-using ScsContentMigrator.Core.Interface;
+using Sidekick.ContentMigrator.Core.Interface;
 using Sitecore.Events;
 using Sitecore.Web.Authentication;
-using SitecoreSidekick.Services.Interface;
-using ScsContentMigrator.Models;
+using Sidekick.Core.Services.Interface;
+using Sidekick.ContentMigrator.Models;
 
-namespace ScsContentMigrator
+namespace Sidekick.ContentMigrator
 {
 	public class ContentMigrationRegistration : ScsRegistration
 	{
@@ -33,13 +33,22 @@ namespace ScsContentMigrator
 		public Dictionary<string, PresetModel> PresetList { get; } = new Dictionary<string, PresetModel>();
 		public override string Directive => "cmmasterdirective";
 		public override NameValueCollection DirectiveAttributes { get; set; }
-		public override string ResourcesPath => "ScsContentMigrator.Resources";
+		public override string ResourcesPath => "Sidekick.ContentMigrator.Resources";
 		public override string Identifier => "cm";
 		public override Type Controller => typeof(ContentMigrationController);
 		public override string Icon => "/scs/cm/resources/cm.png";
 		public override string Name => "Content Migrator";
 		public override string CssStyle => "width:100%;min-width:800px;";
 		public string AuthenticationSecret { get; set; }
+		public bool DefaultChildren { get; set; } = true;
+		public bool DefaultOverwrite { get; set; } = true;
+		public bool DefaultRemoveLocalNotInRemote { get; set; } = false;
+		public bool DefaultPullParent { get; set; } = true;
+		public bool DefaultEventDisabler { get; set; } = true;
+		public bool DefaultBulkUpdate { get; set; } = true;
+		public bool DefaultUseItemBlaster { get; set; } = false;
+		public bool DefaultIgnoreRevId { get; set; } = false;
+
 
 		public ContentMigrationRegistration(string roles, string isAdmin, string users, string remotePullingThreads, string databaseWriterThreads) : base(roles, isAdmin, users)
 		{
@@ -64,7 +73,7 @@ namespace ScsContentMigrator
 			_checksumManager.StartChecksumTimer();
 			if (string.IsNullOrWhiteSpace(AuthenticationSecret))
 			{
-				throw new InvalidOperationException("Sitecore Sidekick Content Migrator was initialized with an empty shared secret. Make a copy of zSCSContentMigrator.Local.config.example, rename it to .config, and set up a unique, long, randomly generated shared secret there.");
+				throw new InvalidOperationException("Sitecore Sidekick Content Migrator was initialized with an empty shared secret. Make a copy of zSidekick.ContentMigrator.Local.config.example, rename it to .config, and set up a unique, long, randomly generated shared secret there.");
 			}
 
 			if (AuthenticationSecret.Length < 32)

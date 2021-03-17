@@ -2,7 +2,7 @@ using System;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Util
+namespace Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster.Util
 {
     /// <summary>
     /// Guid utility that allows to generate stable guids.

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SitecoreSidekick.Models
+namespace Sidekick.Core.Models
 {
 	public class ContentSelectedRelatedModel
 	{

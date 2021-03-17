@@ -5,14 +5,14 @@ using System.Dynamic;
 using System.Web;
 using Rainbow.Model;
 using Rainbow.Storage.Sc.Deserialization;
-using ScsContentMigrator.CMRainbow.Interface;
+using Sidekick.ContentMigrator.CMRainbow.Interface;
 using Sitecore.Data;
 using Sitecore.Data.Fields;
 using Sitecore.Data.Items;
 using Sitecore.Data.Managers;
 using Sitecore.Diagnostics;
 
-namespace ScsContentMigrator.CMRainbow
+namespace Sidekick.ContentMigrator.CMRainbow
 {
 	public class DefaultLogger : IDefaultLogger
 	{

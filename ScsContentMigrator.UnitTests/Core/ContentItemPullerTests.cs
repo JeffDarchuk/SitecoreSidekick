@@ -9,12 +9,12 @@ using NSubstitute;
 using NSubstitute.Core;
 using Rainbow.Model;
 using Rainbow.Storage.Sc;
-using ScsContentMigrator.Core;
-using ScsContentMigrator.Models;
-using ScsContentMigrator.Services.Interface;
+using Sidekick.ContentMigrator.Core;
+using Sidekick.ContentMigrator.Models;
+using Sidekick.ContentMigrator.Services.Interface;
 using Xunit;
 
-namespace ScsContentMigrator.UnitTests.Core
+namespace Sidekick.ContentMigrator.UnitTests.Core
 {
 	public class ContentItemPullerTests : TestBase
 	{

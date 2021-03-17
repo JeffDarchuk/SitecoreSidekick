@@ -10,16 +10,17 @@ using Rainbow.Diff;
 using Rainbow.Model;
 using Rainbow.Storage;
 using Rainbow.Storage.Sc;
-using ScsContentMigrator.CMRainbow;
-using ScsContentMigrator.CMRainbow.Interface;
-using ScsContentMigrator.Core;
-using ScsContentMigrator.Models;
-using ScsContentMigrator.Services.Interface;
+using Sidekick.ContentMigrator.CMRainbow;
+using Sidekick.ContentMigrator.CMRainbow.Interface;
+using Sidekick.ContentMigrator.Core;
+using Sidekick.ContentMigrator.Models;
+using Sidekick.ContentMigrator.Services.Interface;
 using Sitecore.Data.Items;
-using SitecoreSidekick.Services.Interface;
+using Sidekick.Core.Services.Interface;
 using Xunit;
+using Sidekick.ContentMigrator;
 
-namespace ScsContentMigrator.UnitTests.Core
+namespace Sidekick.ContentMigrator.UnitTests.Core
 {
 	public class ContentItemInstallerTests : TestBase
 	{

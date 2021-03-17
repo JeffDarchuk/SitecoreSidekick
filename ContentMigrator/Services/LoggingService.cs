@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ScsContentMigrator.Services.Interface;
+using Sidekick.ContentMigrator.Services.Interface;
 using Sitecore.Diagnostics;
 
-namespace ScsContentMigrator.Services
+namespace Sidekick.ContentMigrator.Services
 {
 	public class LoggingService : ILoggingService
 	{

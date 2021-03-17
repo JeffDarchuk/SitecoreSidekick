@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Rainbow.Model;
 using Sitecore.Data.Items;
 
-namespace ScsContentMigrator.Services.Interface
+namespace Sidekick.ContentMigrator.Services.Interface
 {
 	public interface IYamlSerializationService
 	{

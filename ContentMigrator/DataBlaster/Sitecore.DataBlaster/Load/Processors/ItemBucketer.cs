@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Load.Paths;
+using Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster.Load.Paths;
 using Sitecore;
 using Sitecore.Buckets.Extensions;
 using Sitecore.Buckets.Util;
@@ -9,7 +9,7 @@ using Sitecore.Configuration;
 using Sitecore.Data;
 using Sitecore.Data.Managers;
 
-namespace ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Load.Processors
+namespace Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster.Load.Processors
 {
     /// <summary>
     /// Generates bucket structure for bulk items.

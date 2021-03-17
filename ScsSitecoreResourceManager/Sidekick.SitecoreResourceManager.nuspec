@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>SitecoreSidekickResourceManager</id>
+    <version>$version$</version>
+    <title>Sitecore Sidekick Resource Manager</title>
+    <authors>Jeff Darchuk</authors>
+    <owners>Jeff Darchuk</owners>
+	<licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
+	<projectUrl>https://github.com/JeffDarchuk/SitecoreSidekick</projectUrl>
+
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+	<description>Manages consistantly creating the repetative tasks of creating components in Sitecore.  From creating projects for helix layers to generating templates and renderings.</description>
+	<copyright>Copyright 2018 Jeff Darchuk</copyright>
+	<tags>sitecore</tags>
+	<dependencies>
+		<dependency id="SitecoreSidekickFoundation" version="$version$" />
+	</dependencies>
+  </metadata>
+    <files>
+		<file src="..\ScsSitecoreResourceManager\*.config" target="content\App_Config\Include\Sidekick" />
+	</files>
+</package>

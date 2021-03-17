@@ -5,14 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Rainbow.Model;
-using ScsContentMigrator.Args;
-using ScsContentMigrator.Core;
-using ScsContentMigrator.Core.Interface;
-using ScsContentMigrator.Models;
-using ScsContentMigrator.Services.Interface;
+using Sidekick.ContentMigrator.Args;
+using Sidekick.ContentMigrator.Core;
+using Sidekick.ContentMigrator.Core.Interface;
+using Sidekick.ContentMigrator.Models;
+using Sidekick.ContentMigrator.Services.Interface;
 using Sitecore.Diagnostics;
 
-namespace ScsContentMigrator.Services
+namespace Sidekick.ContentMigrator.Services
 {
 	public class ContentMigrationManagerService : IContentMigrationManagerService
 	{

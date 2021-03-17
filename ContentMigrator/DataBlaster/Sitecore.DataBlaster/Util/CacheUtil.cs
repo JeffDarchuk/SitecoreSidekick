@@ -10,7 +10,7 @@ using Sitecore.Data.DataProviders.Sql;
 using Sitecore.Data.Items;
 using Sitecore.Diagnostics;
 
-namespace ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Util
+namespace Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster.Util
 {
 	public class CacheUtil
 	{

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using MicroCHAP.Server;
 
-namespace ScsContentMigrator.Security
+namespace Sidekick.ContentMigrator.Security
 {
 	/// <summary>
 	/// Implements a reactive challenge store.

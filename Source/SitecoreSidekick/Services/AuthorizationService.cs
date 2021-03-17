@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using SitecoreSidekick.Pipelines.HttpRequestBegin;
-using SitecoreSidekick.Services.Interface;
+using Sidekick.Core.Pipelines.HttpRequestBegin;
+using Sidekick.Core.Services.Interface;
 
-namespace SitecoreSidekick.Services
+namespace Sidekick.Core.Services
 {
 	public class AuthorizationService : IAuthorizationService
 	{

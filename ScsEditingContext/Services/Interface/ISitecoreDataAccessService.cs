@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Rainbow.Model;
 using Sitecore.Data;
 
-namespace ScsEditingContext.Services.Interface
+namespace Sidekick.EditingContext.Services.Interface
 {
 	public interface ISitecoreDataAccessService
 	{

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 
-namespace ScsSitecoreResourceManager.Pipelines.SitecoreResourceManager
+namespace Sidekick.SitecoreResourceManager.Pipelines.SitecoreResourceManager
 {
 	public class ApplyFilesToProject
 	{

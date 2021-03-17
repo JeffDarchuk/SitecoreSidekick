@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ScsSitecoreResourceManager.Pipelines.SitecoreResourceManager
+namespace Sidekick.SitecoreResourceManager.Pipelines.SitecoreResourceManager
 {
 	public class CreateTemplate
 	{

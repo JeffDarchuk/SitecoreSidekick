@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using ScsAuditLog.Model.Interface;
+using Sidekick.AuditLog.Model.Interface;
 using Sitecore;
 using Sitecore.Data;
 using Sitecore.Data.Items;
 using Sitecore.Diagnostics;
 
-namespace ScsAuditLog.Model
+namespace Sidekick.AuditLog.Model
 {
 	public class ItemAuditEntry : IAuditEntry
 	{

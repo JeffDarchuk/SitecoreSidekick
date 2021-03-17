@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
-using ScsContentMigrator.Data;
+using Sidekick.ContentMigrator.Data;
 using Xunit;
 
-namespace ScsContentMigrator.UnitTests.Data
+namespace Sidekick.ContentMigrator.UnitTests.Data
 {
 	public class ChecksumTests : TestBase
 	{
@@ -19,7 +19,7 @@ namespace ScsContentMigrator.UnitTests.Data
 			string expectedValue = "Value";
 			Checksum checksum = new Checksum();
 
-			checksum.LoadRow(expectedId, expectedParentId, expectedValue);
+			checksum.LoadRow(expectedId, expectedParentId, expectedValue, "en", 1);
 
 			checksum._parentTracker.Should().ContainKey(Guid.Parse(expectedId));
 			checksum._parentTracker[Guid.Parse(expectedId)].Should().Be(Guid.Parse(expectedParentId));
@@ -33,7 +33,7 @@ namespace ScsContentMigrator.UnitTests.Data
 			string expectedValue = "Value";
 			Checksum checksum = new Checksum();
 
-			checksum.LoadRow(expectedId, expectedParentId, expectedValue);
+			checksum.LoadRow(expectedId, expectedParentId, expectedValue, "en", 1);
 
 			checksum._childTracker.Should().ContainKey(Guid.Parse(expectedParentId));
 			checksum._childTracker[Guid.Parse(expectedParentId)].Should().Contain(expectedId);
@@ -47,44 +47,13 @@ namespace ScsContentMigrator.UnitTests.Data
 			string existingId = Guid.NewGuid().ToString("N");
 			string expectedValue = "Value";
 			Checksum checksum = new Checksum();
-			checksum._childTracker.Add(Guid.Parse(expectedParentId), new List<Guid> {Guid.Parse(existingId)});
+			checksum._childTracker.Add(Guid.Parse(expectedParentId), new SortedSet<Guid> {Guid.Parse(existingId)});
 
-			checksum.LoadRow(expectedId, expectedParentId, expectedValue);
+			checksum.LoadRow(expectedId, expectedParentId, expectedValue, "en", 1);
 
 			checksum._childTracker.Should().ContainKey(Guid.Parse(expectedParentId));
 			checksum._childTracker[Guid.Parse(expectedParentId)].Should().Contain(Guid.Parse(expectedId));
 			checksum._childTracker[Guid.Parse(expectedParentId)].Should().Contain(Guid.Parse(existingId));
-		}
-
-		[Fact]
-		public void LoadRow_NonexistentChecksumTracker_CreatesAndAddsValue()
-		{
-			string expectedId = Guid.NewGuid().ToString("N");
-			string expectedParentId = Guid.NewGuid().ToString("N");
-			string expectedValue = "Value";
-			Checksum checksum = new Checksum();
-
-			checksum.LoadRow(expectedId, expectedParentId, expectedValue);
-
-			checksum._checksumTracker.Should().ContainKey(Guid.Parse(expectedId));
-			checksum._checksumTracker[Guid.Parse(expectedId)].Should().Contain(expectedValue);
-		}
-
-		[Fact]
-		public void LoadRow_ExistingChecksumTracker_AddsValue()
-		{
-			string expectedId = Guid.NewGuid().ToString("N");
-			string expectedParentId = Guid.NewGuid().ToString("N");
-			short existingValue = 5;
-			string expectedValue = "Value";
-			Checksum checksum = new Checksum();
-			checksum._checksumTracker.Add(Guid.Parse(expectedId), new SortedSet<short> { existingValue});
-
-			checksum.LoadRow(expectedId, expectedParentId, expectedValue);
-
-			checksum._checksumTracker.Should().ContainKey(Guid.Parse(expectedId));
-			checksum._checksumTracker[Guid.Parse(expectedId)].Should().Contain(expectedValue);
-			checksum._checksumTracker[Guid.Parse(expectedId)].Should().Contain(existingValue);
 		}
 
 		[Fact]
@@ -95,7 +64,7 @@ namespace ScsContentMigrator.UnitTests.Data
 			string expectedValue = "Value";
 			Checksum checksum = new Checksum();
 
-			checksum.LoadRow(expectedId, expectedParentId, expectedValue);
+			checksum.LoadRow(expectedId, expectedParentId, expectedValue, "en", 1);
 
 			checksum._leafTracker.Should().Contain(expectedId);
 		}
@@ -107,9 +76,9 @@ namespace ScsContentMigrator.UnitTests.Data
 			string expectedParentId = Guid.NewGuid().ToString("N");
 			string expectedValue = "Value";
 			Checksum checksum = new Checksum();
-			checksum._childTracker.Add(Guid.Parse(expectedId), new List<Guid>());
+			checksum._childTracker.Add(Guid.Parse(expectedId), new SortedSet<Guid>());
 			
-			checksum.LoadRow(expectedId, expectedParentId, expectedValue);
+			checksum.LoadRow(expectedId, expectedParentId, expectedValue, "en", 1);
 
 			checksum._leafTracker.Should().NotContain(expectedId);
 		}
@@ -123,7 +92,7 @@ namespace ScsContentMigrator.UnitTests.Data
 			Checksum checksum = new Checksum();
 			checksum._leafTracker.Add(Guid.Parse(expectedParentId));
 
-			checksum.LoadRow(expectedId, expectedParentId, expectedValue);
+			checksum.LoadRow(expectedId, expectedParentId, expectedValue, "en", 1);
 
 			checksum._leafTracker.Should().NotContain(expectedParentId);
 		}
@@ -187,7 +156,6 @@ namespace ScsContentMigrator.UnitTests.Data
 
 			checksum.Generate();
 
-			checksum._checksumTracker.Should().BeEmpty();
 			checksum._childTracker.Should().BeEmpty();
 			checksum._parentTracker.Should().BeEmpty();
 			checksum._leafTracker.Should().BeEmpty();
@@ -208,10 +176,10 @@ namespace ScsContentMigrator.UnitTests.Data
 			var childB1 = Guid.NewGuid();
 
 			Checksum checksum = new Checksum();
-			checksum._childTracker.Add(root, new List<Guid> { parentA, parentB });
-			checksum._childTracker.Add(parentA, new List<Guid> { childA1, childA2 });
-			checksum._childTracker.Add(parentB, new List<Guid> { subParentBa, childB1 });
-			checksum._childTracker.Add(subParentBa, new List<Guid> { childBa1 });
+			checksum._childTracker.Add(root, new SortedSet<Guid> { parentA, parentB });
+			checksum._childTracker.Add(parentA, new SortedSet<Guid> { childA1, childA2 });
+			checksum._childTracker.Add(parentB, new SortedSet<Guid> { subParentBa, childB1 });
+			checksum._childTracker.Add(subParentBa, new SortedSet<Guid> { childBa1 });
 			checksum._parentTracker.Add(childA1, parentA);
 			checksum._parentTracker.Add(childA2, parentA);
 			checksum._parentTracker.Add(subParentBa, parentB);
@@ -221,8 +189,7 @@ namespace ScsContentMigrator.UnitTests.Data
 			checksum._parentTracker.Add(parentB, root);
 			foreach (var guid in new[] { childA1, childA2, childB1, childBa1 })
 				checksum._leafTracker.Add(guid);
-			foreach (var guid in new[] { parentA, childA1, childA2, parentB, subParentBa, childBa1, childB1 })
-				checksum._checksumTracker.Add(guid, new SortedSet<short> { checksum.GetHashCode16(guid.ToString()) });
+
 
 			return new Tuple<Guid[], Checksum>(new[] {parentA, childA1, childA2, parentB, subParentBa, childBa1, childB1}, checksum);
 		}

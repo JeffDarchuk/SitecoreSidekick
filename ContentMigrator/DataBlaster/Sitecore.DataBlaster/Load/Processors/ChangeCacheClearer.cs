@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Load.Sql;
-using ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Util;
+using Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster.Load.Sql;
+using Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster.Util;
 using Sitecore.Configuration;
 using Sitecore.Data;
 
-namespace ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Load.Processors
+namespace Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster.Load.Processors
 {
     public class ChangeCacheClearer : IChangeProcessor
     {

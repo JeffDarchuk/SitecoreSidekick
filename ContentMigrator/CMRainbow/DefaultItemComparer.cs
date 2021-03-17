@@ -3,7 +3,7 @@ using System.Xml;
 using Rainbow.Diff;
 using Rainbow.Diff.Fields;
 
-namespace ScsContentMigrator.CMRainbow
+namespace Sidekick.ContentMigrator.CMRainbow
 {
 	public class DefaultItemComparer : ItemComparer
 	{

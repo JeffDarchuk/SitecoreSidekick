@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SitecoreSidekick.ContentTree;
+using Sidekick.Core.ContentTree;
 
-namespace ScsContentMigrator.Models
+namespace Sidekick.ContentMigrator.Models
 {
 	public class ContentMigrationOperationStatus
 	{

@@ -1,4 +1,4 @@
-﻿namespace ScsContentMigrator.CMRainbow
+﻿namespace Sidekick.ContentMigrator.CMRainbow
 {
 	public class LogStatus
 	{

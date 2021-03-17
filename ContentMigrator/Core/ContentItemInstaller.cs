@@ -8,23 +8,23 @@ using Rainbow.Diff;
 using Rainbow.Model;
 using Rainbow.Storage;
 using Rainbow.Storage.Sc.Deserialization;
-using ScsContentMigrator.CMRainbow;
-using ScsContentMigrator.CMRainbow.Interface;
-using ScsContentMigrator.Core.Interface;
-using ScsContentMigrator.DataBlaster;
-using ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Load;
-using ScsContentMigrator.Models;
-using ScsContentMigrator.Services.Interface;
+using Sidekick.ContentMigrator.CMRainbow;
+using Sidekick.ContentMigrator.CMRainbow.Interface;
+using Sidekick.ContentMigrator.Core.Interface;
+using Sidekick.ContentMigrator.DataBlaster;
+using Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster.Load;
+using Sidekick.ContentMigrator.Models;
+using Sidekick.ContentMigrator.Services.Interface;
 using Sitecore.Data;
 using Sitecore.Data.Engines;
 using Sitecore.Data.Events;
 using Sitecore.Data.Serialization.Exceptions;
 using Sitecore.Diagnostics;
 using Sitecore.SecurityModel;
-using SitecoreSidekick.ContentTree;
-using SitecoreSidekick.Services.Interface;
+using Sidekick.Core.ContentTree;
+using Sidekick.Core.Services.Interface;
 
-namespace ScsContentMigrator.Core
+namespace Sidekick.ContentMigrator.Core
 {
 	public class ContentItemInstaller : IContentItemInstaller
 	{

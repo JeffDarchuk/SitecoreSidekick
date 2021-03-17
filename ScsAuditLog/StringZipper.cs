@@ -2,7 +2,7 @@
 using System.IO.Compression;
 using System.Text;
 
-namespace ScsAuditLog
+namespace Sidekick.AuditLog
 {
 	/// <summary>
 	/// found here http://stackoverflow.com/questions/7343465/compression-decompression-string-with-c-sharp

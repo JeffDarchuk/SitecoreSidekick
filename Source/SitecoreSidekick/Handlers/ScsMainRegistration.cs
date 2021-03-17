@@ -14,15 +14,15 @@ using Microsoft.CSharp.RuntimeBinder;
 using Sitecore.Configuration;
 using Sitecore.Data.Items;
 using Sitecore.Diagnostics;
-using SitecoreSidekick.ContentTree;
-using SitecoreSidekick.Core;
-using SitecoreSidekick.Models;
-using SitecoreSidekick.Pipelines.HttpRequestBegin;
-using SitecoreSidekick.Services;
-using SitecoreSidekick.Services.Interface;
-using SitecoreSidekick.Shared.IoC;
+using Sidekick.Core.ContentTree;
+using Sidekick.Core;
+using Sidekick.Core.Models;
+using Sidekick.Core.Pipelines.HttpRequestBegin;
+using Sidekick.Core.Services;
+using Sidekick.Core.Services.Interface;
+using Sidekick.Core.Shared.IoC;
 
-namespace SitecoreSidekick.Handlers
+namespace Sidekick.Core.Handlers
 {
 	/// <summary>
 	/// base handler for http requests to the SCS 
@@ -33,7 +33,7 @@ namespace SitecoreSidekick.Handlers
 		public override NameValueCollection DirectiveAttributes { get; set; }
 		public override string Icon => "";
 		public override string Name => "Sitecore Sidekick";
-		public override string ResourcesPath => "SitecoreSidekick.Resources";
+		public override string ResourcesPath => "Sidekick.Core.Resources";
 		public override string CssStyle => "600px";
 		public ScsMainRegistration(string roles, string isAdmin, string users) : base(roles, isAdmin, users)
 		{

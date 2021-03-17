@@ -1,7 +1,7 @@
 ﻿using System;
 using Rainbow.Filtering;
 
-namespace ScsContentMigrator.CMRainbow
+namespace Sidekick.ContentMigrator.CMRainbow
 {
 	public class DefaultFieldFilter : IFieldFilter
 	{

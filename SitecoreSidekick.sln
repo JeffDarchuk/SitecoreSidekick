@@ -1,31 +1,31 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27004.2009
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30711.63
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SitecoreSidekick", "Source\SitecoreSidekick\SitecoreSidekick.csproj", "{0DA36C4A-1B13-4891-A263-5F994127051C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sidekick.Core", "Source\SitecoreSidekick\Sidekick.Core.csproj", "{0DA36C4A-1B13-4891-A263-5F994127051C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScsContentMigrator", "ContentMigrator\ScsContentMigrator.csproj", "{F016480C-DC54-4134-9903-3D30635EF687}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sidekick.ContentMigrator", "ContentMigrator\Sidekick.ContentMigrator.csproj", "{F016480C-DC54-4134-9903-3D30635EF687}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScsEditingContext", "ScsEditingContext\ScsEditingContext.csproj", "{72731B68-5934-4316-A969-BE92CCE6CFC4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sidekick.EditingContext", "ScsEditingContext\Sidekick.EditingContext.csproj", "{72731B68-5934-4316-A969-BE92CCE6CFC4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScsAuditLog", "ScsAuditLog\ScsAuditLog.csproj", "{96A08E68-0029-4DAE-AA1B-290706A22F6A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sidekick.AuditLog", "ScsAuditLog\Sidekick.AuditLog.csproj", "{96A08E68-0029-4DAE-AA1B-290706A22F6A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SitecoreSidekick.Shared.UnitTests", "Source\SitecoreSidekick.Shared.UnitTests\SitecoreSidekick.Shared.UnitTests.csproj", "{3BF608D1-CF04-4A9C-A098-B5455492F6FD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SitecoreSidekick.UnitTests", "Source\SitecoreSidekick.UnitTests\SitecoreSidekick.UnitTests.csproj", "{23421921-4A34-4FB4-AB8F-1B2CEB204F07}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScsContentMigrator.UnitTests", "ScsContentMigrator.UnitTests\ScsContentMigrator.UnitTests.csproj", "{C15F4B76-FE71-4C1F-8647-B8CF8A8CA546}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContentMigrator.UnitTests", "ScsContentMigrator.UnitTests\ContentMigrator.UnitTests.csproj", "{C15F4B76-FE71-4C1F-8647-B8CF8A8CA546}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{8F4C28DB-BD0A-4BB8-A068-EE822E8881CF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScsSitecoreResourceManager", "ScsSitecoreResourceManager\ScsSitecoreResourceManager.csproj", "{960AA8F3-60FF-4D9D-B885-BFAB98B892C7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sidekick.SitecoreResourceManager", "ScsSitecoreResourceManager\Sidekick.SitecoreResourceManager.csproj", "{960AA8F3-60FF-4D9D-B885-BFAB98B892C7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScsJobManager", "ScsJobManager\ScsJobManager.csproj", "{A5334793-4594-4DA0-9EA6-0E2F5C14CBD4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sidekick.JobManager", "ScsJobManager\Sidekick.JobManager.csproj", "{A5334793-4594-4DA0-9EA6-0E2F5C14CBD4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScsXconnect", "ScsXconnect\ScsXconnect.csproj", "{34E78E2D-B92D-4E3E-A6EC-97111C01C43E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sidekick.Xconnect", "ScsXconnect\Sidekick.Xconnect.csproj", "{34E78E2D-B92D-4E3E-A6EC-97111C01C43E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScsXConnectDemo", "ScsXconnect\ScsXConnectDemo\ScsXConnectDemo.csproj", "{1633D2A0-39F2-47C5-A479-9B232A010014}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XConnectDemo", "ScsXconnect\ScsXConnectDemo\XConnectDemo.csproj", "{1633D2A0-39F2-47C5-A479-9B232A010014}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution

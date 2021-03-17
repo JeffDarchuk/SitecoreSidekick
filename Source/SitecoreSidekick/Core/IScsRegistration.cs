@@ -4,7 +4,7 @@ using System.Collections.Specialized;
 using System.Web;
 using System.Web.Mvc;
 
-namespace SitecoreSidekick.Core
+namespace Sidekick.Core
 {
 	public interface IScsRegistration
 	{

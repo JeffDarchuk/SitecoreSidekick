@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Sitecore.Data.Items;
 
-namespace SitecoreSidekick.Models
+namespace Sidekick.Core.Models
 {
 	public class ScsSitecoreItem
 	{

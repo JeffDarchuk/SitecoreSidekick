@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using ScsContentMigrator.Args;
-using ScsContentMigrator.Core;
-using ScsContentMigrator.Core.Interface;
-using ScsContentMigrator.Models;
+using Sidekick.ContentMigrator.Args;
+using Sidekick.ContentMigrator.Core;
+using Sidekick.ContentMigrator.Core.Interface;
+using Sidekick.ContentMigrator.Models;
 
-namespace ScsContentMigrator.Services.Interface
+namespace Sidekick.ContentMigrator.Services.Interface
 {
 	public interface IContentMigrationManagerService
 	{

@@ -10,9 +10,9 @@ using System.Web;
 using System.Web.Mvc;
 using FluentAssertions;
 using NSubstitute;
-using SitecoreSidekick.Shared.IoC;
+using Sidekick.Core.Shared.IoC;
 
-namespace ScsContentMigrator.UnitTests
+namespace Sidekick.ContentMigrator.UnitTests
 {
 	public static class TestLocker
 	{

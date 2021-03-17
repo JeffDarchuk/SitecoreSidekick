@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.Threading;
 
 // FROM http://stackoverflow.com/questions/18922985/concurrent-hashsett-in-net-framework
-namespace ScsContentMigrator
+namespace Sidekick.ContentMigrator
 {
 	[DebuggerDisplay("Count = {Count}")]
 	[Serializable]

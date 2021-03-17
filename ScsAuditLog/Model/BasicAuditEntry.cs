@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using Lucene.Net.Documents;
-using ScsAuditLog.Model.Interface;
+using Sidekick.AuditLog.Model.Interface;
 using Sitecore.Data;
 
-namespace ScsAuditLog.Model
+namespace Sidekick.AuditLog.Model
 {
 	public class BasicAuditEntry : IAuditEntry
 	{

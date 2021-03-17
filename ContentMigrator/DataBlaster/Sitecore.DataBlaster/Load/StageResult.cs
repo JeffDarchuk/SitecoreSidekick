@@ -1,6 +1,6 @@
 using System;
 
-namespace ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Load
+namespace Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster.Load
 {
     [Flags]
     public enum StageResult

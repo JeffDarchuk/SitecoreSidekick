@@ -1,9 +1,9 @@
 ﻿using System.Linq;
-using SitecoreSidekick.Services;
-using SitecoreSidekick.Services.Interface;
-using SitecoreSidekick.Shared.IoC;
+using Sidekick.Core.Services;
+using Sidekick.Core.Services.Interface;
+using Sidekick.Core.Shared.IoC;
 
-namespace SitecoreSidekick
+namespace Sidekick.Core
 {
 	public class Bootstrap
 	{

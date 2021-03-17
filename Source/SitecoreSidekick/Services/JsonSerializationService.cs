@@ -1,9 +1,9 @@
-﻿using SitecoreSidekick.Services.Interface;
+﻿using Sidekick.Core.Services.Interface;
 using System;
 using System.Linq;
 using System.Reflection;
 
-namespace SitecoreSidekick.Services
+namespace Sidekick.Core.Services
 {
 	public class JsonSerializationService : IJsonSerializationService
 	{

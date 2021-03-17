@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using log4net.spi;
-using ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Load.Sql;
-using ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Util;
+using Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster.Load.Sql;
+using Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster.Util;
 
-namespace ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Load.Processors
+namespace Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster.Load.Processors
 {
     public class ChangeLogger : IChangeProcessor
     {

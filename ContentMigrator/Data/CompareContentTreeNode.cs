@@ -1,7 +1,7 @@
 ﻿using Rainbow.Diff.Fields;
 using Rainbow.Model;
 using Rainbow.Storage.Sc;
-using ScsContentMigrator.Services.Interface;
+using Sidekick.ContentMigrator.Services.Interface;
 using Sitecore;
 using Sitecore.Configuration;
 using Sitecore.Data;
@@ -10,16 +10,16 @@ using Sitecore.Data.Items;
 using Sitecore.Data.Managers;
 using Sitecore.Diagnostics;
 using Sitecore.SecurityModel;
-using SitecoreSidekick.ContentTree;
+using Sidekick.Core.ContentTree;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using ScsContentMigrator.Core.Interface;
-using SitecoreSidekick.Services.Interface;
+using Sidekick.ContentMigrator.Core.Interface;
+using Sidekick.Core.Services.Interface;
 using Version = Sitecore.Data.Version;
 
-namespace ScsContentMigrator.Data
+namespace Sidekick.ContentMigrator.Data
 {
 	public class CompareContentTreeNode : ContentTreeNode
 	{

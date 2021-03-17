@@ -6,9 +6,9 @@ using Sitecore.Configuration;
 using Sitecore.Data.Items;
 using Sitecore.Data.Managers;
 using Sitecore.SecurityModel;
-using SitecoreSidekick.Services.Interface;
+using Sidekick.Core.Services.Interface;
 
-namespace SitecoreSidekick.ContentTree
+namespace Sidekick.Core.ContentTree
 {
 	public class ContentTreeNode
 	{

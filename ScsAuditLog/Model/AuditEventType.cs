@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Text.RegularExpressions;
-using ScsAuditLog.Model.Interface;
+using Sidekick.AuditLog.Model.Interface;
 using Sitecore.Data.Items;
 
-namespace ScsAuditLog.Model
+namespace Sidekick.AuditLog.Model
 {
 	public abstract class AuditEventType : IEventType
 	{

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Rainbow.Model;
 
-namespace ScsContentMigrator
+namespace Sidekick.ContentMigrator
 {
 	public class ErrorItemData : IItemData, IItemMetadata
 	{

@@ -1,7 +1,7 @@
 ﻿using log4net;
 using log4net.spi;
 
-namespace ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Util
+namespace Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster.Util
 {
     public static class LogExtensions
     {

@@ -1,10 +1,10 @@
-﻿using ScsAuditLog.Core;
+﻿using Sidekick.AuditLog.Core;
 
-namespace ScsAuditLog
+namespace Sidekick.AuditLog
 {
 	public class AuditLogger
 	{
-		internal static AuditLog Log;
-		public static AuditLog Current => Log;
+		internal static Core.AuditLog Log;
+		public static Core.AuditLog Current => Log;
 	}
 }

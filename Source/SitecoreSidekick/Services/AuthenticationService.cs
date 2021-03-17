@@ -1,6 +1,6 @@
-﻿using SitecoreSidekick.Services.Interface;
+﻿using Sidekick.Core.Services.Interface;
 
-namespace SitecoreSidekick.Services
+namespace Sidekick.Core.Services
 {
 	public class AuthenticationService : IAuthenticationService
 	{

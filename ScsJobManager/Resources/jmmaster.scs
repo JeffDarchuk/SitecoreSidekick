@@ -1,0 +1,25 @@
+﻿<div ng-controller="jmmastercontroller as vm">
+	<div class="jmcontent">A SIDEKICK APP!</div>
+
+	<ul ng-repeat="job in vm.jobs">
+		<li>
+			<div>
+				<ol>
+					<li>{{job.name}}</li>
+					<li>{{job.category}}</li>
+					<li>{{job.displayName}}</li>
+					<li>{{job.queueTime}}</li>
+					<li>{{job.isDone}}</li>
+					<li>{{job.user}}</li>
+					<li>{{job.status.exceptions}}</li>
+					<li>{{job.status.result}}</li>
+					<li>{{job.status.messages}}</li>
+					<li>{{job.status.processed}}</li>
+					<li>{{job.status.total}}</li>
+					<li>{{job.status.state}}</li>
+				</ol>
+				<div class="btn" ng-click="vm.cancelJob(job.name)">Cancel</div>
+			</div>
+		</li>
+	</ul>
+</div>

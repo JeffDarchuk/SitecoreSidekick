@@ -3,7 +3,7 @@ using Sitecore.Diagnostics;
 using Sitecore.Mvc.Common;
 using Sitecore.Mvc.ExperienceEditor.Pipelines.RenderPageExtenders;
 
-namespace SitecoreSidekick.Pipelines.ExperienceEditor
+namespace Sidekick.Core.Pipelines.ExperienceEditor
 {
 	class RegisterSidekickForEe : RenderPageExtendersProcessor
 	{

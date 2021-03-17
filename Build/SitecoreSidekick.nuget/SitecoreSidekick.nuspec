@@ -11,7 +11,7 @@
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<description>Collection of Sitecore Sidekick Apps</description>
         <summary>Collection of Sitecore Sidekick Apps</summary>
-		<copyright>Copyright 2017 Jeff Darchuk</copyright>
+		<copyright>Copyright 2021 Jeff Darchuk</copyright>
 		<tags>sitecore</tags>
 	<dependencies>
 		<dependency id="SitecoreSidekickFoundation" version="$version$" />

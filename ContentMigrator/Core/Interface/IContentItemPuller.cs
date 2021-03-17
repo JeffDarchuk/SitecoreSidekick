@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Rainbow.Model;
 
-namespace ScsContentMigrator.Core.Interface
+namespace Sidekick.ContentMigrator.Core.Interface
 {
 	public interface IContentItemPuller
 	{

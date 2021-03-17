@@ -1,9 +1,9 @@
 ﻿using Rainbow.Model;
 using Rainbow.Storage.Yaml;
-using ScsContentMigrator.Core.Interface;
-using ScsContentMigrator.Models;
-using ScsContentMigrator.Services;
-using ScsContentMigrator.Services.Interface;
+using Sidekick.ContentMigrator.Core.Interface;
+using Sidekick.ContentMigrator.Models;
+using Sidekick.ContentMigrator.Services;
+using Sidekick.ContentMigrator.Services.Interface;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -12,11 +12,11 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using SitecoreSidekick.Services.Interface;
+using Sidekick.Core.Services.Interface;
 
-namespace ScsContentMigrator.Core
+namespace Sidekick.ContentMigrator.Core
 {
-	class ContentItemPuller : IContentItemPuller
+	public class ContentItemPuller : IContentItemPuller
 	{
 		internal readonly BlockingCollection<IItemData> GatheredRemoteItems = new BlockingCollection<IItemData>();
 		internal readonly BlockingCollection<Guid> ProcessingIds = new BlockingCollection<Guid>();

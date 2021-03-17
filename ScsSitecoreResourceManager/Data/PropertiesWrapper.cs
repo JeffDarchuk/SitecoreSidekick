@@ -1,12 +1,12 @@
-﻿using ScsSitecoreResourceManager.Data.Properties;
-using ScsSitecoreResourceManager.Data.Targets;
+﻿using Sidekick.SitecoreResourceManager.Data.Properties;
+using Sidekick.SitecoreResourceManager.Data.Targets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ScsSitecoreResourceManager.Data
+namespace Sidekick.SitecoreResourceManager.Data
 {
 	public class PropertiesWrapper
 	{

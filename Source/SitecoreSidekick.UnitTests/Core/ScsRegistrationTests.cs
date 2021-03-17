@@ -6,11 +6,11 @@ using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
 using NSubstitute;
-using SitecoreSidekick.Core;
-using SitecoreSidekick.Services.Interface;
+using Sidekick.Core;
+using Sidekick.Core.Services.Interface;
 using Xunit;
 
-namespace SitecoreSidekick.UnitTests.Core
+namespace Sidekick.Core.UnitTests.Core
 {
 	public class ScsRegistrationTests : TestBase
 	{

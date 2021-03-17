@@ -64,7 +64,7 @@
 			</div>
 			<div>
 				<input type="checkbox" id="useItemBlaster" ng-model="vm.useItemBlaster" />
-				<label for="useItemBlaster"> Use Item Blaster.  <i>This will increase item create speed by up to 200%</i></label>
+				<label for="useItemBlaster"> Use Item Blaster.  <i>This will increase item create speed by up to 200%</i> Note that content may need to be reviewed afterwards for inconsistencies.</label>
 			</div>
 			<div>
 				<input type="checkbox" id="ignoreRevId" ng-model="vm.ignoreRevId" />

@@ -9,7 +9,7 @@ using Sitecore.Security.Accounts;
 using System.Web.Configuration;
 using System.Configuration;
 
-namespace SitecoreSidekick.Pipelines.HttpRequestBegin
+namespace Sidekick.Core.Pipelines.HttpRequestBegin
 {
 	public class IsAdmin : HttpRequestProcessor
 	{

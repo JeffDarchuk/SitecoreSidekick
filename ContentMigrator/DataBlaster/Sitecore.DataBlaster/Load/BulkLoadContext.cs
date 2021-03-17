@@ -7,7 +7,7 @@ using Sitecore.ContentSearch;
 using Sitecore.Data.Items;
 using Sitecore.Diagnostics;
 
-namespace ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Load
+namespace Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster.Load
 {
     /// <summary>
     /// Should be created a fresh for every bulk import action.

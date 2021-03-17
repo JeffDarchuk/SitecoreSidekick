@@ -7,18 +7,17 @@ using Sitecore.Collections;
 using Sitecore.Data.Managers;
 using Sitecore.Diagnostics;
 
-namespace ScsContentMigrator.Data
+namespace Sidekick.ContentMigrator.Data
 {
 	public class Checksum
 	{
-		internal readonly Dictionary<Guid, SortedSet<short>> _checksumTracker = new Dictionary<Guid, SortedSet<short>>();
-		internal readonly Dictionary<Guid, Guid> _revTracker = new Dictionary<Guid, Guid>();
-		internal readonly Dictionary<Guid, List<Guid>> _childTracker = new Dictionary<Guid, List<Guid>>();
+		internal readonly Dictionary<Guid, SortedSet<short>> _revTracker = new Dictionary<Guid, SortedSet<short>>();
+		internal readonly Dictionary<Guid, SortedSet<Guid>> _childTracker = new Dictionary<Guid, SortedSet<Guid>>();
 		internal readonly Dictionary<Guid, Guid> _parentTracker = new Dictionary<Guid, Guid>();
 		internal readonly HashSet<Guid> _leafTracker = new HashSet<Guid>();
 		internal readonly Dictionary<Guid, short> _checksum = new Dictionary<Guid, short>();
 		//t.ID, t.Name, t.TemplateID, t.MasterID, t.ParentID, v.Value
-		public void LoadRow(string id, string parentId, string value)
+		public void LoadRow(string id, string parentId, string value, string language, int? version)
 		{
 			var idGuid = Guid.Parse(id);
 			var parentGuid = Guid.Parse(parentId);
@@ -27,14 +26,14 @@ namespace ScsContentMigrator.Data
 			_parentTracker[idGuid] = parentGuid;
 			if (!_childTracker.ContainsKey(parentGuid))
 			{
-				_childTracker[parentGuid] = new List<Guid>();
+				_childTracker[parentGuid] = new SortedSet<Guid>();
 			}
 			_childTracker[parentGuid].Add(idGuid);
-			if (!_checksumTracker.ContainsKey(idGuid))
+			if (!_revTracker.ContainsKey(idGuid))
 			{
-				_checksumTracker[idGuid] = new SortedSet<short>();
+				_revTracker[idGuid] = new SortedSet<short>();
 			}
-			_revTracker[idGuid] = valueGuid;
+			_revTracker[idGuid].Add(GetHashCode16(value+language+version));
 			if (!_childTracker.ContainsKey(idGuid))
 				_leafTracker.Add(idGuid);
 			_leafTracker.Remove(parentGuid);
@@ -55,27 +54,26 @@ namespace ScsContentMigrator.Data
 			while (processing.Any())
 			{
 				Guid id = processing.Dequeue();
-				if (_checksumTracker[id].Count == 0)
+				
+				if (_childTracker.ContainsKey(id))
 				{
-					if (_checksumTracker.ContainsKey(_parentTracker[id]))
+					if (!_childTracker[id].All(x => _checksum.ContainsKey(x)))
 					{
-						_checksumTracker[_parentTracker[id]].Add(GetHashCode16(_revTracker[id].ToString("N")+id));
+						processing.Enqueue(id);
+						continue;
 					}
+					_checksum[id] = GetHashCode16(string.Join("", _childTracker[id].Select(x => _checksum[x])) + string.Join("", _revTracker[id]));
 				}
 				else
 				{
-					_checksum[id] = GetHashCode16(string.Join("", _checksumTracker[id]));
-					if (_checksumTracker.ContainsKey(_parentTracker[id]))
-					{
-						_checksumTracker[_parentTracker[id]].Add(_checksum[id]);
-					}
+					_checksum[id] = GetHashCode16(string.Join("", _revTracker[id]));
 				}
-				if (_checksumTracker.ContainsKey(_parentTracker[id]))
+
+				if (_revTracker.ContainsKey(_parentTracker[id]))
 				{
 					processing.Enqueue(_parentTracker[id]);
 				}
 			}
-			_checksumTracker.Clear();
 			_childTracker.Clear();
 			_parentTracker.Clear();
 			_leafTracker.Clear();
@@ -98,6 +96,10 @@ namespace ScsContentMigrator.Data
 				num2 = (((num2 << 5) + num2) + (num2 >> 0x1b)) ^ (nextCh << 16 | ch);
 			}
 			return (short)((num1 + num2 * 0x5d588b65) & 0xFFFF);
+		}
+		private string GenerateRef(SortedSet<short> refIds)
+		{
+			return refIds.Aggregate(new StringBuilder(), (a, b) => a.Append(b)).ToString();
 		}
 	}
 }

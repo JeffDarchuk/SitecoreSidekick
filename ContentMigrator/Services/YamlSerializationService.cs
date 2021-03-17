@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 using Rainbow.Model;
 using Rainbow.Storage.Sc;
 using Rainbow.Storage.Yaml;
-using ScsContentMigrator.Services.Interface;
+using Sidekick.ContentMigrator.Services.Interface;
 using Sitecore.Data.Items;
 using Sitecore.Diagnostics;
 
-namespace ScsContentMigrator.Services
+namespace Sidekick.ContentMigrator.Services
 {
 	public class YamlSerializationService : IYamlSerializationService
 	{

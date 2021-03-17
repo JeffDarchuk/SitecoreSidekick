@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Load.Sql;
+using Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster.Load.Sql;
 using Sitecore.Configuration;
 using Sitecore.ContentSearch;
 using Sitecore.ContentSearch.Maintenance;
@@ -11,7 +11,7 @@ using Sitecore.Data.Managers;
 using Sitecore.Events;
 using Sitecore.Globalization;
 
-namespace ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Load.Processors
+namespace Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster.Load.Processors
 {
     public class ChangeIndexer : IChangeProcessor
     {

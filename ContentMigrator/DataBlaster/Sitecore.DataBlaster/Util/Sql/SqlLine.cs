@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Util.Sql
+namespace Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster.Util.Sql
 {
 	public class SqlLine
 	{

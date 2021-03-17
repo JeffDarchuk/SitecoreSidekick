@@ -1,11 +1,11 @@
 ﻿using System;
 using System.IO;
 using Rainbow.Model;
-using ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Load;
+using Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster.Load;
 using Sitecore;
 using Convert = System.Convert;
 
-namespace ScsContentMigrator.DataBlaster
+namespace Sidekick.ContentMigrator.DataBlaster
 {
 	/// <summary>
 	/// Maps a Unicorn item to a bulk load item.

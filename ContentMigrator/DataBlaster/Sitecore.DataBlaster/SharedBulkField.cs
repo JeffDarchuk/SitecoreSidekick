@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace ScsContentMigrator.DataBlaster.Sitecore.DataBlaster
+namespace Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster
 {
     /// <summary>
     /// Field which has the same value for all languages and all versions.

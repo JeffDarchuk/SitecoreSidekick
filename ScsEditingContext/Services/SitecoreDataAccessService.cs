@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Rainbow.Model;
 using Rainbow.Storage.Sc;
-using ScsEditingContext.Services.Interface;
+using Sidekick.EditingContext.Services.Interface;
 using Sitecore;
 using Sitecore.Configuration;
 using Sitecore.Data;
@@ -15,7 +15,7 @@ using Sitecore.Globalization;
 using Sitecore.SecurityModel;
 using Version = Sitecore.Data.Version;
 
-namespace ScsEditingContext.Services
+namespace Sidekick.EditingContext.Services
 {
 	public class SitecoreDataAccessService : ISitecoreDataAccessService
 	{

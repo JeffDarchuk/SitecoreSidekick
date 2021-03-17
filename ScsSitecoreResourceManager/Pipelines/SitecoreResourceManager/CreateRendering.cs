@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Sitecore.Diagnostics;
 
-namespace ScsSitecoreResourceManager.Pipelines.SitecoreResourceManager
+namespace Sidekick.SitecoreResourceManager.Pipelines.SitecoreResourceManager
 {
 	public class CreateRendering
 	{

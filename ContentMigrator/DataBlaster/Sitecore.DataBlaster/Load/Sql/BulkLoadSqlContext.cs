@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Diagnostics.CodeAnalysis;
-using ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Util.Sql;
+using Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster.Util.Sql;
 
-namespace ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Load.Sql
+namespace Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster.Load.Sql
 {
     public class BulkLoadSqlContext : SqlContext
     {

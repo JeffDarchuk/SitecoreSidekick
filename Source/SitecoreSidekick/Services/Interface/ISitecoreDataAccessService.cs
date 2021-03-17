@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using Rainbow.Model;
 using Sitecore.Data;
 using Sitecore.Data.Items;
-using SitecoreSidekick.Models;
+using Sidekick.Core.Models;
 
-namespace SitecoreSidekick.Services.Interface
+namespace Sidekick.Core.Services.Interface
 {
 	public interface ISitecoreDataAccessService
 	{

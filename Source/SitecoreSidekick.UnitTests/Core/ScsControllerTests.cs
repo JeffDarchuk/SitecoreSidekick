@@ -11,12 +11,12 @@ using System.Web.Mvc;
 using FluentAssertions;
 using NSubstitute;
 using Sitecore.Mvc.Extensions;
-using SitecoreSidekick.Core;
-using SitecoreSidekick.Handlers;
-using SitecoreSidekick.Services.Interface;
+using Sidekick.Core;
+using Sidekick.Core.Handlers;
+using Sidekick.Core.Services.Interface;
 using Xunit;
 
-namespace SitecoreSidekick.UnitTests.Core
+namespace Sidekick.Core.UnitTests.Core
 {
 	public class ScsControllerTests : TestBase
 	{

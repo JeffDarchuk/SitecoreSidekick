@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using ScsContentMigrator.Args;
-using ScsContentMigrator.Models;
+using Sidekick.ContentMigrator.Args;
+using Sidekick.ContentMigrator.Models;
 
-namespace ScsContentMigrator.Core.Interface
+namespace Sidekick.ContentMigrator.Core.Interface
 {
 	public interface IContentMigration
 	{

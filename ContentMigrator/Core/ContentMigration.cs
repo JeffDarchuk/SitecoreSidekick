@@ -1,14 +1,14 @@
-﻿using ScsContentMigrator.Core.Interface;
-using ScsContentMigrator.Models;
-using ScsContentMigrator.Services.Interface;
-using SitecoreSidekick.Services.Interface;
+﻿using Sidekick.ContentMigrator.Core.Interface;
+using Sidekick.ContentMigrator.Models;
+using Sidekick.ContentMigrator.Services.Interface;
+using Sidekick.Core.Services.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ScsContentMigrator.Core
+namespace Sidekick.ContentMigrator.Core
 {
 	public class ContentMigration : IContentMigration
 	{

@@ -3,7 +3,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Text;
 
-namespace SitecoreSidekick
+namespace Sidekick.Core
 {
 	public static class StringExtentions
 	{

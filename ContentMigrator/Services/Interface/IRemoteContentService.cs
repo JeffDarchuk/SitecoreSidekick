@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Rainbow.Model;
-using ScsContentMigrator.Args;
-using ScsContentMigrator.Data;
-using ScsContentMigrator.Models;
-using ScsContentMigrator.Security;
+using Sidekick.ContentMigrator.Args;
+using Sidekick.ContentMigrator.Data;
+using Sidekick.ContentMigrator.Models;
+using Sidekick.ContentMigrator.Security;
 
-namespace ScsContentMigrator.Services.Interface
+namespace Sidekick.ContentMigrator.Services.Interface
 {
 	public interface IRemoteContentService
 	{
@@ -17,6 +17,6 @@ namespace ScsContentMigrator.Services.Interface
 		ChildrenItemDataModel GetRemoteItemDataWithChildren(Guid id, string server, Dictionary<Guid, string> rev = null);
 		IItemData DeserializeYaml(string yaml, Guid id);
 		CompareContentTreeNode GetContentTreeNode(RemoteContentTreeArgs args);
-		ScsHmacServer HmacServer { get; }
+		HmacServer HmacServer { get; }
 	}
 }

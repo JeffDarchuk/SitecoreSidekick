@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
 using System.Linq;
-using ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Util.Sql;
+using Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster.Util.Sql;
 using Sitecore.Data;
 using Sitecore.Data.Items;
 
-namespace ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Read
+namespace Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster.Read
 {
     public class BulkReader
     {

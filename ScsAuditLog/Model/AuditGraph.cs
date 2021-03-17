@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using ScsAuditLog.Model.Interface;
+using Sidekick.AuditLog.Model.Interface;
 
-namespace ScsAuditLog.Model
+namespace Sidekick.AuditLog.Model
 {
 	public class AuditGraph
 	{

@@ -1,9 +1,9 @@
-﻿using ScsSitecoreResourceManager.Data;
-using ScsSitecoreResourceManager.Data.Properties;
-using ScsSitecoreResourceManager.Data.Properties.Collectors;
-using ScsSitecoreResourceManager.Data.Targets;
+﻿using Sidekick.SitecoreResourceManager.Data;
+using Sidekick.SitecoreResourceManager.Data.Properties;
+using Sidekick.SitecoreResourceManager.Data.Properties.Collectors;
+using Sidekick.SitecoreResourceManager.Data.Targets;
 using Sitecore.Pipelines;
-using SitecoreSidekick.Services.Interface;
+using Sidekick.Core.Services.Interface;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ScsSitecoreResourceManager.Pipelines.SitecoreResourceManager
+namespace Sidekick.SitecoreResourceManager.Pipelines.SitecoreResourceManager
 {
 	public class SitecoreResourceManagerArgs : DefaultPropertiesArgs
 	{

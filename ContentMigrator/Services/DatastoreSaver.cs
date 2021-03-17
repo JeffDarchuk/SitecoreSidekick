@@ -6,9 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Rainbow.Model;
 using Rainbow.Storage;
-using ScsContentMigrator.Services.Interface;
+using Sidekick.ContentMigrator.Services.Interface;
 
-namespace ScsContentMigrator.Services
+namespace Sidekick.ContentMigrator.Services
 {
 	public class DatastoreSaver : IDatastoreSaver
 	{

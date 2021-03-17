@@ -2,7 +2,7 @@ using System;
 using Sitecore.Data;
 using Sitecore.Links;
 
-namespace ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Load.Links
+namespace Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster.Load.Links
 {
     public class BulkItemLink : ItemLink
     {

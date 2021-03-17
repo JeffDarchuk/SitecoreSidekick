@@ -1,7 +1,7 @@
 ﻿using Microsoft.CSharp.RuntimeBinder;
-using ScsContentMigrator.Models;
+using Sidekick.ContentMigrator.Models;
 
-namespace ScsContentMigrator.Args
+namespace Sidekick.ContentMigrator.Args
 {
 	public class RemoteContentTreeArgs : ContentTreeModel
 	{

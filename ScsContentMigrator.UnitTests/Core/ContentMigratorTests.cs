@@ -7,16 +7,16 @@ using System.Threading;
 using System.Threading.Tasks;
 using NSubstitute;
 using Rainbow.Model;
-using ScsContentMigrator.Core;
-using ScsContentMigrator.Core.Interface;
-using ScsContentMigrator.Models;
-using ScsContentMigrator.Services.Interface;
+using Sidekick.ContentMigrator.Core;
+using Sidekick.ContentMigrator.Core.Interface;
+using Sidekick.ContentMigrator.Models;
+using Sidekick.ContentMigrator.Services.Interface;
 using Sitecore.Data.Items;
-using SitecoreSidekick.Core;
-using SitecoreSidekick.Services.Interface;
+using Sidekick.Core;
+using Sidekick.Core.Services.Interface;
 using Xunit;
 
-namespace ScsContentMigrator.UnitTests.Core
+namespace Sidekick.ContentMigrator.UnitTests.Core
 {
 	public class ContentMigratorTests : TestBase
 	{

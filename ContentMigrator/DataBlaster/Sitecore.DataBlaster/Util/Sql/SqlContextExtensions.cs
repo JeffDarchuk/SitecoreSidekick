@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Util.Sql
+namespace Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster.Util.Sql
 {
     public static class SqlLineExtensions
     {

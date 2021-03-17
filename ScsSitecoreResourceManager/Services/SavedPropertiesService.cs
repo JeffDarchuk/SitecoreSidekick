@@ -1,4 +1,4 @@
-﻿using SitecoreSidekick.Services.Interface;
+﻿using Sidekick.Core.Services.Interface;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ScsSitecoreResourceManager.Services
+namespace Sidekick.SitecoreResourceManager.Services
 {
 	public class SavedPropertiesService : ISavedPropertiesService
 	{
@@ -18,7 +18,7 @@ namespace ScsSitecoreResourceManager.Services
 		{
 			_json = Bootstrap.Container.Resolve<IJsonSerializationService>();
 			_registration = Bootstrap.Container.Resolve<IScsRegistrationService>();
-			_properties = _registration.GetScsRegistration<ScsSitecoreResourceManagerRegistration>().GetDataDirectory();
+			_properties = _registration.GetScsRegistration<SitecoreResourceManagerRegistration>().GetDataDirectory();
 		}
 		public string GetPropertiesFilePath(string template)
 		{

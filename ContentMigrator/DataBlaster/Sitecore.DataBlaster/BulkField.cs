@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace ScsContentMigrator.DataBlaster.Sitecore.DataBlaster
+namespace Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster
 {
     public abstract class BulkField
     {

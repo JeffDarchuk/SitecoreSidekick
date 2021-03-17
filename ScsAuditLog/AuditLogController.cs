@@ -9,19 +9,19 @@ using System.Web.Mvc;
 using System.Xml;
 using Lucene.Net.Search;
 using Rainbow.Model;
-using ScsAuditLog.Model;
-using ScsAuditLog.Model.Interface;
+using Sidekick.AuditLog.Model;
+using Sidekick.AuditLog.Model.Interface;
 using Sitecore.Configuration;
 using Sitecore.Data;
 using Sitecore.Data.Items;
 using Sitecore.Events;
 using Sitecore.SecurityModel;
-using SitecoreSidekick;
-using SitecoreSidekick.ContentTree;
-using SitecoreSidekick.Core;
-using SitecoreSidekick.Services.Interface;
+using Sidekick.Core;
+using Sidekick.Core.ContentTree;
+using Sidekick.Core;
+using Sidekick.Core.Services.Interface;
 
-namespace ScsAuditLog
+namespace Sidekick.AuditLog
 {
 	public class AuditLogController : ScsController
 	{
@@ -50,62 +50,62 @@ namespace ScsAuditLog
 		}
 		private readonly List<string> _luceneSpecialChars = new List<string>() { "+", "-", "&&", "||", "!", "(", ")", "{", "}", "[", "]", "^", "\"", "~", "*", "?", ":", "\\" };
 
-		[ScsLoggedIn]
+		[LoggedIn]
 		[ActionName("alcontenttree.scsvc")]
 		public ActionResult ContentTree(ContentTreeModel data)
 		{
 			return ScsJson(GetContentTree(data));
 		}
 
-		[ScsLoggedIn]
+		[LoggedIn]
 		[ActionName("alqueryactivity.scsvc")]
 		public ActionResult UserActivity(ActivityDataModel data)
 		{
 			return ScsJson(GetUserActivity(data));
 		}
 
-		[ScsLoggedIn]
+		[LoggedIn]
 		[ActionName("aleventtypes.scsvc")]
 		public ActionResult Types()
 		{
 			return ScsJson(GetTypes());
 		}
 
-		[ScsLoggedIn]
+		[LoggedIn]
 		[ActionName("alautocomplete.scsvc")]
 		public ActionResult AutoComplete(AutocompleteModel data)
 		{
 			return ScsJson(GetAutocomplete(data));
 		}
 
-		[ScsLoggedIn]
+		[LoggedIn]
 		[ActionName("alactivitydata.scsvc")]
 		public ActionResult ActivityData(ActivityDataModel data)
 		{
 			return ScsJson(GetActivityData(data));
 		}
 
-		[ScsLoggedIn]
+		[LoggedIn]
 		[ActionName("alusers.scsvc")]
 		public ActionResult ActiveUsers()
 		{
 			return ScsJson(GetUsers());
 		}
 
-		[ScsLoggedIn]
+		[LoggedIn]
 		[ActionName("alrebuild.scsvc")]
 		public ActionResult Rebuild()
 		{
 			return ScsJson(RebuildLog());
 		}
 
-		[ScsLoggedIn]
+		[LoggedIn]
 		[ActionName("alrebuildstatus.scsvc")]
 		public ActionResult RebuildStatus()
 		{
 			return ScsJson(RebuildLogStatus());
 		}
-		[ScsLoggedIn]
+		[LoggedIn]
 		[ActionName("algetdatabases.scsvc")]
 		public ActionResult GetDatabases()
 		{

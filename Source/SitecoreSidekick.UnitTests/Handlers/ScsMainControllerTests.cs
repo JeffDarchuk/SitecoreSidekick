@@ -6,19 +6,19 @@ using System.Threading.Tasks;
 using System.Web;
 using FluentAssertions;
 using NSubstitute;
-using SitecoreSidekick.Handlers;
-using SitecoreSidekick.Services.Interface;
+using Sidekick.Core.Handlers;
+using Sidekick.Core.Services.Interface;
 using System.Web.Mvc;
 using System.Web.Routing;
 using NSubstitute.Extensions;
 using Sitecore.Data;
 using Sitecore.Data.Items;
 using Sitecore.Globalization;
-using SitecoreSidekick.Core;
-using SitecoreSidekick.Models;
+using Sidekick.Core;
+using Sidekick.Core.Models;
 using Xunit;
 
-namespace SitecoreSidekick.UnitTests.Handlers
+namespace Sidekick.Core.UnitTests.Handlers
 {
 	public class ScsMainControllerTests : TestBase
 	{

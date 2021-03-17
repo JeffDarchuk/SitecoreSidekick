@@ -5,7 +5,7 @@ using Rainbow.Storage.Sc;
 using Rainbow.Storage.Yaml;
 using Sitecore.Data.Items;
 
-namespace ScsContentMigrator
+namespace Sidekick.ContentMigrator
 {
 	public static class ItemExtensions
 	{

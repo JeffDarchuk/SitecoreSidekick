@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using Rainbow.Model;
-using ScsContentMigrator.Services.Interface;
-using SitecoreSidekick.Shared.IoC;
+using Sidekick.ContentMigrator.Services.Interface;
+using Sidekick.Core.Shared.IoC;
 
-namespace ScsContentMigrator.Models
+namespace Sidekick.ContentMigrator.Models
 {
 	public class ChildrenItemDataModel
 	{

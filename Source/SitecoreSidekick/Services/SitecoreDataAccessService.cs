@@ -11,12 +11,12 @@ using Sitecore.Data.Items;
 using Sitecore.Data.Managers;
 using Sitecore.Globalization;
 using Sitecore.SecurityModel;
-using SitecoreSidekick.Models;
-using SitecoreSidekick.Services.Interface;
+using Sidekick.Core.Models;
+using Sidekick.Core.Services.Interface;
 using ItemData = Rainbow.Storage.Sc.ItemData;
 using Version = Sitecore.Data.Version;
 
-namespace SitecoreSidekick.Services
+namespace Sidekick.Core.Services
 {
 	public class SitecoreDataAccessService : ISitecoreDataAccessService
 	{

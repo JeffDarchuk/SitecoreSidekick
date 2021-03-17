@@ -8,7 +8,7 @@ using Rainbow.Model;
 using Rainbow.Storage.Sc.Deserialization;
 using Sitecore.Data.Items;
 
-namespace ScsContentMigrator.CMRainbow.Interface
+namespace Sidekick.ContentMigrator.CMRainbow.Interface
 {
 	public interface IDefaultLogger : IDefaultDeserializerLogger
 	{

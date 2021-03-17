@@ -1,4 +1,4 @@
-﻿using SitecoreSidekick.Services;
+﻿using Sidekick.Core.Services;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -10,10 +10,10 @@ using System.Net;
 using System.Resources;
 using System.Web;
 using System.Web.Mvc;
-using SitecoreSidekick.Services.Interface;
-using SitecoreSidekick.Shared.IoC;
+using Sidekick.Core.Services.Interface;
+using Sidekick.Core.Shared.IoC;
 
-namespace SitecoreSidekick.Core
+namespace Sidekick.Core
 {
 	public abstract class ScsController : Controller
 	{
@@ -30,7 +30,7 @@ namespace SitecoreSidekick.Core
 			_manifestResourceStreamService = Bootstrap.Container.Resolve<IMainfestResourceStreamService>();
 		}
 
-		[ScsLoggedIn]
+		[LoggedIn]
 		public virtual ActionResult Resources(string filename)
 		{
 			try

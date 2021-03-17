@@ -1,4 +1,4 @@
-﻿using SitecoreSidekick.Services.Interface;
+﻿using Sidekick.Core.Services.Interface;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ScsSitecoreResourceManager.Pipelines.SitecoreResourceManager
+namespace Sidekick.SitecoreResourceManager.Pipelines.SitecoreResourceManager
 {
 	public class OverlayTemplate
 	{

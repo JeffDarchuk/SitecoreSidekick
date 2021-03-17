@@ -3,21 +3,21 @@ using System.Collections.Generic;
 using Rainbow.Storage;
 using Rainbow.Storage.Sc;
 using Rainbow.Storage.Sc.Deserialization;
-using ScsContentMigrator.CMRainbow;
-using ScsContentMigrator.Core;
-using ScsContentMigrator.Core.Interface;
-using ScsContentMigrator.Services;
-using ScsContentMigrator.Services.Interface;
-using SitecoreSidekick.Shared.IoC;
+using Sidekick.ContentMigrator.CMRainbow;
+using Sidekick.ContentMigrator.Core;
+using Sidekick.ContentMigrator.Core.Interface;
+using Sidekick.ContentMigrator.Services;
+using Sidekick.ContentMigrator.Services.Interface;
+using Sidekick.Core.Shared.IoC;
 using System.Linq;
 using System.Reflection;
 using MicroCHAP;
 using Rainbow.Diff;
-using ScsContentMigrator.CMRainbow.Interface;
-using SitecoreSidekick.Services;
-using SitecoreSidekick.Services.Interface;
+using Sidekick.ContentMigrator.CMRainbow.Interface;
+using Sidekick.Core.Services;
+using Sidekick.Core.Services.Interface;
 
-namespace ScsContentMigrator
+namespace Sidekick.ContentMigrator
 {
 	public class Bootstrap
 	{
@@ -52,7 +52,7 @@ namespace ScsContentMigrator
 
 		private static Container InitializeContainer()
 		{
-			Container container = SitecoreSidekick.Bootstrap.Container;
+			Container container = Sidekick.Core.Bootstrap.Container;
 
 			// Register components here
 			container.Register<IContentMigrationManagerService, ContentMigrationManagerService>();

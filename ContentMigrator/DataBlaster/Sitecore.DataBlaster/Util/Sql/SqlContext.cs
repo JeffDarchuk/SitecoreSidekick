@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Util.Sql
+namespace Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster.Util.Sql
 {
 	/// <summary>
 	/// Holder class for a connection and a transaction which supports working with embedded sql files.

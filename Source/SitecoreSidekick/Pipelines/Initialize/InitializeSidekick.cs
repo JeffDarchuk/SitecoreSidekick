@@ -6,10 +6,10 @@ using Sitecore.Diagnostics;
 using Sitecore.Pipelines;
 using Sitecore.SecurityModel;
 using Sitecore.StringExtensions;
-using SitecoreSidekick.Handlers;
-using SitecoreSidekick.Models;
-using SitecoreSidekick.Services;
-using SitecoreSidekick.Services.Interface;
+using Sidekick.Core.Handlers;
+using Sidekick.Core.Models;
+using Sidekick.Core.Services;
+using Sidekick.Core.Services.Interface;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -18,7 +18,7 @@ using System.Xml;
 using Sitecore;
 using System.Threading.Tasks;
 
-namespace SitecoreSidekick.Pipelines.Initialize
+namespace Sidekick.Core.Pipelines.Initialize
 {
 
 	public class InitializeSidekick
@@ -136,8 +136,8 @@ namespace SitecoreSidekick.Pipelines.Initialize
 			var routes = RouteTable.Routes;
 			using (routes.GetWriteLock())
 			{
-				routes.MapRoute("scs", "scs/platform/{action}", new { controller = "SitecoreSidekick.Handlers.ScsMainController, SitecoreSidekick", action = "scs" });
-				routes.MapRoute("scsresources", "scs/platform/{action}/{filename}", new { controller = $"SitecoreSidekick.Handlers.ScsMainController, SitecoreSidekick", action = "resources" });
+				routes.MapRoute("scs", "scs/platform/{action}", new { controller = "Sidekick.Core.Handlers.ScsMainController, Sidekick.Core", action = "scs" });
+				routes.MapRoute("scsresources", "scs/platform/{action}/{filename}", new { controller = $"Sidekick.Core.Handlers.ScsMainController, Sidekick.Core", action = "resources" });
 			}
 			foreach (var sidekick in _registration.GetAllSidekicks().Where(x => x.Name != "Sitecore Sidekick"))
 			{

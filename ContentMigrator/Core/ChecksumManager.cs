@@ -5,12 +5,12 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
-using ScsContentMigrator.Core.Interface;
-using ScsContentMigrator.Data;
+using Sidekick.ContentMigrator.Core.Interface;
+using Sidekick.ContentMigrator.Data;
 using Sitecore.Data;
 using Sitecore.Events;
 
-namespace ScsContentMigrator.Core
+namespace Sidekick.ContentMigrator.Core
 {
 	public class ChecksumManager : IChecksumManager
 	{

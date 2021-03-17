@@ -1,0 +1,85 @@
+﻿<div ng-controller="xcmastercontroller as vm">
+	<div class="xccontent">Generate XConnect Assets</div>
+	<div class="xcdescription">
+		<strong class="btn" ng-if="!vm.showDetails" ng-click="vm.showDetails = true">Show Deployment Details</strong>
+		<strong class="btn" ng-if="vm.showDetails" ng-click="vm.showDetails = false">Hide Deployment Details</strong>
+		<h4 ng-if="vm.showDetails">The different asset types belong at the particular locations on the following servers.</h4>
+		<div ng-if="vm.showDetails">
+			<h3>cm</h3><pre>
+DLL
+	\bin
+CONFIG
+	\App_Config\Sitecore\XConnect.Client.Configuration
+		
+			</pre><h3>cd</h3><pre>
+DLL
+	\bin
+CONFIG
+	\App_Config\Sitecore\XConnect.Client.Configuration
+		
+			</pre><h3>ma-ops</h3><pre>
+DLL
+	\App_Data\jobs\continuous\AutomationEngine
+	\bin
+JSON
+	\App_Data\Models
+					</pre><h3>ma-rep</h3><pre>
+JSON
+	\App_Data\Models
+DLL
+	\bin
+			</pre><h3>rep</h3><pre>
+DLL
+	\bin
+CONFIG
+	\App_Config\Sitecore\XConnect.Client.Configuration
+			</pre><h3>prc</h3><pre>
+DLL
+	\bin
+CONFIG
+	\App_Config\Sitecore\XConnect.Client.Configuration
+			</pre><h3>xc-collect</h3><pre>
+JSON
+	\App_Data\Models
+DLL
+	\bin
+			</pre><h3>xc-search</h3><pre>
+DLL
+	\App_Data\jobs\continuous\IndexWorker
+	\bin
+JSON
+	\App_Data\jobs\continuous\IndexWorker\App_data\Models
+	\App_Data\Models
+			</pre><h3>xc-refdata</h3><pre>
+JSON
+	\App_Data\Models
+DLL
+	\bin
+			</pre><h3>cortex-processing</h3><pre>
+DLL
+	\App_Data\jobs\continuous\ProcessingEngine
+	\bin
+JSON
+	\App_Data\jobs\continuous\ProcessingEngine\App_Data\Models
+	\App_Data\Models
+			</pre><h3>cortex-reporting</h3><pre>
+DLL
+	\bin
+JSON
+	\App_Data\Models
+			</pre>
+		</div>
+	</div>
+	<img ng-if="vm.loading" class="xcspinner" src="/scs/platform/resources/scsspinner.gif" />
+	<div class="xcmodel" ng-repeat="model in vm.models">
+		<div>
+			{{model.name}}
+		</div>
+
+		<div class="xcnamespace" ng-repeat="fn in model.fullName">
+			{{fn}}
+		</div>
+		<a class="btn" href="/scs/xc/xcdownloadmodel.scsvc?name={{model.name}}">Download Json</a>
+		<a class="btn" href="/scs/xc/xcdownloadconfig.scsvc?name={{model.name}}">Download Config</a>
+	</div>
+</div>

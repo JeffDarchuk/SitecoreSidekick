@@ -9,18 +9,18 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.Security;
 using System.Xml;
-using ScsEditingContext.Services.Interface;
+using Sidekick.EditingContext.Services.Interface;
 using Sitecore.Configuration;
 using Sitecore.Data;
 using Sitecore.Data.Managers;
 using Sitecore.SecurityModel;
-using SitecoreSidekick;
-using SitecoreSidekick.ContentTree;
-using SitecoreSidekick.Core;
-using SitecoreSidekick.Handlers;
-using SitecoreSidekick.Pipelines.HttpRequestBegin;
+using Sidekick.Core;
+using Sidekick.Core.ContentTree;
+using Sidekick.Core;
+using Sidekick.Core.Handlers;
+using Sidekick.Core.Pipelines.HttpRequestBegin;
 
-namespace ScsEditingContext
+namespace Sidekick.EditingContext
 {
 	public class EditingContextRegistration : ScsRegistration
 	{
@@ -31,7 +31,7 @@ namespace ScsEditingContext
 		public List<dynamic> EditorLocations { get; } = new List<dynamic>();
 		public override string Directive => "ecmasterdirective";
 		public override NameValueCollection DirectiveAttributes { get; set; }
-		public override string ResourcesPath => "ScsEditingContext.Resources";
+		public override string ResourcesPath => "Sidekick.EditingContext.Resources";
 		public override Type Controller => typeof(EditingContextController);
 		public override string Icon => "/scs/ec/resources/ec.png";
 		public override string Name => "Editing Context";

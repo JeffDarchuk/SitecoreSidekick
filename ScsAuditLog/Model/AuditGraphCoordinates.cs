@@ -1,4 +1,4 @@
-﻿namespace ScsAuditLog.Model
+﻿namespace Sidekick.AuditLog.Model
 {
 	public class AuditGraphCoordinates
 	{

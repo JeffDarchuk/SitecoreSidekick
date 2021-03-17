@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Util
+namespace Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster.Util
 {
 	/// <summary>
 	/// Simple generic implementation of a chain of processors.

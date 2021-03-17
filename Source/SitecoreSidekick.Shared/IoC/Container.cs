@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Reflection;
 
-namespace SitecoreSidekick.Shared.IoC
+namespace Sidekick.Core.Shared.IoC
 {
 	public class Container : IContainer
 	{

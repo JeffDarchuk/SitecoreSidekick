@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ScsAuditLog.Core
+namespace Sidekick.AuditLog.Core
 {
 	public class AuditTrie<T>
 	{

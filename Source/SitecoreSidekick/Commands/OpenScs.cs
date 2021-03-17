@@ -4,7 +4,7 @@ using Sitecore.Diagnostics;
 using Sitecore.Shell.Framework.Commands;
 using Sitecore.Web.UI.Sheer;
 
-namespace SitecoreSidekick.Commands
+namespace Sidekick.Core.Commands
 {
 	public class OpenScs : Command
 	{

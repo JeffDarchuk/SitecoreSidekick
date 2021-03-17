@@ -1,4 +1,4 @@
-﻿using ScsAuditLog.Model;
+﻿using Sidekick.AuditLog.Model;
 using Sitecore.Diagnostics;
 using Sitecore.Publishing.Pipelines.Publish;
 using System;
@@ -7,7 +7,7 @@ using System.Text;
 using Sitecore;
 using Sitecore.Data;
 
-namespace ScsAuditLog.Pipelines.Publish
+namespace Sidekick.AuditLog.Pipelines.Publish
 {
 	public class AuditPublish : PublishProcessor
 	{

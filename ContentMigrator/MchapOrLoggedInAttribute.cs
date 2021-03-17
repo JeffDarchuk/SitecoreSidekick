@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Mvc;
-using SitecoreSidekick;
+using Sidekick.Core;
 
-namespace ScsContentMigrator
+namespace Sidekick.ContentMigrator
 {
-	public class MchapOrLoggedInAttribute : ScsLoggedInAttribute
+	public class MchapOrLoggedInAttribute : LoggedInAttribute
 	{
 		public override void OnActionExecuting(ActionExecutingContext filterContext)
 		{

@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Text;
-using ScsAuditLog.Model;
+using Sidekick.AuditLog.Model;
 using Sitecore.Data.Fields;
 using Sitecore.Data.Items;
 using Sitecore.Diagnostics;
 using Sitecore.Events;
 
-namespace ScsAuditLog.Pipelines
+namespace Sidekick.AuditLog.Pipelines
 {
 	public class OnSaveStandardValues : AuditEventType
 	{

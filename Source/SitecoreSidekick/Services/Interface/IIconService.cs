@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Sitecore.Pipelines.GetAboutInformation;
 
-namespace SitecoreSidekick.Services.Interface
+namespace Sidekick.Core.Services.Interface
 {
 	public interface IIconService
 	{

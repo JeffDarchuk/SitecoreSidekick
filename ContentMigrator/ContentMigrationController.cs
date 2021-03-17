@@ -12,12 +12,12 @@ using MicroCHAP;
 using Microsoft.CSharp.RuntimeBinder;
 using Rainbow.Model;
 using Rainbow.Storage.Yaml;
-using ScsContentMigrator.Args;
-using ScsContentMigrator.Core.Interface;
-using ScsContentMigrator.Data;
-using ScsContentMigrator.Models;
-using ScsContentMigrator.Services;
-using ScsContentMigrator.Services.Interface;
+using Sidekick.ContentMigrator.Args;
+using Sidekick.ContentMigrator.Core.Interface;
+using Sidekick.ContentMigrator.Data;
+using Sidekick.ContentMigrator.Models;
+using Sidekick.ContentMigrator.Services;
+using Sidekick.ContentMigrator.Services.Interface;
 using Sitecore;
 using Sitecore.Configuration;
 using Sitecore.Data;
@@ -29,13 +29,13 @@ using Sitecore.Install.Framework;
 using Sitecore.Install.Items;
 using Sitecore.Install.Utils;
 using Sitecore.SecurityModel;
-using SitecoreSidekick;
-using SitecoreSidekick.Core;
-using SitecoreSidekick.Services.Interface;
-using SitecoreSidekick.Shared.IoC;
+using Sidekick.Core;
+using Sidekick.Core;
+using Sidekick.Core.Services.Interface;
+using Sidekick.Core.Shared.IoC;
 using Guid = System.Guid;
 
-namespace ScsContentMigrator
+namespace Sidekick.ContentMigrator
 {
 	public class ContentMigrationController : ScsController
 	{
@@ -162,7 +162,7 @@ namespace ScsContentMigrator
 			return ScsJson(GetContentTree(data));
 		}
 
-		[ScsLoggedIn]
+		[LoggedIn]
 		[ActionName("cmserverlist.scsvc")]
 		public ActionResult GetServerList()
 		{
@@ -203,7 +203,7 @@ namespace ScsContentMigrator
 			return ScsJson(_migrationManager.CancelContentMigration(operationId));
 		}
 
-		[ScsLoggedIn]
+		[LoggedIn]
 		[ActionName("cmapprovepreview.scsvc")]
 		public ActionResult ApprovePreview(string operationId)
 		{
@@ -233,7 +233,7 @@ namespace ScsContentMigrator
 				return ScsJson(ret);
 			}
 		}
-		[ScsLoggedIn]
+		[LoggedIn]
 		[ActionName("cminstallpackage.scsvc")]
 		public ActionResult InstallPackage()
 		{
@@ -269,7 +269,7 @@ namespace ScsContentMigrator
 			return Content(ret.ToString());
 		}
 
-		[ScsLoggedIn]
+		[LoggedIn]
 		[ActionName("cmgetpresets.scsvc")]
 		public ActionResult GetPresets(string server)
 		{
@@ -279,13 +279,20 @@ namespace ScsContentMigrator
 					(!x.WhiteList.Any() || x.WhiteList.Contains(server))));
 		}
 
-		[ScsLoggedIn]
+		[LoggedIn]
 		[ActionName("cmrunpreset.scsvc")]
 		public ActionResult RunPreset(PresetRunModel model)
 		{
 			var preset = _registration.GetScsRegistration<ContentMigrationRegistration>().PresetList[model.Name];
 			preset.Server = model.Server;
 			return StartOperation(preset);
+		}
+
+		[LoggedIn]
+		[ActionName("cmdefaultoperationparameters.scsvc")]
+		public ActionResult DefaultParameters(PresetRunModel model)
+		{
+			return ScsJson(new PullItemModel(_registration.GetScsRegistration<ContentMigrationRegistration>()));
 		}
 
 		private object OperationQueueLength(string operationId)

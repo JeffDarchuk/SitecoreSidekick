@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Sitecore.Data;
 
-namespace ScsAuditLog.Model.Interface
+namespace Sidekick.AuditLog.Model.Interface
 {
 	public interface IAuditEntry
 	{

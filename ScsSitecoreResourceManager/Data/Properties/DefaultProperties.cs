@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using ScsSitecoreResourceManager.Data.Properties.Collectors;
+using Sidekick.SitecoreResourceManager.Data.Properties.Collectors;
 using Sitecore.Pipelines;
 using Sitecore.Pipelines.GetAboutInformation;
 
-namespace ScsSitecoreResourceManager.Data.Properties
+namespace Sidekick.SitecoreResourceManager.Data.Properties
 {
 	public class DefaultPropertiesArgs : PipelineArgs
 	{

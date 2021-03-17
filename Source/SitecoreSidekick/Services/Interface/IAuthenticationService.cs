@@ -1,4 +1,4 @@
-﻿namespace SitecoreSidekick.Services.Interface
+﻿namespace Sidekick.Core.Services.Interface
 {
 	public interface IAuthenticationService
 	{

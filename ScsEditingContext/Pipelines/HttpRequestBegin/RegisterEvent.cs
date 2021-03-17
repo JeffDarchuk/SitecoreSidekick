@@ -7,17 +7,17 @@ using Sitecore.Configuration;
 using Sitecore.Data;
 using Sitecore.Data.Items;
 using Sitecore.Pipelines.HttpRequest;
-using SitecoreSidekick.ContentTree;
+using Sidekick.Core.ContentTree;
 using Sitecore.Diagnostics;
 using System.Web.Configuration;
 using System.Configuration;
 using System.Text;
 using System.Text.RegularExpressions;
 using Rainbow.Model;
-using ScsEditingContext.Services.Interface;
+using Sidekick.EditingContext.Services.Interface;
 using Sitecore.Pipelines.RenderField;
 
-namespace ScsEditingContext.Pipelines.HttpRequestBegin
+namespace Sidekick.EditingContext.Pipelines.HttpRequestBegin
 {
 	public class RegisterEvent : HttpRequestProcessor
 	{

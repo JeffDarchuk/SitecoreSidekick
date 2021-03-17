@@ -20,8 +20,18 @@
 		vm.spinner = false;
 		vm.isPreview = false;
 		vm.displayLog = false;
-		vm.useItemBlaster = true;
+		vm.useItemBlaster = false;
 		vm.ignoreRevId = false;
+		CMfactory.getDefaultOptions().then(function (response) {
+			vm.children = response.data.Children;
+			vm.overwrite = response.data.Overwrite;
+			vm.pullParent = response.data.PullParent;
+			vm.mirror = response.data.RemoveLocalNotInRemote;
+			vm.eventDisabler = response.data.EventDisabler;
+			vm.bulkUpdate = response.data.BulkUpdate;
+			vm.useItemBlaster = response.data.UseItemBlaster;
+			vm.ignoreRevId = response.data.IgnoreRevId;
+		});
 		vm.events = {
 			'selectedIds': [],
 			'selected': [],

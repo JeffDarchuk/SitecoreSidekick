@@ -6,9 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using Sitecore.Publishing;
-using SitecoreSidekick.Services.Interface;
+using Sidekick.Core.Services.Interface;
 
-namespace SitecoreSidekick.Models
+namespace Sidekick.Core.Models
 {
 	public class ScsModelBinder : IModelBinder
 	{

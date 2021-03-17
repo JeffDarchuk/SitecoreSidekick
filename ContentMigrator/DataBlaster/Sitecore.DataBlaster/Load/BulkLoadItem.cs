@@ -3,7 +3,7 @@ using Sitecore.Buckets.Util;
 using Sitecore.Data.Items;
 using Sitecore.Data.Templates;
 
-namespace ScsContentMigrator.DataBlaster.Sitecore.DataBlaster.Load
+namespace Sidekick.ContentMigrator.DataBlaster.Sitecore.DataBlaster.Load
 {
 	public class BulkLoadItem : BulkItem
 	{

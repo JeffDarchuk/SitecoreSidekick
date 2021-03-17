@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>SitecoreSidekickEditingContext</id>
+    <version>$version$</version>
+    <title>Sitecore Sidekick Editing Context</title>
+    <authors>Jeff Darchuk</authors>
+    <owners>Jeff Darchuk</owners>
+        <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
+        <projectUrl>https://github.com/JeffDarchuk/SitecoreSidekick</projectUrl>
+
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>A tool to help Sitecore users more easily navigate around the content editor with previously visited items and a customizable list of important locations.</description>
+        <copyright>Copyright 2017 Jeff Darchuk</copyright>
+        <tags>sitecore</tags>
+  </metadata>
+    <files>
+		<file src="..\ScsEditingContext\*.config" target="content\App_Config\Include\Sidekick" />
+	</files>
+</package>

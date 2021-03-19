@@ -15,6 +15,6 @@
 	<tags>sitecore</tags>
   </metadata>
   	<files>
-		<file src="..\..\Source\SitecoreSidekick\zSCS.config" target="content\App_Config\Include\Sidekick" />
+		<file src="..\..\Source\SitecoreSidekick\Sidekick.Core.config" target="content\App_Config\Include\Sidekick" />
 	</files>
 </package>

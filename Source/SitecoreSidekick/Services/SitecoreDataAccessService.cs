@@ -122,7 +122,13 @@ namespace Sidekick.Core.Services
 		public void RecycleItem(Guid id) => RecycleItem(new ID(id).ToString());
 		public string GetIcon(Guid id)
 		{
-			return GetItem(id)?[FieldIDs.Icon] ?? "";
+			Item item = GetItem(id);
+			var icon = item?[FieldIDs.Icon] ?? "";
+			if (string.IsNullOrWhiteSpace(icon))
+			{
+				icon = item.Template.InnerItem?[FieldIDs.Icon] ?? "";
+			}
+			return icon;
 		}
 
 		public List<Database> GetAllDatabases()

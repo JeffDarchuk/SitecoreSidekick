@@ -20,6 +20,6 @@
 	</dependencies>
   </metadata>
     <files>
-		<file src="..\ScsAuditLog\*.config" target="content\App_Config\Include\Sidekick" />
+		<file src="..\ScsAuditLog\Sidekick*.config" target="content\App_Config\Include\Sidekick" />
 	</files>
 </package>

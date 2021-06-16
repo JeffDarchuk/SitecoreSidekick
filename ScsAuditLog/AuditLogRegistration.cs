@@ -41,7 +41,7 @@ namespace Sidekick.AuditLog
 				backup = 0;
 			if (!int.TryParse(keepRecords, out duration))
 				duration = 0;
-			AuditLogger.Log = new Core.AuditLog(backup, duration);
+			AuditLogger.Log = new Core.LuceneAuditLog(backup, duration);
 		}
 		public void RegisterCustomEventType(XmlNode node)
 		{

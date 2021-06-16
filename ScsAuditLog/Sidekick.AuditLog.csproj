@@ -90,6 +90,8 @@
     <Compile Include="AuditLogRegistration.cs" />
     <Compile Include="Bootstrap.cs" />
     <Compile Include="ConcurrentHashSet.cs" />
+    <Compile Include="Core\IAuditLog.cs" />
+    <Compile Include="Core\SqlAuditLog.cs" />
     <Compile Include="Model\ActivityDataModel.cs" />
     <Compile Include="Model\AuditSourceRecord.cs" />
     <Compile Include="Model\AuditEventType.cs" />
@@ -104,7 +106,7 @@
     <Compile Include="Model\ItemAuditEntry.cs" />
     <Compile Include="Model\AuditGraph.cs" />
     <Compile Include="Model\AuditGraphEntry.cs" />
-    <Compile Include="Core\AuditLog.cs" />
+    <Compile Include="Core\LuceneAuditLog.cs" />
     <Compile Include="Model\Interface\IAuditEntry.cs" />
     <Compile Include="Pipelines\GeneralEvent.cs" />
     <Compile Include="Pipelines\OnRename.cs" />

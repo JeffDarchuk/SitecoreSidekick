@@ -22,6 +22,10 @@ namespace Sidekick.AuditLog.Model
 		public string Color { get; set; }
 		public string Icon { get; set; }
 
+		public BasicAuditEntry()
+		{
+		}
+
 		public BasicAuditEntry(Document doc, int luceneId)
 		{
 			User = doc.Get("user");

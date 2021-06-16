@@ -1,24 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Linq;
-using System.Text;
-using System.Web;
-using Sidekick.AuditLog.Model;
-using Sidekick.Core.Handlers;
-using System.Dynamic;
 using System.Reflection;
-using System.Web.Mvc;
 using System.Xml;
-using Lucene.Net.Search;
-using Sidekick.AuditLog.Core;
-using Sidekick.AuditLog.Model.Interface;
-using Sidekick.Core.ContentTree;
-using Sitecore.Configuration;
-using Sitecore.Data;
-using Sitecore.Data.Items;
-using Sitecore.Events;
+using Sidekick.AuditLog.Model;
 using Sidekick.Core;
+using Sitecore.Events;
 
 namespace Sidekick.AuditLog
 {
@@ -41,7 +27,7 @@ namespace Sidekick.AuditLog
 				backup = 0;
 			if (!int.TryParse(keepRecords, out duration))
 				duration = 0;
-			AuditLogger.Log = new Core.LuceneAuditLog(backup, duration);
+			AuditLogger.Log = new Core.SqlAuditLog();
 		}
 		public void RegisterCustomEventType(XmlNode node)
 		{

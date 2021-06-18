@@ -3,6 +3,8 @@
 	color: black;
 	background-color: #ddd;
 	border: thin solid black;
+	left: 44px;
+	top: 44px;
 }
 
 .alnote {
@@ -10,6 +12,7 @@
 	margin-top: -100px;
 	min-width: 30%;
 	max-width: 80%;
+	text-align: left;
 }
 
 .alpane td {
@@ -130,4 +133,13 @@ del {
 }
 .aliconcol {
 	text-align: center;
+}
+.graph {
+	margin: 20px 0 20px 0;
+}
+.altable td {
+	padding: 5px 10px;
+}
+.altable td img {
+	height: 16px;
 }

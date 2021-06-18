@@ -219,6 +219,7 @@ input {
 .lite-btn {
 	cursor: pointer;
 	color: blue;
+	padding: 0 10px;
 }
 	.btn:active {
 		border-top: 2px solid darkgrey;

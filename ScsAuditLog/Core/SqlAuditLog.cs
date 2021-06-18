@@ -14,10 +14,21 @@ namespace Sidekick.AuditLog.Core
 {
 	public class SqlAuditLog : IAuditLog
 	{
-		private readonly Dictionary<string, IEventType> _types = new Dictionary<string, IEventType>();
+		private readonly int _logDays;
+		private readonly int _recordDays;
+		private readonly bool _logAnonymousEvents;
 		private static readonly ISitecoreDataAccessService _sitecoreDataAccessSerivce = Bootstrap.Container.Resolve<ISitecoreDataAccessService>();
-		private readonly List<string> _sqlSpecialChars = new List<string>() { "+", "-", "&&", "||", "!", "(", ")", "{", "}", "[", "]", "^", "\"", "~", "*", "?", ":", "\\" };
+		private static readonly IJsonSerializationService _jsonSerializationService = Bootstrap.Container.Resolve<IJsonSerializationService>();
 
+		private readonly Dictionary<string, IEventType> _types = new Dictionary<string, IEventType>();
+		private readonly List<string> _sqlSpecialChars = new List<string>() { "'", "--", "(", ")", "[", "]" };
+
+		public SqlAuditLog(int daysToKeepLog, int daysToKeepRecords, bool logAnonymousEvents)
+		{
+			_logDays = daysToKeepLog;
+			_recordDays = daysToKeepRecords;
+			_logAnonymousEvents = logAnonymousEvents;
+		}
 
 		public IEnumerable<KeyValuePair<string, int>> AutoComplete(string text, string start, string end, List<object> eventTypes)
 		{
@@ -40,27 +51,26 @@ namespace Sidekick.AuditLog.Core
 
 				var pageSize = 20;
 
-				//var totalCount = db.ExecuteQuery<int>(
-				//	"SELECT count(*) FROM [dbo].[AuditEntry] " +
-				//	"WHERE {0} <= [Timestamp] AND [Timestamp] <= {1}",
-				//	start,
-				//	end)
-				//	.ToList();
 				var query = "SELECT * FROM [dbo].[AuditEntry] " +
 					"WHERE {0} <= [Timestamp] AND [Timestamp] <= {1} AND " +
 					sb.ToString() +
 					" ORDER BY [Timestamp] desc";
+#if DEBUG
 				Sitecore.Diagnostics.Log.Info($"SCS: {query}", this);
+#endif
 
+				var sqlAuditLogEntriesCount = db.ExecuteQuery<SqlAuditLogEntry>(
+					query,
+					start,
+					end).Count();
 				var sqlAuditLogEntries = db.ExecuteQuery<SqlAuditLogEntry>(
 					query,
-					start, 
-					end)
-					.ToList();
+					start,
+					end);
 
 				var sqlAuditLogUser = db.ExecuteQuery<SqlAuditLogUser>("SELECT * FROM dbo.Users").ToList();
 
-				ret.total = sqlAuditLogEntries.Count();
+				ret.total = sqlAuditLogEntriesCount;
 				ret.perPage = pageSize;
 
 				int skip = data.Page * pageSize;
@@ -99,29 +109,28 @@ namespace Sidekick.AuditLog.Core
 				DateTime end = DateTime.Parse(data.End).AddDays(1);
 				TimeSpan range = end.Subtract(start);
 				var filter = BuildArrayQuery(data.Filters, data.Field, data.Databases);
-				List<string> dates = new List<string>();
+				List<DateTime> dates = new List<DateTime>();
 				for (int i = 0; i <= range.Days; i++)
-					dates.Add(start.AddDays(i).ToString("yyyyMMdd"));
+					dates.Add(start.AddDays(i));
 				foreach (string eventType in data.EventTypes)
 				{
 					AuditGraphEntry gentry = new AuditGraphEntry() { Color = GetEventType(eventType).Color };
-					foreach (string date in dates)
+					foreach (var date in dates)
 					{
 						var query = "SELECT count(*) FROM [dbo].[AuditEntry] " +
 							"WHERE {0} <= [Timestamp] AND [Timestamp] <= {1} AND [EventId] = {2} AND " +
 							filter;
-						//Sitecore.Diagnostics.Log.Info($"SCS: {query}", this);
 
 						var sqlAuditLogEntries = db.ExecuteQuery<int>(
 							query,
-							start,
-							end,
+							date,
+							date.AddDays(1),
 							eventType)
 							.ToList();
 						var count = sqlAuditLogEntries.First();
 						if (count > max)
 							max = count;
-						gentry.Coordinates.Add(new AuditGraphCoordinates() { X = date.Insert(6, "-").Insert(4, "-"), Y = count.ToString() });
+						gentry.Coordinates.Add(new AuditGraphCoordinates() { X = date.ToString("yyyy-MM-dd"), Y = count.ToString() });
 					}
 					entries[eventType] = gentry;
 				}
@@ -180,6 +189,7 @@ namespace Sidekick.AuditLog.Core
 			try
 			{
 				ItemAuditEntry entry = new ItemAuditEntry(eventId, label, color, item);
+				if (entry.User.ToLower().Contains("anonymous") && !_logAnonymousEvents) return;
 				entry.Note = note;
 				StringBuilder sb = new StringBuilder();
 				if (item != null)
@@ -218,6 +228,8 @@ namespace Sidekick.AuditLog.Core
 				}
 			}
 
+			var role = _jsonSerializationService.SerializeObject(entry.Role);
+
 			using (var db = new SqlAuditLogDataContext())
 			{
 				db.ExecuteCommand(
@@ -226,7 +238,7 @@ namespace Sidekick.AuditLog.Core
 				"VALUES ({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, {11}, {12})",
 				Guid.NewGuid(),
 				userId,
-				"",//entry.Role,
+				role,
 				entry.Id?.ToLower() ?? "",
 				entry.Database ?? "",
 				entry.Path ?? "",
@@ -270,14 +282,15 @@ namespace Sidekick.AuditLog.Core
 			StringBuilder sb = new StringBuilder("(");
 			foreach (string term in terms)
 			{
+				var replacedTerm = ReplaceReservedChars(term);
 				if (term != "*" && (key == "content" || key == "path"))
-					sb.Append($"[{key}] like '%{term}%' OR ");
+					sb.Append($"[{key}] like '%{replacedTerm}%' OR ");
 				else if (term != "*" && key == "ItemId")
-					sb.Append($"[{key}] = '{term.Replace('*', '-')}' OR ");
+					sb.Append($"[{key}] = '{replacedTerm.Replace('*', '-')}' OR ");
 				else if (term != "*" && key == "UserId")
-					sb.Append($"[{key}] = '{GetUserId(term)}' OR ");
+					sb.Append($"[{key}] = '{GetUserId(replacedTerm)}' OR ");
 				else if (term != "*")
-					sb.Append($"[{key}] = '{term}' OR ");
+					sb.Append($"[{key}] = '{replacedTerm}' OR ");
 			}
 			if (sb.Length > 1)
 			{
@@ -308,7 +321,7 @@ namespace Sidekick.AuditLog.Core
 
 		private string ReplaceReservedChars(string rawInput)
 		{
-			return _sqlSpecialChars.Aggregate(rawInput, (current, c) => current.Replace(c, @"\"));
+			return _sqlSpecialChars.Aggregate(rawInput, (current, c) => current.Replace(c, string.Empty));
 		}
 	}
 

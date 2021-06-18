@@ -15,6 +15,7 @@ namespace Sidekick.AuditLog.Model
 		public string Id { get; set; }
 		public string Database { get; set; }
 		public string Path { get; set; }
+		public string ItemName => Path != null ? Path.Split('/').LastOrDefault() : string.Empty;
 		public DateTime TimeStamp { get; set; }
 		public string EventId { get; set; }
 		public string Note { get; set; }

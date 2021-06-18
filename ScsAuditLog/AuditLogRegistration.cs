@@ -19,7 +19,7 @@ namespace Sidekick.AuditLog
 		public override string Identifier => "al";
 		public override string CssStyle { get; } = "width:100%;min-width:900px";
 
-		public AuditLogRegistration(string keepBackups, string keepRecords, string roles, string isAdmin, string users) : base(roles, isAdmin, users)
+		public AuditLogRegistration(string type, string keepBackups, string keepRecords, string logAnonymousEvents, string roles, string isAdmin, string users) : base(roles, isAdmin, users)
 		{
 			int backup;
 			int duration;
@@ -27,7 +27,14 @@ namespace Sidekick.AuditLog
 				backup = 0;
 			if (!int.TryParse(keepRecords, out duration))
 				duration = 0;
-			AuditLogger.Log = new Core.SqlAuditLog();
+			if (type == "SQL")
+			{
+				AuditLogger.Log = new Core.SqlAuditLog(backup, duration, logAnonymousEvents == "true");
+			}
+			else
+			{
+				AuditLogger.Log = new Core.LuceneAuditLog(backup, duration);
+			}
 		}
 		public void RegisterCustomEventType(XmlNode node)
 		{

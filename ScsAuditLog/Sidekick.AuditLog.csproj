@@ -110,6 +110,8 @@
     <Compile Include="Model\AuditGraphEntry.cs" />
     <Compile Include="Core\LuceneAuditLog.cs" />
     <Compile Include="Model\Interface\IAuditEntry.cs" />
+    <Compile Include="Model\SqlAuditLogUser.cs" />
+    <Compile Include="Model\SqlAuditLogEntry.cs" />
     <Compile Include="Pipelines\GeneralEvent.cs" />
     <Compile Include="Pipelines\OnRename.cs" />
     <Compile Include="Pipelines\OnMoved.cs" />

@@ -67,7 +67,7 @@ namespace Sidekick.AuditLog
 		[ActionName("alactivitydata.scsvc")]
 		public ActionResult ActivityData(ActivityDataModel data)
 		{
-			return ScsJson(AuditLogger.Current.GetActivityData(data));
+			return ScsJson(GetActivityData(data));
 		}
 
 		[LoggedIn]
@@ -97,6 +97,11 @@ namespace Sidekick.AuditLog
 			return ScsJson(_sitecoreDataAccessSerivce.GetAllDatabases().Where(x => x.Name != "core" && x.Name != "filesystem").ToDictionary(x => x.Name, x => x.Name == "master"));
 		}
 
+		private object GetActivityData(ActivityDataModel data)
+		{
+			return AuditLogger.Current.GetActivityData(data);
+		}
+
 		private object RebuildLogStatus()
 		{
 			return AuditLogger.Log.RebuildLogStatus();
@@ -112,13 +117,11 @@ namespace Sidekick.AuditLog
 		{
 			return AuditLogger.Current.GetUsers();
 		}
-
 		
 		private object GetAutocomplete(AutocompleteModel data)
 		{
 			return AuditLogger.Current.AutoComplete(data.Text, data.Start, data.End, data.EventTypes);
 		}
-
 
 		private object GetTypes()
 		{
@@ -132,7 +135,6 @@ namespace Sidekick.AuditLog
 			IItemData item = _sitecoreDataAccessSerivce.GetItemData(data.Id, data.Database);
 			return new ContentTreeNode(item);			
 		}
-
 		
 
 	}

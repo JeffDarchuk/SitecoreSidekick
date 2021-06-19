@@ -3,9 +3,12 @@
 	color: black;
 	background-color: #ddd;
 	border: thin solid black;
-	left: 44px;
-	top: 44px;
+	box-shadow: black 1px 1px 15px 0px;
 }
+	.alpane.filterpane {
+		left: 44px;
+		top: 44px;
+	}
 
 .alnote {
 	left: 100px;
@@ -14,6 +17,9 @@
 	max-width: 80%;
 	text-align: left;
 }
+	.alnote table td {
+		padding: 3px;
+	}
 
 .alpane td {
 	padding: 3px;
@@ -21,7 +27,7 @@
 
 .almenu {
 	max-height: 520px;
-	padding: 2px;
+	padding: 3px;
 }
 
 .almenu .tab {
@@ -61,6 +67,7 @@
 	font-size: 13pt;
 	margin: 0;
 	background-color: #2b2b2b;
+	padding: 5px;
 }
 
 .autoCompletePane {
@@ -83,7 +90,7 @@
 		}
 
 .arrow {
-	padding-bottom: 2px;
+	padding-bottom: 3px;
 }
 
 .jumpto {
@@ -142,4 +149,8 @@ del {
 }
 .altable td img {
 	height: 16px;
+}
+.my-1 {
+	margin-top: 10px;
+	margin-bottom: 10px;
 }

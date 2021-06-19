@@ -46,27 +46,30 @@ namespace Sidekick.AuditLog.Core
 				if (sb.Length > 0)
 					sb.Append(" AND ");
 				sb.Append(BuildArrayQuery(data.EventTypes, "event", data.Databases));
+				var filterExpression = sb.ToString();
 
 				dynamic ret = new ExpandoObject();
 
 				var pageSize = 20;
 
-				var query = "SELECT * FROM [dbo].[AuditEntry] " +
+				var countQuery = "SELECT count(*) FROM [dbo].[AuditEntry] " +
 					"WHERE {0} <= [Timestamp] AND [Timestamp] <= {1} AND " +
-					sb.ToString() +
-					" ORDER BY [Timestamp] desc";
+					filterExpression;
+
+				var selectQuery = "SELECT * FROM [dbo].[AuditEntry] " +
+					"WHERE {0} <= [Timestamp] AND [Timestamp] <= {1} AND " +
+					filterExpression +
+					" ORDER BY [Timestamp] desc" +
+					" OFFSET ({2}) ROWS FETCH NEXT ({3}) ROWS ONLY";
 #if DEBUG
-				Sitecore.Diagnostics.Log.Info($"SCS: {query}", this);
+				Sitecore.Diagnostics.Log.Info($"SCS: {selectQuery}", this);
 #endif
 
-				var sqlAuditLogEntriesCount = db.ExecuteQuery<SqlAuditLogEntry>(
-					query,
+				var sqlAuditLogEntriesCount = db.ExecuteQuery<int>(
+					countQuery,
 					start,
-					end).Count();
-				var sqlAuditLogEntries = db.ExecuteQuery<SqlAuditLogEntry>(
-					query,
-					start,
-					end);
+					end)
+					.First();
 
 				var sqlAuditLogUser = db.ExecuteQuery<SqlAuditLogUser>("SELECT * FROM dbo.Users").ToList();
 
@@ -75,9 +78,14 @@ namespace Sidekick.AuditLog.Core
 
 				int skip = data.Page * pageSize;
 
+				var sqlAuditLogEntries = db.ExecuteQuery<SqlAuditLogEntry>(
+					selectQuery,
+					start,
+					end,
+					skip,
+					pageSize);
+
 				ret.results = sqlAuditLogEntries
-					.Skip(skip)
-					.Take(pageSize)
 					.Select(x => new BasicAuditEntry
 					{
 						Uid = x.Id.ToString(),
@@ -261,7 +269,7 @@ namespace Sidekick.AuditLog.Core
 
 		public int RebuildLogStatus()
 		{
-			return 1;
+			return -1;
 		}
 
 		private string BuildArrayQuery(IEnumerable<object> terms, string key, Dictionary<string, bool> databases)
@@ -332,28 +340,6 @@ namespace Sidekick.AuditLog.Core
 		public SqlAuditLogDataContext() : base(DatabaseConnectionString)
 		{
 		}
-	}
-
-	public class SqlAuditLogUser
-	{
-		public Guid Id { get; set; }
-		public string Username { get; set; }
-	}
-
-	public class SqlAuditLogEntry
-	{
-		public Guid Id { get; set; }
-		public Guid? UserId { get; set; }
-		public string Role { get; set; }
-		public Guid? ItemId { get; set; }
-		public string Database { get; set; }
-		public string Path { get; set; }
-		public DateTime TimeStamp { get; set; }
-		public string EventId { get; set; }
-		public string Note { get; set; }
-		public string Label { get; set; }
-		public string Color { get; set; }
-		public string Icon { get; set; }
 	}
 
 }

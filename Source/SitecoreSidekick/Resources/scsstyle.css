@@ -5,7 +5,6 @@ h3, h1 {
 	background-color: #2b2b2b;
 	margin: 0;
 	padding: 20px;
-	font-size: 2em;
 }
 
 h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
@@ -14,7 +13,7 @@ h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 
 body {
 	line-height: initial;
-	font-family: Arial, Helvetica, sans-serif;
+	font-family: Helvetica, sans-serif;
 	font-size: 12px;
 	color: #131313;
 	border: none;

@@ -335,7 +335,7 @@ namespace Sidekick.AuditLog.Core
 
 	public class SqlAuditLogDataContext : DataContext
 	{
-		private static readonly string DatabaseConnectionString = ConfigurationManager.ConnectionStrings["scsauditlog"]?.ConnectionString;
+		private static readonly string DatabaseConnectionString = ConfigurationManager.ConnectionStrings["sidekick.auditlog"]?.ConnectionString;
 
 		public SqlAuditLogDataContext() : base(DatabaseConnectionString)
 		{

@@ -144,7 +144,7 @@ By default the Audit Log will use Lucene to store audit events. This will store 
 
 You can choose to use SQL instead by following this:
 
-1. Create a new database on your SQL server using the provided `ScsAuditLog.dacpac` 
+1. Create a new database on your SQL server using the provided [Sidekick.AuditLog.dacpac](ScsAuditLog/Sidekick.AuditLog.dacpac)
 2. Add a new connection string called `sidekick.auditlog` to your `App_Config/ConnectionStrings.config`_
 3. In the `Sidekick.AuditLog.config` change the `type` parameter from `LUCENE` to `SQL`
 

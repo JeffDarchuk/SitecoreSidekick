@@ -27,6 +27,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sidekick.Xconnect", "ScsXco
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XConnectDemo", "ScsXconnect\ScsXConnectDemo\XConnectDemo.csproj", "{1633D2A0-39F2-47C5-A479-9B232A010014}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{974EA48B-B76D-45EB-AEF6-F887DB852728}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Source\SitecoreSidekick.Shared\SitecoreSidekick.Shared.projitems*{0da36c4a-1b13-4891-a263-5f994127051c}*SharedItemsImports = 4

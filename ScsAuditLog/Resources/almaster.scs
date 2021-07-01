@@ -2,15 +2,15 @@
 	<div>
 		<div>
 			<img class="algear" ng-click="vm.resetPanes('settings')" src="/scs/al/resources/algear.png"></img>
-			<a href="#" class="btn" ng-click="vm.resetPanes('viewQuery')">Filter</a>
+			<a class="btn" ng-click="vm.resetPanes('viewQuery')">Filter</a>
 		</div>
 		<div ng-if="vm.panes.settings" class="alpane">
 			<div class ="almenu">
-				<a ng-if="vm.rebuildNum == -1" href="#" class="btn" ng-click="vm.rebuild()">Rebuild Index</a>
+				<a ng-if="vm.rebuildNum == -1" class="btn" ng-click="vm.rebuild()">Rebuild Index</a>
 				<h4 style="padding-left:10px; padding-right:10px" ng-if="vm.rebuildNum != -1">Rebuilding {{vm.rebuildNum}}</h4>
 			</div>
 		</div>
-		<div ng-show="vm.panes.viewQuery" ng-click="vm.autoComplete = false" class="alpane">
+		<div ng-show="vm.panes.viewQuery" ng-click="vm.autoComplete = false" class="alpane filterpane">
 			<div class="almenu">
 				<fieldset>
 					<legend>Date Range</legend>
@@ -80,12 +80,12 @@
 		</div>
 
 		<div ng-if="vm.events && vm.totalPages > 0">
-			<h3>
-					page {{vm.page + 1}} out of {{vm.totalPages}}
-			</h3>
-			<div ng-if="vm.totalPages > 1">
+			<strong>
+					Displaying audit log details page {{vm.page + 1}} out of {{vm.totalPages}}
+			</strong>
+			<div class="my-1" ng-if="vm.totalPages > 1">
 				<a ng-if="vm.pagination.back" ng-click="vm.getData(0)" class="btn arrow">
-					<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="25px" height="20px" viewBox="-15 0 80 80" xml:space="preserve">
+					<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="12px" height="12px" viewBox="-15 0 80 80" xml:space="preserve">
     <polyline fill="none" stroke="#000000" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" points="
 	30.63,75.8 -15.375,38.087 30.63,0.375 "></polyline>
 		 <polyline fill="none" stroke="#000000" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" points="
@@ -93,20 +93,20 @@
   </svg>
 				</a>
 				<a ng-if="vm.pagination.back" ng-click="vm.getData(vm.page-1)" class="btn arrow">
-					<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="15px" height="20px" viewBox="0 0 50 80" xml:space="preserve">
+					<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="12px" height="12px" viewBox="0 0 50 80" xml:space="preserve">
     <polyline fill="none" stroke="#000000" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" points="
 	45.63,75.8 0.375,38.087 45.63,0.375 "></polyline>
   </svg>
 				</a>
 				<a ng-repeat="page in vm.pagination.pages" ng-click="vm.getData(page)" ng-style="page == vm.page ? {'border':'thin solid white', 'background-color':'white'} : {}" class="btn">{{page+1}}</a>
 				<a ng-if="vm.pagination.next" ng-click="vm.getData(vm.page+1)" class="btn arrow">
-					<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="15px" height="20px" viewBox="0 0 50 80" xml:space="preserve">
+					<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="12px" height="12px" viewBox="0 0 50 80" xml:space="preserve">
     <polyline fill="none" stroke="#000000" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" points="
 	0.375,0.375 45.63,38.087 0.375,75.8 "></polyline>
   </svg>
 				</a>
 				<a ng-if="vm.pagination.next" ng-click="vm.getData(vm.totalPages-1)" class="btn arrow">
-					<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="25px" height="20px" viewBox="-15 0 80 80" xml:space="preserve">
+					<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="12px" height="12px" viewBox="-15 0 80 80" xml:space="preserve">
     <polyline fill="none" stroke="#000000" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" points="
 	-15.375,0.375 30.63,38.087 -15.375,75.8"></polyline>
 		 <polyline fill="none" stroke="#000000" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" points="
@@ -121,26 +121,27 @@
 			
 		</div>
 		<div ng-if="!vm.events">
-			<a class="btn" ng-click="vm.getData(0)">Get Details</a>
+			<a class="btn" ng-click="vm.getData(0)">Get Audit Log Details</a>
 		</div>
 		<div ng-if="vm.events && vm.totalPages > 0">
-			<table>
+			<table class="altable">
 				<tr>
 					<th>Time</th>
-					<th>Icon</th>
+					<th>Item</th>
 					<th>User</th>
 					<th>Type</th>
 					<th>Details</th>
 				</tr>
 				<tr ng-repeat="item in vm.events"  ng-class="{even: $even, odd: $odd}">
-					<td ng-bind="item.TimeStamp | date:'h:mm ss a MMM, dd yyyy'"></td>
+					<td ng-bind="item.TimeStamp | date:'yyyy-MM-dd HH:mm:ss'"></td>
 					<td class ="aliconcol">
 						<img ng-src="/scs/platform/scsicon.scsvc?icon={{item.Icon}}"></img>
+						<span>{{item.ItemName}}</span>
 					</td>
 					<td ng-bind="item.User"></td>
 					<td ng-style="{'border-left':'solid 10px ' + vm.eventList[item.EventId].Color}">{{vm.eventList[item.EventId].Label}}</td>
-					<td>
-						<a class="lite-btn" ng-click="vm.resetPanes(item.Uid)">See Details</a>
+					<td style="text-align:center">
+						<a class="lite-btn" ng-click="vm.resetPanes(item.Uid)" href="">See Details</a>
 						<div ng-attr-id="{{'note' + item.Uid}}" ng-class="{'alvisible': vm.panes[item.Uid], 'alinvisible' : !vm.panes[item.Uid]}" class="alpane alnote">
 							<h5 ng-if="item.User" class="aldetailheading">User</h5>
 							<div ng-if="item.User" class="aldetailpane">{{item.User}}</div>
@@ -149,13 +150,11 @@
 							<h5 ng-if="item.Database" class="aldetailheading">Database</h5>
 							<div ng-if="item.Database" class="aldetailpane">{{item.Database}}</div>
 							<h5 ng-if="item.Note" class="aldetailheading">Note</h5>
-							<div ng-if="item.Note">
+							<div ng-if="item.Note" style="padding:5px">
 								<pre ng-bind-html="item.Note | sanitize"></pre>
 							</div>
 						</div>
-					</td>
-					<td>
-						<a ng-if="item.Id" href="/sitecore/shell/Applications/Content%20Editor.aspx?sc_content=master&fo={{item.Id}}" class="btn fancybox fancybox.iframe">Edit Item</a>
+						<a ng-if="item.Id" href="/sitecore/shell/Applications/Content%20Editor.aspx?sc_content=master&fo={{item.Id}}" class="lite-btn fancybox fancybox.iframe">Edit Item</a>
 					</td>
 				</tr>
 			</table>

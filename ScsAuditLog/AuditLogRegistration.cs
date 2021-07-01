@@ -1,24 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Linq;
-using System.Text;
-using System.Web;
-using Sidekick.AuditLog.Model;
-using Sidekick.Core.Handlers;
-using System.Dynamic;
 using System.Reflection;
-using System.Web.Mvc;
 using System.Xml;
-using Lucene.Net.Search;
-using Sidekick.AuditLog.Core;
-using Sidekick.AuditLog.Model.Interface;
-using Sidekick.Core.ContentTree;
-using Sitecore.Configuration;
-using Sitecore.Data;
-using Sitecore.Data.Items;
-using Sitecore.Events;
+using Sidekick.AuditLog.Model;
 using Sidekick.Core;
+using Sitecore.Events;
 
 namespace Sidekick.AuditLog
 {
@@ -33,7 +19,7 @@ namespace Sidekick.AuditLog
 		public override string Identifier => "al";
 		public override string CssStyle { get; } = "width:100%;min-width:900px";
 
-		public AuditLogRegistration(string keepBackups, string keepRecords, string roles, string isAdmin, string users) : base(roles, isAdmin, users)
+		public AuditLogRegistration(string type, string keepBackups, string keepRecords, string logAnonymousEvents, string roles, string isAdmin, string users) : base(roles, isAdmin, users)
 		{
 			int backup;
 			int duration;
@@ -41,7 +27,14 @@ namespace Sidekick.AuditLog
 				backup = 0;
 			if (!int.TryParse(keepRecords, out duration))
 				duration = 0;
-			AuditLogger.Log = new Core.AuditLog(backup, duration);
+			if (type == "SQL")
+			{
+				AuditLogger.Log = new Core.SqlAuditLog(backup, duration, logAnonymousEvents == "true");
+			}
+			else
+			{
+				AuditLogger.Log = new Core.LuceneAuditLog(backup, duration);
+			}
 		}
 		public void RegisterCustomEventType(XmlNode node)
 		{

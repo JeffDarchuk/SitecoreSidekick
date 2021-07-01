@@ -32,7 +32,7 @@
 			}
 		};
 		vm.start = new Date();
-		vm.start.setDate(vm.start.getDate() - 10);
+		vm.start.setDate(vm.start.getDate() - 7);
 		vm.start = $.datepicker.formatDate("M d, yy", vm.start);
 		vm.end = $.datepicker.formatDate("M d, yy", new Date());
 		vm.queryText = "*";
@@ -202,13 +202,13 @@
 		})
 		.y(function (d) {
 			return yScale(d.Y);
-		})
-		.interpolate("basis");
-			vis.append('svg:path')
-				.attr('d', lineGen(g.Coordinates))
-				.attr('style', "stroke:"+g.Color)
-				.attr('stroke-width', 2)
-				.attr('fill', 'none');
+		});
+
+		vis.append('svg:path')
+			.attr('d', lineGen(g.Coordinates))
+			.attr('style', "stroke:"+g.Color)
+			.attr('stroke-width', 2)
+			.attr('fill', 'none');
 	}
 	function buildGraph(o) {
 		var parseDate = d3.time.format("%Y-%m-%d").parse;

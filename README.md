@@ -138,7 +138,17 @@ Each event is color coded as defined in the filter for a quick visual sweep of a
 
 ![using the details view](doc/auditlog-details.gif)
 
-### Configuring the Audit Log
+### Configuring the Audit Log Data Provider - Lucene / SQL
+
+By default the Audit Log will use Lucene to store audit events. This will store on the local server filesystem.
+
+You can choose to use SQL instead by following this:
+
+1. Create a new database on your SQL server using the provided [Sidekick.AuditLog.dacpac](ScsAuditLog/Sidekick.AuditLog.dacpac)
+2. Add a new connection string called `sidekick.auditlog` to your `App_Config/ConnectionStrings.config`_
+3. In the `Sidekick.AuditLog.config` change the `type` parameter from `LUCENE` to `SQL`
+
+### Other Audit Log Configuration Options
 
 Backups and record duration can be configured in the `zSCSAuditLog.config` file.  It is recommended that you keep only what would be useful as due to the volume of data collected, these logs can get get large on a site with a high number of events if keeping logs for more than a week.
 

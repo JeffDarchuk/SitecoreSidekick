@@ -1,10 +1,8 @@
-﻿using Sidekick.AuditLog.Core;
-
-namespace Sidekick.AuditLog
+﻿namespace Sidekick.AuditLog
 {
 	public class AuditLogger
 	{
-		internal static Core.AuditLog Log;
-		public static Core.AuditLog Current => Log;
+		internal static Core.IAuditLog Log;
+		public static Core.IAuditLog Current => Log;
 	}
 }

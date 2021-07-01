@@ -51,7 +51,9 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data.Linq" />
     <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -90,6 +92,8 @@
     <Compile Include="AuditLogRegistration.cs" />
     <Compile Include="Bootstrap.cs" />
     <Compile Include="ConcurrentHashSet.cs" />
+    <Compile Include="Core\IAuditLog.cs" />
+    <Compile Include="Core\SqlAuditLog.cs" />
     <Compile Include="Model\ActivityDataModel.cs" />
     <Compile Include="Model\AuditSourceRecord.cs" />
     <Compile Include="Model\AuditEventType.cs" />
@@ -104,8 +108,10 @@
     <Compile Include="Model\ItemAuditEntry.cs" />
     <Compile Include="Model\AuditGraph.cs" />
     <Compile Include="Model\AuditGraphEntry.cs" />
-    <Compile Include="Core\AuditLog.cs" />
+    <Compile Include="Core\LuceneAuditLog.cs" />
     <Compile Include="Model\Interface\IAuditEntry.cs" />
+    <Compile Include="Model\SqlAuditLogUser.cs" />
+    <Compile Include="Model\SqlAuditLogEntry.cs" />
     <Compile Include="Pipelines\GeneralEvent.cs" />
     <Compile Include="Pipelines\OnRename.cs" />
     <Compile Include="Pipelines\OnMoved.cs" />

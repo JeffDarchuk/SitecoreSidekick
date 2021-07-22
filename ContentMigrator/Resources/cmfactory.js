@@ -58,6 +58,9 @@
 			},
 			getDefaultOptions: function () {
 				return $http.get("/scs/cm/cmdefaultoperationparameters.scsvc")
+			},
+			isChecksumGenerating: function (server) {
+				return $http.post("/scs/cm/cmchecksumisgenerating.scsvc", "'"+server+"'")
 			}
 
 		};

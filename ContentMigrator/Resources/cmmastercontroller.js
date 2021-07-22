@@ -22,6 +22,8 @@
 		vm.displayLog = false;
 		vm.useItemBlaster = false;
 		vm.ignoreRevId = false;
+		vm.checksumBuilding = false;
+		vm.checksumRemoteBuilding = false;
 		CMfactory.getDefaultOptions().then(function (response) {
 			vm.children = response.data.Children;
 			vm.overwrite = response.data.Overwrite;
@@ -176,6 +178,18 @@
 		CMfactory.contentTreeServerList().then(function (response) {
 			vm.serverList = response.data;
 		});
+		vm.GetChecksumStatus = function () {
+			CMfactory.isChecksumGenerating("").then(function (response) {
+				vm.checksumBuilding = response.data;
+			})
+			if (vm.server) {
+				CMfactory.isChecksumGenerating(vm.server).then(function (response) {
+					vm.checksumRemoteBuilding = response.data;
+				})
+			}
+			if (scsActiveModule === "Content Migrator")
+				setTimeout(function () { vm.GetChecksumStatus() }, 3000);
+		}
 		vm.GetOperationsInProgress = function () {
 			CMfactory.operations().then(function (response) {
 				vm.completedOperations = new Array();
@@ -209,6 +223,7 @@
 				vm.streamResults(vm.operationId, vm.streaming.server, vm.streaming.id, vm.streaming.name, false);
 			}
 		}
+		vm.GetChecksumStatus();
 		vm.GetOperationsInProgress();
 		vm.getStatus = function () {
 			if (vm.operationId) {

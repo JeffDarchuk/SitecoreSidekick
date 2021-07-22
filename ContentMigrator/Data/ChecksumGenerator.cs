@@ -37,7 +37,7 @@ namespace Sidekick.ContentMigrator.Data
 				}
 				catch (Exception e)
 				{
-					Log.Warn("Checksum generation failed.",e, this);
+					Log.Warn("Checksum generation failed.", e, this);
 				}
 				finally
 				{

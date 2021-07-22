@@ -248,3 +248,7 @@ td.cmresultslabel {
 	color: darkgreen;
 	font-weight: bold;
 }
+.cmchecksumreport {
+	font-style: italic;
+	color: maroon;
+}

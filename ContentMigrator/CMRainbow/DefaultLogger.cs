@@ -177,5 +177,12 @@ namespace Sidekick.ContentMigrator.CMRainbow
 			AddToLog(status);
 			Log.Info(status, this);
 		}
+
+		public void LogSystemMessage(string message)
+		{
+			string status = $"{DateTime.Now:h:mm:ss tt} [SYSTEM] {message} ";
+			AddToLog(status);
+			Log.Info(status, this);
+		}
 	}
 }

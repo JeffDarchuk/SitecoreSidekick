@@ -14,9 +14,9 @@ namespace Sidekick.ContentMigrator.Core
 {
 	public class ChecksumManager : IChecksumManager
 	{
+		public static bool ChecksumRefreshing = false;
 		private object _checksumLocker = new object();
 		private bool _checksumRefreshQueued = false;
-		private bool _checksumRefreshing = false;
 		private int _timeSinceLastChecksumRefresh = 0;
 		private string[] _events = new[] { "item:saved", "item:renamed", "item:moved", "item:deleted", "item:added", "item:copied", "item:versionAdded", "item:versionRemoved" };
 		private static Checksum _checksum;
@@ -47,13 +47,13 @@ namespace Sidekick.ContentMigrator.Core
 			{
 				if (ContentMigrationRegistration.Root != null)
 				{
-					if ((_checksumRefreshQueued || _timeSinceLastChecksumRefresh > 120000) && !_checksumRefreshing)
+					if ((_checksumRefreshQueued || _timeSinceLastChecksumRefresh > 120000) && !ChecksumRefreshing)
 					{
-						_checksumRefreshing = true;
+						ChecksumRefreshing = true;
 						_timeSinceLastChecksumRefresh = 0;
 						var newChecksum = new ChecksumGenerator().Generate(ContentMigrationRegistration.Root.Nodes.Select(x => new ID(x.Id)).ToList(), "master");
 						_checksum = newChecksum ?? _checksum;
-						_checksumRefreshing = false;
+						ChecksumRefreshing = false;
 						_checksumRefreshQueued = false;
 					}
 					_timeSinceLastChecksumRefresh += 500;

@@ -16,6 +16,7 @@ namespace Sidekick.ContentMigrator.Services.Interface
 		IItemData GetRemoteItemData(Guid id, string server);
 		ChildrenItemDataModel GetRemoteItemDataWithChildren(Guid id, string server, Dictionary<Guid, string> rev = null);
 		IItemData DeserializeYaml(string yaml, Guid id);
+		bool ChecksumIsGenerating(string server);
 		CompareContentTreeNode GetContentTreeNode(RemoteContentTreeArgs args);
 		HmacServer HmacServer { get; }
 	}

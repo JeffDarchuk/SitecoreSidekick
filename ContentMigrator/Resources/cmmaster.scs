@@ -3,6 +3,8 @@
 		<fieldset>
 			<legend>Choose a Sitecore server to pull content from</legend>
 			<select ng-model="vm.server" ng-options="key as value for (key, value) in vm.serverList" ng-change="vm.serverSubmit()"> </select>
+			<div class="cmchecksumreport" ng-if="vm.checksumBuilding">Checksum is currently regenerating locally, may impact diff results.</div>
+			<div class="cmchecksumreport" ng-if="vm.checksumRemoteBuilding">Checksum is currently regenerating on the remote server, may impact diff results.</div>
 		</fieldset>
 		<fieldset class="cmresults" ng-if="vm.presets">
 			<legend>Preset Operations</legend>

@@ -34,6 +34,7 @@ using Sidekick.Core;
 using Sidekick.Core.Services.Interface;
 using Sidekick.Core.Shared.IoC;
 using Guid = System.Guid;
+using Sidekick.ContentMigrator.Core;
 
 namespace Sidekick.ContentMigrator
 {
@@ -293,6 +294,15 @@ namespace Sidekick.ContentMigrator
 		public ActionResult DefaultParameters(PresetRunModel model)
 		{
 			return ScsJson(new PullItemModel(_registration.GetScsRegistration<ContentMigrationRegistration>()));
+		}
+
+		[MchapOrLoggedIn]
+		[ActionName("cmchecksumisgenerating.scsvc")]
+		public ActionResult ChecksumIsGenerating(string server)
+		{
+			if (string.IsNullOrWhiteSpace(server))
+				return ScsJson(ChecksumManager.ChecksumRefreshing);
+			return ScsJson(_remoteContent.ChecksumIsGenerating(server));
 		}
 
 		private object OperationQueueLength(string operationId)

@@ -16,6 +16,8 @@ namespace Sidekick.ContentMigrator.Data
 		internal readonly Dictionary<Guid, Guid> _parentTracker = new Dictionary<Guid, Guid>();
 		internal readonly HashSet<Guid> _leafTracker = new HashSet<Guid>();
 		internal readonly Dictionary<Guid, short> _checksum = new Dictionary<Guid, short>();
+		internal DateTime StartTime;
+		internal DateTime FinishTime;
 		//t.ID, t.Name, t.TemplateID, t.MasterID, t.ParentID, v.Value
 		public void LoadRow(string id, string parentId, string value, string language, int? version)
 		{
@@ -50,6 +52,7 @@ namespace Sidekick.ContentMigrator.Data
 
 		public void Generate()
 		{
+			StartTime = DateTime.Now;
 			Queue<Guid> processing = new Queue<Guid>(_leafTracker);
 			while (processing.Any())
 			{
@@ -77,6 +80,8 @@ namespace Sidekick.ContentMigrator.Data
 			_childTracker.Clear();
 			_parentTracker.Clear();
 			_leafTracker.Clear();
+			FinishTime = DateTime.Now;
+			Log.Info($"[Sidekick] checksum generated in {FinishTime.Subtract(StartTime).TotalSeconds}", this);
 		}
 		public short GetHashCode16(string s)
 		{

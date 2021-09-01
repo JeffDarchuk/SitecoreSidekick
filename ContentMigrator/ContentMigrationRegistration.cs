@@ -2,6 +2,7 @@
 using Sidekick.ContentMigrator.Security;
 using Sitecore.Configuration;
 using Sitecore.Data;
+using Sitecore.Diagnostics;
 using Sitecore.Pipelines;
 using Sitecore.SecurityModel;
 using Sidekick.Core.ContentTree;
@@ -73,11 +74,13 @@ namespace Sidekick.ContentMigrator
 			_checksumManager.StartChecksumTimer();
 			if (string.IsNullOrWhiteSpace(AuthenticationSecret))
 			{
+				Log.Error($"[Sidekick] Sitecore Sidekick Content Migrator was initialized with an empty shared secret. Make a copy of zSidekick.ContentMigrator.Local.config.example, rename it to .config, and set up a unique, long, randomly generated shared secret there.", this);
 				throw new InvalidOperationException("Sitecore Sidekick Content Migrator was initialized with an empty shared secret. Make a copy of zSidekick.ContentMigrator.Local.config.example, rename it to .config, and set up a unique, long, randomly generated shared secret there.");
 			}
 
 			if (AuthenticationSecret.Length < 32)
 			{
+				Log.Error($"[Sidekick] Sitecore Sidekick Content Migrator was initialized with an insecure shared secret. Please use a shared secret of 32 or more characters.", this);
 				throw new InvalidOperationException("Sitecore Sidekick Content Migrator was initialized with an insecure shared secret. Please use a shared secret of 32 or more characters.");
 			}
 			base.Process(args);

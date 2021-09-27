@@ -178,11 +178,8 @@
 		vm.configureActivityColumns = function (cell) {
 			var fieldIndex = vm.alActivityAddlColumns.findIndex(x => x.fieldname == cell.fieldname);
 
-			if (fieldIndex > -1 && !cell.show) {
-				vm.alActivityAddlColumns[fieldIndex].show = false;
-			}
-			if (cell.show) {
-				vm.alActivityAddlColumns[fieldIndex].show = true;
+			if (fieldIndex > -1) {
+				vm.alActivityAddlColumns[fieldIndex].show = cell.show;
 			}
 		}
 	}

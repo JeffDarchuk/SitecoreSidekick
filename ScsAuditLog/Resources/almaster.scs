@@ -31,6 +31,7 @@
 				<span ng-click="vm.filterType='text'" ng-class="['tab', {alactive: vm.filterType==='text'}]">Content Filter</span>
 				<span ng-click="vm.filterType='item'" ng-class="['tab', {alactive: vm.filterType==='item'}]">Item Filter</span>
 				<span ng-click="vm.filterType='user'" ng-class="['tab', {alactive: vm.filterType==='user'}]">User Filter</span>
+				<span ng-click="vm.filterType='column'" ng-class="['tab', {alactive: vm.filterType==='column'}]">Column Filter</span>
 				<div class="alqueryfilterpane">
 					<div class="alqueryfilter" ng-if="!vm.filterType || vm.filterType === 'none'">
 						<a class="btn" ng-click="vm.query('*', 'content')">Query Without Additional Filters</a>
@@ -55,6 +56,23 @@
 						<select ng-model="vm.user" ng-change="vm.query(vm.user, 'user')">
 							<option ng-repeat="user in vm.users" value="{{user}}" >{{user}}</option>
 						</select>
+					</div>
+					<div class="alqueryfilter" ng-if="vm.filterType === 'column'">
+						<div class="almenu">
+							<table class="altable">
+								<tr>
+									<th>Column Name</th>
+									<th>Show</th>
+								</tr>
+								<tr ng-repeat="cell in vm.alActivityColumns">
+									<td>{{cell.fieldname}}</td>
+									<td>
+										<input id="{{cell.fieldname}}" type="checkbox"
+											ng-checked="{{cell.show}}" ng-model="cell.show" ng-disabled="cell.default == true" ng-change="vm.configureActivityColumns(cell)" />
+									</td>
+								</tr>
+							</table>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -126,11 +144,7 @@
 		<div ng-if="vm.events && vm.totalPages > 0">
 			<table class="altable">
 				<tr>
-					<th>Time</th>
-					<th>Item</th>
-					<th>User</th>
-					<th>Type</th>
-					<th>Details</th>
+					<th ng-repeat="cell in vm.alActivityColumns" ng-show="cell.show==true">{{cell.fieldname}}</th>
 				</tr>
 				<tr ng-repeat="item in vm.events"  ng-class="{even: $even, odd: $odd}">
 					<td ng-bind="item.TimeStamp | date:'yyyy-MM-dd HH:mm:ss'"></td>
@@ -147,6 +161,10 @@
 							<div ng-if="item.User" class="aldetailpane">{{item.User}}</div>
 							<h5 ng-if="item.Path" class="aldetailheading">Path</h5>
 							<div ng-if="item.Path" class="aldetailpane">{{item.Path}}</div>
+							<h5 ng-if="item.Id" class="aldetailheading">Item</h5>
+							<div ng-if="item.Id" class="aldetailpane">
+								<a ng-if="item.Id" href="/sitecore/shell/Applications/Content%20Editor.aspx?sc_content=master&fo={{item.Id}}" class="lite-btn fancybox fancybox.iframe">{{item.Id}}</a>
+							</div>
 							<h5 ng-if="item.Database" class="aldetailheading">Database</h5>
 							<div ng-if="item.Database" class="aldetailpane">{{item.Database}}</div>
 							<h5 ng-if="item.Note" class="aldetailheading">Note</h5>
@@ -155,6 +173,14 @@
 							</div>
 						</div>
 						<a ng-if="item.Id" href="/sitecore/shell/Applications/Content%20Editor.aspx?sc_content=master&fo={{item.Id}}" class="lite-btn fancybox fancybox.iframe">Edit Item</a>
+					</td>
+					<td ng-repeat="alCell in vm.alActivityAddlColumns" ng-show="alCell.show==true">
+						<div ng-if="alCell.fieldname === 'Id'">
+							<a ng-if="item.Id" href="/sitecore/shell/Applications/Content%20Editor.aspx?sc_content=master&fo={{item.Id}}" class="lite-btn fancybox fancybox.iframe">
+								<span>{{item[alCell.fieldname]}}</span>
+							</a>
+						</div>
+						<span ng-if="alCell.fieldname !== 'Id'">{{item[alCell.fieldname]}}</span>
 					</td>
 				</tr>
 			</table>

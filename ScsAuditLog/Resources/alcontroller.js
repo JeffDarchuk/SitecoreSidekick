@@ -42,6 +42,8 @@
 		vm.rebuildNum = -1;
 		vm.getDescendants = false;
 		vm.databases = new Object();
+		buildTableColumns(vm);
+
 		ALfactory.getUsers()
 			.then(function(response) {
 				vm.users = response.data;
@@ -162,6 +164,7 @@
 				vm.totalResults = response.data.total;
 				vm.resultsPerPage = response.data.perPage;
 				buildPagination(vm);
+				buildTableColumns(vm, response.data.results.length > 0 ? response.data.results[0] : null);
 			});
 		}
 		vm.selectAll = function(event) {
@@ -171,6 +174,17 @@
 		}
 		$("#alStartDate").datepicker({ dateFormat: "M d, yy" });
 		$("#alEndDate").datepicker({ dateFormat: "M d, yy" });
+
+		vm.configureActivityColumns = function (cell) {
+			var fieldIndex = vm.alActivityAddlColumns.findIndex(x => x.fieldname == cell.fieldname);
+
+			if (fieldIndex > -1 && !cell.show) {
+				vm.alActivityAddlColumns[fieldIndex].show = false;
+			}
+			if (cell.show) {
+				vm.alActivityAddlColumns[fieldIndex].show = true;
+			}
+		}
 	}
 	function buildPagination(vm) {
 		vm.totalPages = Math.ceil(vm.totalResults / vm.resultsPerPage);
@@ -231,5 +245,33 @@
 			.attr("transform", "translate(" + (MARGINS.left) + ",0)")
 			.attr('stroke-width', 1)
 			.call(yAxis);
+	}
+	function buildTableColumns(vm, activityData) {
+		let defaultColumns = [];
+		defaultColumns.push({ fieldname: "TimeStamp", caption: "Time", show: true, default: true });
+		defaultColumns.push({ fieldname: "ItemName", caption: "Item", show: true, default: true });
+		defaultColumns.push({ fieldname: "User", caption: "User", show: true, default: true });
+		defaultColumns.push({ fieldname: "Label", caption: "Type", show: true, default: true });
+		defaultColumns.push({ fieldname: "Details", caption: "Details", show: true, default: true });
+
+		if (activityData) {
+			const additionalColumns = Object.keys(activityData)
+				.filter(function (key) {
+					return (defaultColumns.filter(function (col) {
+						return col.fieldname.includes(key);
+					})).length == 0;
+				});
+
+			var additionalColObj = [];
+
+			additionalColumns.forEach(function (key) {
+				defaultColumns.push({ fieldname: key, caption: key, show: false, default: false });
+				additionalColObj.push({ fieldname: key, caption: key, show: false, default: false })
+			});
+
+			vm.alActivityAddlColumns = additionalColObj;
+		}
+
+		vm.alActivityColumns = defaultColumns;
 	}
 })();

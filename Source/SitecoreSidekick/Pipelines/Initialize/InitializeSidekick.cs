@@ -17,6 +17,7 @@ using System.Web.Routing;
 using System.Xml;
 using Sitecore;
 using System.Threading.Tasks;
+using System;
 
 namespace Sidekick.Core.Pipelines.Initialize
 {
@@ -43,19 +44,26 @@ namespace Sidekick.Core.Pipelines.Initialize
 			Assert.ArgumentNotNull(args, "args");
 			Task.Run(() =>
 			{
-				if (DisableItemGeneration?.ToLower() != "true")
+				try
 				{
-					EnsureDesktopButton();
-				}
-				if (Factory.GetDatabase("master", false) != null)
+					if (DisableItemGeneration?.ToLower() != "true")
+					{
+						EnsureDesktopButton();
+					}
+					if (Factory.GetDatabase("master", false) != null)
+					{
+						ScsMainRegistration maintmp = new ScsMainRegistration("", "", "");
+						_registration.RegisterSidekick(maintmp);
+						_registration.RegisterSidekick(maintmp.Controller, maintmp);
+						var pipeline = CorePipelineFactory.GetPipeline("scsRegister", string.Empty);
+						pipeline.Run(new PipelineArgs());
+						RegisterRoutes("scs");
+					}
+				}catch(Exception e)
 				{
-					ScsMainRegistration maintmp = new ScsMainRegistration("", "", "");
-					_registration.RegisterSidekick(maintmp);
-					_registration.RegisterSidekick(maintmp.Controller, maintmp);
-					var pipeline = CorePipelineFactory.GetPipeline("scsRegister", string.Empty);
-					pipeline.Run(new PipelineArgs());
-					RegisterRoutes("scs");
+					Log.Error("Problem initializing Sidekick.", e, this);
 				}
+
 			});
 		}
 

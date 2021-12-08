@@ -3,8 +3,38 @@
 		<fieldset>
 			<legend>Choose a Sitecore server to pull content from</legend>
 			<select ng-model="vm.server" ng-options="key as value for (key, value) in vm.serverList" ng-change="vm.serverSubmit()"> </select>
-			<div class="cmchecksumreport" ng-if="vm.checksumBuilding">Checksum is currently regenerating locally, may impact diff results.</div>
-			<div class="cmchecksumreport" ng-if="vm.checksumRemoteBuilding">Checksum is currently regenerating on the remote server, may impact diff results.</div>
+
+
+		</fieldset>
+		<fieldset class="cmchecksum">
+			<legend>Diff Management</legend>
+			<p>Content migrator uses checksums to execute the comparison operations.  To work properly an up to date checksum must be generated both locally and remotely.</p>
+			<table class="cmchecksumtable">
+				<tr ng-if="!vm.checksumBuilding.refreshing">
+					<td class="cmchecksumheader">Local</td>
+					<td span="cmlastchecksum">Last refresh {{vm.checksumBuilding.lastRefresh}} minutes ago</td>
+					<td><div class="btn cmchecksumbtn" ng-if="!vm.checksumBuilding.refreshing" ng-click="vm.regenerateChecksumLocal()">Regenerate</div></td>
+				</tr>
+				<tr ng-if="vm.checksumBuilding.refreshing">
+					<td class="cmchecksumheader">Local</td>
+					<td class="cmchecksumbuilding" colspan="2">
+						Locally checksum is currently regenerating.
+					</td>
+				</tr>
+				<tr ng-if="!vm.checksumRemoteBuilding.refreshing && vm.checksumRemoteBuilding.lastRefresh">
+					<td class="cmchecksumheader">Remote</td>
+					<td span="cmlastchecksum">Last refresh {{vm.checksumRemoteBuilding.lastRefresh}} minutes ago</td>
+					<td>
+						<div class="btn cmchecksumbtn" ng-if="!vm.checksumRemoteBuilding.refreshing" ng-click="vm.regenerateChecksumRemote()">Regenerate</div>
+					</td>
+				</tr>
+				<tr ng-if="vm.checksumRemoteBuilding.refreshing">
+					<td class="cmchecksumheader">Remote</td>
+					<td class="cmchecksumbuilding" colspan="2">
+						Remote checksum is currently regenerating.
+					</td>
+				</tr>
+			</table>
 		</fieldset>
 		<fieldset class="cmresults" ng-if="vm.presets">
 			<legend>Preset Operations</legend>

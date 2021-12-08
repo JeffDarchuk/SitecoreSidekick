@@ -9,7 +9,7 @@ namespace Sidekick.ContentMigrator.Core.Interface
 	interface IChecksumManager
 	{
 		void RegenerateChecksum(object sender = null, EventArgs args = null);
-		void StartChecksumTimer();
+		void StartChecksumTimer(bool manualChecksumOnly);
 		int GetChecksum(string id);
 	}
 }

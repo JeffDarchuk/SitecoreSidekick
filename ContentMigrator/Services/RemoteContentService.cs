@@ -48,12 +48,19 @@ namespace Sidekick.ContentMigrator.Services
 			_ss = signature;
 			_registration = registration;
 		}
-		public bool ChecksumIsGenerating(string server)
+		public object ChecksumIsGenerating(string server)
 		{
 			string url = $"{server}/scs/cm/cmchecksumisgenerating.scsvc";
 			string json = MakeRequest(url, "");
+			return _jsonSerializationService.DeserializeObject<object>(json);
+		}
+		public bool ChecksumRegenerate(string server)
+		{
+			string url = $"{server}/scs/cm/cmchecksumregenerate.scsvc";
+			string json = MakeRequest(url, "");
 			return _jsonSerializationService.DeserializeObject<bool>(json);
 		}
+
 		public IItemData GetRemoteItemData(Guid id, string server)
 		{
 			string url = $"{server}/scs/cm/cmgetitemyaml.scsvc";

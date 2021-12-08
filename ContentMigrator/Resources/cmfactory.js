@@ -61,6 +61,9 @@
 			},
 			isChecksumGenerating: function (server) {
 				return $http.post("/scs/cm/cmchecksumisgenerating.scsvc", "'"+server+"'")
+			},
+			checksumRegenerate: function (server) {
+				return $http.post("/scs/cm/cmchecksumregenerate.scsvc", "'" + server + "'")
 			}
 
 		};

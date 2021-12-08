@@ -190,6 +190,14 @@
 			if (scsActiveModule === "Content Migrator")
 				setTimeout(function () { vm.GetChecksumStatus() }, 3000);
 		}
+		vm.regenerateChecksumLocal = function () {
+			CMfactory.checksumRegenerate("")
+			vm.checksumBuilding.refreshing = true;
+		}
+		vm.regenerateChecksumRemote = function () {
+			CMfactory.checksumRegenerate(vm.server)
+			vm.checksumRemoteBuilding.refreshing = true;
+		}
 		vm.GetOperationsInProgress = function () {
 			CMfactory.operations().then(function (response) {
 				vm.completedOperations = new Array();

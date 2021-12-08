@@ -252,3 +252,14 @@ td.cmresultslabel {
 	font-style: italic;
 	color: maroon;
 }
+.cmchecksumheader {
+	font-size: 2em;
+	margin: 10px;
+}
+.cmchecksumbtn {
+	background-color: #ddd;
+	padding: 1px;
+}
+.cmchecksumtable td {
+	border-color: #777;
+}

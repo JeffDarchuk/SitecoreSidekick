@@ -301,8 +301,25 @@ namespace Sidekick.ContentMigrator
 		public ActionResult ChecksumIsGenerating(string server)
 		{
 			if (string.IsNullOrWhiteSpace(server))
-				return ScsJson(ChecksumManager.ChecksumRefreshing);
+				return ScsJson(new 
+				{ 
+					refreshing = ChecksumManager.ChecksumRefreshing,
+					lastRefresh = string.Format("{0:0.00}", DateTime.Now.Subtract(ChecksumManager.LastTimeRan).TotalMinutes)
+				});
 			return ScsJson(_remoteContent.ChecksumIsGenerating(server));
+		}
+
+		[MchapOrLoggedIn]
+		[ActionName("cmchecksumregenerate.scsvc")]
+		public ActionResult ChecksumRegenerate(string server)
+		{
+			if (string.IsNullOrWhiteSpace(server))
+			{
+				_checksumManager.RegenerateChecksum();
+				return ScsJson(true);
+			}
+				
+			return ScsJson(_remoteContent.ChecksumRegenerate(server));
 		}
 
 		private object OperationQueueLength(string operationId)

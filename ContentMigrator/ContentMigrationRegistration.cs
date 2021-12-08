@@ -40,6 +40,7 @@ namespace Sidekick.ContentMigrator
 		public override string Icon => "/scs/cm/resources/cm.png";
 		public override string Name => "Content Migrator";
 		public override string CssStyle => "width:100%;min-width:800px;";
+		public bool ManualChecksumOnly { get; set; } = true;
 		public string AuthenticationSecret { get; set; }
 		public bool DefaultChildren { get; set; } = true;
 		public bool DefaultOverwrite { get; set; } = true;
@@ -70,8 +71,11 @@ namespace Sidekick.ContentMigrator
 
 		public override void Process(PipelineArgs args)
 		{
-			_checksumManager.RegenerateChecksum();
-			_checksumManager.StartChecksumTimer();
+			if (!ManualChecksumOnly)
+			{
+				_checksumManager.RegenerateChecksum();
+			}
+			_checksumManager.StartChecksumTimer(ManualChecksumOnly);
 			if (string.IsNullOrWhiteSpace(AuthenticationSecret))
 			{
 				Log.Error($"[Sidekick] Sitecore Sidekick Content Migrator was initialized with an empty shared secret. Make a copy of zSidekick.ContentMigrator.Local.config.example, rename it to .config, and set up a unique, long, randomly generated shared secret there.", this);

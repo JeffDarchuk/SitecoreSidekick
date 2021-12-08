@@ -1,5 +1,6 @@
 $Webroot = "D:\Clients\Lincare\LinRoot\Docker\Containers\ltsc2019\sitecore-xp0\site-data"
-
+docker exec lincare_cm_1 iisreset
+start-sleep -seconds 10
 # Get-ChildItem "$PSScriptRoot\" -recurse -filter *.config -File | Foreach-Object{
 	# $fileName = Split-Path $_.FullName -leaf
 	# if (-Not $_.FullName.Contains("\doc\") -and $fileName.StartsWith("Sidekick", "CurrentCultureIgnoreCase") -and $fileName.EndsWith(".config", "CurrentCultureIgnoreCase") -and -not $fileName.EndsWith(".dll.config", "CurrentCultureIgnoreCase")){

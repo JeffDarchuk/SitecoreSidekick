@@ -26,6 +26,13 @@
 					<DefaultUseItemBlaster>false</DefaultUseItemBlaster>
 					<DefaultIgnoreRevId>false</DefaultIgnoreRevId>
 
+					<!-- 
+						This is recommended to stay true if you have a massive amount of content.  By default the checksum manager
+						regenerates the checksum every two minutes or on item event.  If you have 1 million + items in the area
+						managed by Content Migrator it may be too expensive of an operation to be useful.
+					-->
+					<ManualChecksumOnly>true</ManualChecksumOnly>
+
 
 					<!--
 						Sync Root Settings

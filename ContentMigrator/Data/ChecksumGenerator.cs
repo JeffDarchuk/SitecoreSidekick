@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
+using Sidekick.Core.Services.Interface;
 using Sitecore;
 using Sitecore.Data;
 using Sitecore.Diagnostics;
@@ -13,6 +14,11 @@ namespace Sidekick.ContentMigrator.Data
 	{
 		public Checksum Generate(List<ID> ids, string database)
 		{
+			var checksum = new Checksum();
+			foreach (var id in ids)
+			{
+				checksum.LoadRow(id.Guid.ToString().ToUpper(), "11111111-1111-1111-1111-111111111111", "11111111-1111-1111-1111-111111111111", "en", 1);
+			}
 			using (var sqlConnection = new SqlConnection(System.Configuration.ConfigurationManager.ConnectionStrings[database].ConnectionString))
 			{
 				try
@@ -24,7 +30,7 @@ namespace Sidekick.ContentMigrator.Data
 
 						using (var reader = sqlCommand.ExecuteReader())
 						{
-							var checksum = new Checksum();
+							
 							while (reader.Read())
 							{
 								checksum.LoadRow(reader["ID"].ToString(), reader["ParentID"].ToString(), reader["Value"].ToString(), reader["Language"].ToString(), reader["Version"] as int?);
@@ -59,7 +65,7 @@ namespace Sidekick.ContentMigrator.Data
 					SELECT Id
 					FROM Items
 					WITH (NOLOCK)
-					where Id {BuildSqlInStatement(id, "r")}
+					where ParentID {BuildSqlInStatement(id, "r")}
 				), tree AS (
 					SELECT x.ID, x.ParentID
 					FROM Items x

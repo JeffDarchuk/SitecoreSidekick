@@ -386,7 +386,7 @@ namespace Sidekick.ContentMigrator
 				return null;
 			}
 
-			return data.Id == "" ? ContentMigrationRegistration.Root : new CompareContentTreeNode(_sitecore.GetItemData(data.Id));
+			return data.Id == "" ? ContentMigrationRegistration.Root : new CompareContentTreeNode(_sitecore.GetItemData(data.Id, data.Database));
 		}
 	}
 }

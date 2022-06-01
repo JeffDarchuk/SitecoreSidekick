@@ -9,6 +9,7 @@ namespace Sidekick.Core.Models
 	public class ContentSelectedRelatedModel
 	{
 		public string Server { get; set; }
+		public string Database { get; set; }
 		public List<string> SelectedIds { get; set; }
 	}
 }

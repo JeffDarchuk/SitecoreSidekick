@@ -22,6 +22,15 @@ namespace Sidekick.Core.Services
 	{
 		private readonly Database _db = Factory.GetDatabase("master", false);
 
+		public ScsSitecoreItem GetScsSitecoreItem(string id, string database)
+		{
+			var db = string.IsNullOrWhiteSpace(database) ? _db : Factory.GetDatabase(database,false);
+
+			Item item = db.GetItem(id);
+
+			return new ScsSitecoreItem(item);
+		}
+
 		public ScsSitecoreItem GetScsSitecoreItem(string id)
 		{
 			Item item = _db.GetItem(id);
@@ -92,7 +101,7 @@ namespace Sidekick.Core.Services
 
 		public IEnumerable<string> GetVersions(IItemData itemData)
 		{
-			Item item = GetItem(itemData.Id);
+			Item item = GetItem(itemData.Id, itemData.DatabaseName);
 			return item.Versions.GetVersions(true).Select(v => v[FieldIDs.Revision]);
 		}
 

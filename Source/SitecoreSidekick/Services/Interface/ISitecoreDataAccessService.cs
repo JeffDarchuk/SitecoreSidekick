@@ -13,6 +13,7 @@ namespace Sidekick.Core.Services.Interface
 	public interface ISitecoreDataAccessService
 	{
 		ScsSitecoreItem GetScsSitecoreItem(string id);
+		ScsSitecoreItem GetScsSitecoreItem(string id, string database);
 		IItemData GetLatestItemData(string idataId, string database = null);
 		IItemData GetLatestItemData(Guid idataId, string database = null);
 		IItemData GetItemData(string idataId, string database = null);

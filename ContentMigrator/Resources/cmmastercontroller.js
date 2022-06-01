@@ -63,7 +63,7 @@
 					vm.events.selected.splice(index, 1);
 					vm.events.selectedIds.splice(index, 1);
 				}
-				ScsFactory.contentTreeSelectedRelated(vm.events.selectedIds, vm.server).then(function (response) {
+				ScsFactory.contentTreeSelectedRelated(vm.events.selectedIds, vm.server, val.DatabaseName).then(function (response) {
 					vm.events.relatedIds = response.data;
 				});
 			}

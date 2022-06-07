@@ -9,6 +9,7 @@ namespace Sidekick.ContentMigrator.Models
 	public class DiffRequestModel
 	{
 		public string Id;
+		public string Database;
 		public string Server;
 	}
 }

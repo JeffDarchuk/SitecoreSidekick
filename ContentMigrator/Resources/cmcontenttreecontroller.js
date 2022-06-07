@@ -15,7 +15,7 @@
 		vm.buildDiff = function(status, id, events) {
 			if (status !== "cmfieldchanged")
 				return;
-			CMfactory.getDiff(id, vm.server).then(function(response) {
+			CMfactory.getDiff(id, vm.db, vm.server).then(function(response) {
 				events.lastClicked = response.data;
 				events.diff = id;
 				vm.setupCompare(events.lastClicked.Compare, events.showAll, events);
@@ -42,6 +42,7 @@
 		$scope.init = function (nodeId, selectedId, events, server, database) {
 			vm.events = events;
 			vm.data = nodeId;
+			vm.db = database;
 			vm.loading = true;
 			if (typeof(nodeId) === "object")
 				vm.data.loading = true;

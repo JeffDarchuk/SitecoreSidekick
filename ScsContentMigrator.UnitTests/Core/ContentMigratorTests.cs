@@ -28,7 +28,7 @@ namespace Sidekick.ContentMigrator.UnitTests.Core
 			var item = Substitute.For<IItemData>();
 			item.ParentId.Returns(parent);
 			ContentMigration contentMigration = CreateInstance<ContentMigration>();
-			GetSubstitute<IRemoteContentService>().GetRemoteItemData(Arg.Any<Guid>(), Arg.Any<string>()).Returns(Substitute.For<IItemData>());
+			GetSubstitute<IRemoteContentService>().GetRemoteItemData(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>()).Returns(Substitute.For<IItemData>());
 			GetSubstitute<IContentItemPuller>().ItemsToInstall.Returns(new BlockingCollection<IItemData>());
 			GetSubstitute<ISitecoreDataAccessService>().GetItemData(parent).Returns(Substitute.For<IItemData>());			
 
@@ -48,9 +48,9 @@ namespace Sidekick.ContentMigrator.UnitTests.Core
 			var parentItem = Substitute.For<IItemData>();
 			parentItem.ParentId.Returns(secondParent);
 			ContentMigration contentMigration = CreateInstance<ContentMigration>();
-			GetSubstitute<IRemoteContentService>().GetRemoteItemData(initialTarget, Arg.Any<string>()).Returns(item);
-			GetSubstitute<IRemoteContentService>().GetRemoteItemData(firstParent, Arg.Any<string>()).Returns(parentItem);
-			GetSubstitute<IRemoteContentService>().GetRemoteItemData(secondParent, Arg.Any<string>()).Returns(Substitute.For<IItemData>());
+			GetSubstitute<IRemoteContentService>().GetRemoteItemData(initialTarget, Arg.Any<string>(), Arg.Any<string>()).Returns(item);
+			GetSubstitute<IRemoteContentService>().GetRemoteItemData(firstParent, Arg.Any<string>(), Arg.Any<string>()).Returns(parentItem);
+			GetSubstitute<IRemoteContentService>().GetRemoteItemData(secondParent, Arg.Any<string>(), Arg.Any<string>()).Returns(Substitute.For<IItemData>());
 			GetSubstitute<IContentItemPuller>().ItemsToInstall.Returns(new BlockingCollection<IItemData>());
 			GetSubstitute<ISitecoreDataAccessService>().GetItemData(initialTarget).Returns((IItemData)null);
 			GetSubstitute<ISitecoreDataAccessService>().GetItemData(firstParent).Returns((IItemData)null);
@@ -71,7 +71,7 @@ namespace Sidekick.ContentMigrator.UnitTests.Core
 
 			contentMigration.StartContentMigration(new PullItemModel {PullParent = false, Ids = new List<string>{Guid.NewGuid().ToString()}});
 
-			GetSubstitute<IRemoteContentService>().Received(0).GetRemoteItemData(Arg.Any<Guid>(), Arg.Any<string>());
+			GetSubstitute<IRemoteContentService>().Received(0).GetRemoteItemData(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>());
 			GetSubstitute<ISitecoreDataAccessService>().Received(0).GetItemData(Arg.Any<Guid>());
 		}
 
@@ -94,7 +94,7 @@ namespace Sidekick.ContentMigrator.UnitTests.Core
 
 			contentMigration.StartContentMigration(new PullItemModel { PullParent = false, Ids = new List<string> { Guid.NewGuid().ToString() } });
 
-			GetSubstitute<IContentItemPuller>().Received(1).StartGatheringItems(Arg.Any<IEnumerable<Guid>>(), Arg.Any<int>(), Arg.Any<bool>(), Arg.Any<string>(), Arg.Any<CancellationToken>(), Arg.Any<bool>());
+			GetSubstitute<IContentItemPuller>().Received(1).StartGatheringItems(Arg.Any<IEnumerable<Guid>>(), Arg.Any<string>(), Arg.Any<int>(), Arg.Any<bool>(), Arg.Any<string>(), Arg.Any<CancellationToken>(), Arg.Any<bool>());
 		}
 
 		[Fact]

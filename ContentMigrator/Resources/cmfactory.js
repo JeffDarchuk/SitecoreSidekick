@@ -45,8 +45,8 @@
 			queuedItems: function (operationId) {
 				return $http.post("/scs/cm/cmqueuelength.scsvc", "'" + operationId + "'");
 			},
-			getDiff: function (id, server) {
-				var data = { "id": id, "server": server };
+			getDiff: function (id, database, server) {
+				var data = { "id": id, "server": server, "database": database };
 				return $http.post("/scs/cm/cmbuilddiff.scsvc", data);
 			},
 			getPresets: function (server) {

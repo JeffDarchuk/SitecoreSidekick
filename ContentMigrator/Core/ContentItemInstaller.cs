@@ -161,7 +161,7 @@ namespace Sidekick.ContentMigrator.Core
 			try
 			{
 
-				var context = bulkLoader.NewBulkLoadContext("master");
+				var context = bulkLoader.NewBulkLoadContext(args.Database);
 				bulkLoader.LoadItems(context, GetAllItemsToCreate(context, cancellationToken));
 				_checksumManager.RegenerateChecksum();
 			}
@@ -206,7 +206,7 @@ namespace Sidekick.ContentMigrator.Core
 							CurrentlyProcessing.Add(remoteData.Id);
 						}
 
-						IItemData localData = _sitecore.GetItemData(remoteData.Id);
+						IItemData localData = _sitecore.GetItemData(remoteData.Id, args.Database);
 
 						ProcessItem(args, localData, remoteData);
 

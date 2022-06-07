@@ -164,7 +164,7 @@ namespace Sidekick.Core.Services
 		}
 		private string GetItemRevision(Item item)
 		{
-			var ret = item.Languages.Aggregate(new StringBuilder(), (sb, lang) => sb.Append(GetItem(item.ID.Guid, null, lang, Version.Latest).Versions.GetVersions().Aggregate(new StringBuilder(), (sb2, version) => sb2.Append(version[FieldIDs.Revision])).ToString())).ToString().GetHashCode().ToString();
+			var ret = item.Languages.Aggregate(new StringBuilder(), (sb, lang) => sb.Append(GetItem(item.ID.Guid, item.Database.Name, lang, Version.Latest).Versions.GetVersions().Aggregate(new StringBuilder(), (sb2, version) => sb2.Append(version[FieldIDs.Revision])).ToString())).ToString().GetHashCode().ToString();
 
 			return ret;
 		}

@@ -70,14 +70,14 @@ namespace Sidekick.ContentMigrator.Data
 			return false;
 		}
 
-		public void BuildDiff(string server)
+		public void BuildDiff(string server, string database)
 		{
 			Compare = new Dictionary<string, List<Tuple<string, string>>>();
 			IItemData itemData = null;
-			itemData = Bootstrap.Container.Resolve<IRemoteContentService>().GetRemoteItemData(Guid.Parse(Id), server);
+			itemData = Bootstrap.Container.Resolve<IRemoteContentService>().GetRemoteItemData(Guid.Parse(Id), database, server);
 			using (new SecurityDisabler())
 			{
-				var localItem = Factory.GetDatabase("master", true).DataManager.DataEngine.GetItem(new ID(Id), LanguageManager.DefaultLanguage, Sitecore.Data.Version.Latest);
+				var localItem = Factory.GetDatabase(database, true).DataManager.DataEngine.GetItem(new ID(Id), LanguageManager.DefaultLanguage, Sitecore.Data.Version.Latest);
 				localItem.Fields.ReadAll();
 				foreach (var chk in itemData.SharedFields)
 				{

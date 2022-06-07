@@ -9,6 +9,7 @@ namespace Sidekick.ContentMigrator.Models
 	public class RevisionModel
 	{
 		public string Id;
+		public string Database;
 		public Dictionary<Guid, string> Rev;
 	}
 }

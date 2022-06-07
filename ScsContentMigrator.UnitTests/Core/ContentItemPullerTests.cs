@@ -25,7 +25,7 @@ namespace Sidekick.ContentMigrator.UnitTests.Core
 
 			List<Guid> expectedGuids = new List<Guid> {Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()};
 
-			contentItemPuller.StartGatheringItems(expectedGuids, 0, false, "", CancellationToken.None, false);
+			contentItemPuller.StartGatheringItems(expectedGuids, "master", 0, false, "", CancellationToken.None, false);
 
 			contentItemPuller.ProcessingIds.Count.Should().Be(expectedGuids.Count);
 		}
@@ -34,10 +34,10 @@ namespace Sidekick.ContentMigrator.UnitTests.Core
 		public void GatherItems_TakesFromProcessingList()
 		{
 			ContentItemPuller contentItemPuller = CreateInstance<ContentItemPuller>();
-			GetSubstitute<IRemoteContentService>().GetRemoteItemDataWithChildren(Arg.Any<Guid>(), Arg.Any<string>()).Returns(new ChildrenItemDataModel());
+			GetSubstitute<IRemoteContentService>().GetRemoteItemDataWithChildren(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>()).Returns(new ChildrenItemDataModel());
 			contentItemPuller.ProcessingIds.Add(Guid.NewGuid());
 			
-			contentItemPuller.GatherItems(false, "", CancellationToken.None, false);
+			contentItemPuller.GatherItems(false, "master", "", CancellationToken.None, false);
 
 			contentItemPuller.ProcessingIds.Should().BeEmpty();
 		}
@@ -46,22 +46,22 @@ namespace Sidekick.ContentMigrator.UnitTests.Core
 		public void GatherItems_FetchesRemoteContent()
 		{
 			ContentItemPuller contentItemPuller = CreateInstance<ContentItemPuller>();
-			GetSubstitute<IRemoteContentService>().GetRemoteItemDataWithChildren(Arg.Any<Guid>(), Arg.Any<string>()).Returns(new ChildrenItemDataModel());
+			GetSubstitute<IRemoteContentService>().GetRemoteItemDataWithChildren(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>()).Returns(new ChildrenItemDataModel());
 			contentItemPuller.ProcessingIds.Add(Guid.NewGuid());
 
-			contentItemPuller.GatherItems(false, "", CancellationToken.None, false);
+			contentItemPuller.GatherItems(false, "master", "", CancellationToken.None, false);
 
-			GetSubstitute<IRemoteContentService>().Received(1).GetRemoteItemDataWithChildren(Arg.Any<Guid>(), Arg.Any<string>());
+			GetSubstitute<IRemoteContentService>().Received(1).GetRemoteItemDataWithChildren(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>());
 		}
 
 		[Fact]
 		public void GatherItems_DeserializesRemoteContentItem()
 		{
 			ContentItemPuller contentItemPuller = CreateInstance<ContentItemPuller>();
-			GetSubstitute<IRemoteContentService>().GetRemoteItemDataWithChildren(Arg.Any<Guid>(), Arg.Any<string>()).Returns(new ChildrenItemDataModel());
+			GetSubstitute<IRemoteContentService>().GetRemoteItemDataWithChildren(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>()).Returns(new ChildrenItemDataModel());
 			contentItemPuller.ProcessingIds.Add(Guid.NewGuid());
 
-			contentItemPuller.GatherItems(false, "", CancellationToken.None, false);
+			contentItemPuller.GatherItems(false, "master", "", CancellationToken.None, false);
 
 			GetSubstitute<IYamlSerializationService>().Received(1).DeserializeYaml(Arg.Any<string>(), Arg.Any<string>());
 		}
@@ -72,11 +72,11 @@ namespace Sidekick.ContentMigrator.UnitTests.Core
 			IItemData expectedItemData = Substitute.For<IItemData>();
 			expectedItemData.Name.Returns("ExpectedName");
 			ContentItemPuller contentItemPuller = CreateInstance<ContentItemPuller>();
-			GetSubstitute<IRemoteContentService>().GetRemoteItemDataWithChildren(Arg.Any<Guid>(), Arg.Any<string>()).Returns(new ChildrenItemDataModel());
+			GetSubstitute<IRemoteContentService>().GetRemoteItemDataWithChildren(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>()).Returns(new ChildrenItemDataModel());
 			GetSubstitute<IYamlSerializationService>().DeserializeYaml(Arg.Any<string>(), Arg.Any<string>()).Returns(expectedItemData);
 			contentItemPuller.ProcessingIds.Add(Guid.NewGuid());
 
-			contentItemPuller.GatherItems(false, "", CancellationToken.None, false);
+			contentItemPuller.GatherItems(false, "master", "", CancellationToken.None, false);
 
 			contentItemPuller.GatheredRemoteItems.Should().NotBeEmpty();
 			contentItemPuller.GatheredRemoteItems.Should().Contain(expectedItemData);
@@ -90,11 +90,11 @@ namespace Sidekick.ContentMigrator.UnitTests.Core
 			expectedItemData.GetChildren().Returns(new List<IItemData> {Substitute.For<IItemData>()});
 
 			ContentItemPuller contentItemPuller = CreateInstance<ContentItemPuller>();
-			GetSubstitute<IRemoteContentService>().GetRemoteItemDataWithChildren(Arg.Any<Guid>(), Arg.Any<string>()).Returns(new ChildrenItemDataModel());
+			GetSubstitute<IRemoteContentService>().GetRemoteItemDataWithChildren(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>()).Returns(new ChildrenItemDataModel());
 			GetSubstitute<IYamlSerializationService>().DeserializeYaml(Arg.Any<string>(), Arg.Any<string>()).Returns(expectedItemData);
 			contentItemPuller.ProcessingIds.Add(Guid.NewGuid());
 
-			contentItemPuller.GatherItems(false, "", CancellationToken.None, false);
+			contentItemPuller.GatherItems(false, "master", "", CancellationToken.None, false);
 
 			contentItemPuller.GatheredRemoteItems.Count.Should().Be(1);
 		}
@@ -109,12 +109,12 @@ namespace Sidekick.ContentMigrator.UnitTests.Core
 			expectedItemData.GetChildren().Returns(new List<IItemData> { Substitute.For<IItemData>() });
 
 			ContentItemPuller contentItemPuller = CreateInstance<ContentItemPuller>();
-			GetSubstitute<IRemoteContentService>().GetRemoteItemDataWithChildren(parentGuid, Arg.Any<string>()).Returns(new ChildrenItemDataModel {GrandChildren = new List<Guid> {childGuid}});
-			GetSubstitute<IRemoteContentService>().GetRemoteItemDataWithChildren(childGuid, Arg.Any<string>()).Returns(new ChildrenItemDataModel());
+			GetSubstitute<IRemoteContentService>().GetRemoteItemDataWithChildren(parentGuid, Arg.Any<string>(), Arg.Any<string>()).Returns(new ChildrenItemDataModel {GrandChildren = new List<Guid> {childGuid}});
+			GetSubstitute<IRemoteContentService>().GetRemoteItemDataWithChildren(childGuid, Arg.Any<string>(), Arg.Any<string>()).Returns(new ChildrenItemDataModel());
 			GetSubstitute<IYamlSerializationService>().DeserializeYaml(Arg.Any<string>(), Arg.Any<string>()).Returns(expectedItemData);
 			contentItemPuller.ProcessingIds.Add(parentGuid);
 
-			contentItemPuller.GatherItems(true, "", CancellationToken.None, false);
+			contentItemPuller.GatherItems(true, "master", "", CancellationToken.None, false);
 
 			contentItemPuller.GatheredRemoteItems.Count.Should().Be(2);
 		}
@@ -123,7 +123,7 @@ namespace Sidekick.ContentMigrator.UnitTests.Core
 		public void GatherItems_MultipleItems_CanceledDuringFirstItem_OnlyGathersOneItem()
 		{
 			ContentItemPuller contentItemPuller = CreateInstance<ContentItemPuller>();
-			GetSubstitute<IRemoteContentService>().GetRemoteItemDataWithChildren(Arg.Any<Guid>(), Arg.Any<string>()).Returns(ci =>
+			GetSubstitute<IRemoteContentService>().GetRemoteItemDataWithChildren(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>()).Returns(ci =>
 			{
 				// Introduce a delay
 				Thread.Sleep(10);
@@ -135,7 +135,7 @@ namespace Sidekick.ContentMigrator.UnitTests.Core
 			contentItemPuller.ProcessingIds.Add(Guid.NewGuid());
 
 			CancellationTokenSource cts = new CancellationTokenSource(10);
-			contentItemPuller.GatherItems(false, "", cts.Token, false);
+			contentItemPuller.GatherItems(false, "master", "", cts.Token, false);
 
 			contentItemPuller.GatheredRemoteItems.Count.Should().BeLessThan(3);
 		}
@@ -148,13 +148,13 @@ namespace Sidekick.ContentMigrator.UnitTests.Core
 			expectedItemData.GetChildren().Returns(new List<IItemData> { Substitute.For<IItemData>() });
 
 			ContentItemPuller contentItemPuller = CreateInstance<ContentItemPuller>();
-			GetSubstitute<IRemoteContentService>().GetRemoteItemDataWithChildren(Arg.Any<Guid>(), Arg.Any<string>()).Returns(new ChildrenItemDataModel());
+			GetSubstitute<IRemoteContentService>().GetRemoteItemDataWithChildren(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>()).Returns(new ChildrenItemDataModel());
 			GetSubstitute<IYamlSerializationService>().DeserializeYaml(Arg.Any<string>(), Arg.Any<string>()).Returns(expectedItemData);
 			contentItemPuller.ProcessingIds.Add(Guid.NewGuid());
 			contentItemPuller.ProcessingIds.Add(Guid.NewGuid());
 			contentItemPuller.ProcessingIds.Add(Guid.NewGuid());
 
-			contentItemPuller.GatherItems(false, "", CancellationToken.None, false);
+			contentItemPuller.GatherItems(false, "master", "", CancellationToken.None, false);
 
 			contentItemPuller.GatheredRemoteItems.Count.Should().Be(3);
 		}
@@ -168,7 +168,7 @@ namespace Sidekick.ContentMigrator.UnitTests.Core
 			expectedItemData.GetChildren().Returns(new List<IItemData> { Substitute.For<IItemData>() });
 
 			ContentItemPuller contentItemPuller = CreateInstance<ContentItemPuller>();
-			GetSubstitute<IRemoteContentService>().GetRemoteItemDataWithChildren(Arg.Any<Guid>(), Arg.Any<string>()).Returns(new ChildrenItemDataModel());
+			GetSubstitute<IRemoteContentService>().GetRemoteItemDataWithChildren(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>()).Returns(new ChildrenItemDataModel());
 			GetSubstitute<IYamlSerializationService>().DeserializeYaml(Arg.Any<string>(), Arg.Any<string>()).Returns(expectedItemData);
 			for (int i = 0; i < expectedCount; i++)
 				contentItemPuller.ProcessingIds.Add(Guid.NewGuid());
@@ -179,15 +179,15 @@ namespace Sidekick.ContentMigrator.UnitTests.Core
 			{
 				Task.Run(() =>
 				{
-					contentItemPuller.GatherItems(false, "", cancellationTokenSource.Token, false);
+					contentItemPuller.GatherItems(false, "master", "", cancellationTokenSource.Token, false);
 				}),
 				Task.Run(() =>
 				{
-					contentItemPuller.GatherItems(false, "", cancellationTokenSource.Token, false);
+					contentItemPuller.GatherItems(false, "master", "", cancellationTokenSource.Token, false);
 				}),
 				Task.Run(() =>
 				{
-					contentItemPuller.GatherItems(false, "", cancellationTokenSource.Token, false);
+					contentItemPuller.GatherItems(false, "master", "", cancellationTokenSource.Token, false);
 				})
 			};
 

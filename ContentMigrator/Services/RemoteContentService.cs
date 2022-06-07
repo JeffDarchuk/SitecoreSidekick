@@ -61,7 +61,7 @@ namespace Sidekick.ContentMigrator.Services
 			return _jsonSerializationService.DeserializeObject<bool>(json);
 		}
 
-		public IItemData GetRemoteItemData(Guid id, string server)
+		public IItemData GetRemoteItemData(Guid id, string database, string server)
 		{
 			string url = $"{server}/scs/cm/cmgetitemyaml.scsvc";
 			string parameters = _jsonSerializationService.SerializeObject(id);
@@ -69,10 +69,10 @@ namespace Sidekick.ContentMigrator.Services
 			return DeserializeYaml(yaml, id);
 		}
 
-		public ChildrenItemDataModel GetRemoteItemDataWithChildren(Guid id, string server, Dictionary<Guid, string> rev = null)
+		public ChildrenItemDataModel GetRemoteItemDataWithChildren(Guid id, string database, string server, Dictionary<Guid, string> rev = null)
 		{
 			string url = $"{server}/scs/cm/cmgetitemyamlwithchildren.scsvc";
-			string parameters = _jsonSerializationService.SerializeObject(new {id, rev});
+			string parameters = _jsonSerializationService.SerializeObject(new {id, rev, database});
 			string json = MakeRequest(url, parameters);
 			return _jsonSerializationService.DeserializeObject<ChildrenItemDataModel>(json);
 		}

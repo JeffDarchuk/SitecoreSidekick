@@ -41,8 +41,8 @@ namespace Sidekick.ContentMigrator.Core
 
 		public bool Completed { get; private set; }
 
-		public void StartGatheringItems(IEnumerable<Guid> rootIds, int threads, bool getChildren, string server, CancellationToken cancellationToken, bool ignoreRevId)
-		{			
+		public void StartGatheringItems(IEnumerable<Guid> rootIds, string database, int threads, bool getChildren, string server, CancellationToken cancellationToken, bool ignoreRevId)
+		{
 			foreach (Guid id in rootIds)
 			{
 				ProcessingIds.Add(id);
@@ -51,12 +51,12 @@ namespace Sidekick.ContentMigrator.Core
 			{
 				Task.Run(async () =>
 				{
-					await GatherItems(getChildren, server, cancellationToken, ignoreRevId);
+					await GatherItems(getChildren, database, server, cancellationToken, ignoreRevId);
 				});
 			}
 		}
 
-		internal async Task GatherItems(bool getChildren, string server, CancellationToken cancellationToken, bool ignoreRevId)
+		internal async Task GatherItems(bool getChildren, string database, string server, CancellationToken cancellationToken, bool ignoreRevId)
 		{
 			ChildrenItemDataModel buffer = null;
 			while (!Completed)
@@ -73,10 +73,12 @@ namespace Sidekick.ContentMigrator.Core
 						break;
 					}
 					lock (_locker)
+					{
 						_processing++;
+					}
 					if (buffer == null)
 					{
-						buffer = _remoteContent.GetRemoteItemDataWithChildren(id, server, ignoreRevId ? null : _sitecore.GetItemAndChildrenRevision(id));
+						buffer = _remoteContent.GetRemoteItemDataWithChildren(id, database, server, ignoreRevId ? null : _sitecore.GetItemAndChildrenRevision(id, database));
 					}
 
 					foreach (var item in (getChildren ? buffer.Items : buffer.Items.Where(x => x.Key == id)))
@@ -88,7 +90,7 @@ namespace Sidekick.ContentMigrator.Core
 						}
 						else
 						{
-							GatheredRemoteItems.Add(_sitecore.GetItemData(item.Key), cancellationToken);
+							GatheredRemoteItems.Add(_sitecore.GetItemData(item.Key, database), cancellationToken);
 						}
 					}
 					if (getChildren && buffer.GrandChildren != null)

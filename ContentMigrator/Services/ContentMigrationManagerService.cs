@@ -20,7 +20,7 @@ namespace Sidekick.ContentMigrator.Services
 		private readonly Dictionary<string, IContentMigration> _migrations = new Dictionary<string, IContentMigration>();
 		public ContentMigration StartContentMigration(PullItemModel model)
 		{
-			Log.Info($"Starting Content Migration...\n{model.Server}\n{string.Join(", ", model.Ids)}", this);
+			Log.Info($"Starting Content Migration...\n{model.Server}\n{string.Join(", ", model.Ids)}\n{model.Database}", this);
 			string id = Guid.NewGuid().ToString();
 			ContentMigration newMigration = new ContentMigration();
 			newMigration.Status.OperationId = id;

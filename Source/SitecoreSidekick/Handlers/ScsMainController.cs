@@ -107,7 +107,7 @@ namespace Sidekick.Core.Handlers
 				{
 					var node = _jsonSerializationService.DeserializeObject<Dictionary<string, string>>(
 						await _httpClientService.Post($"{data.Server}/scs/platform/contenttreeselectedrelated.scsvc",
-							$@"{{ ""selectedIds"": {_jsonSerializationService.SerializeObject(data.SelectedIds)}, ""server"": null}}").ConfigureAwait(false));
+							$@"{{ ""selectedIds"": {_jsonSerializationService.SerializeObject(data.SelectedIds)}, ""server"": null, ""database"": ""{data.Database}"" }}").ConfigureAwait(false));
 					return node;
 				}
 			}
@@ -118,16 +118,16 @@ namespace Sidekick.Core.Handlers
 			Dictionary<string, string> ret = new Dictionary<string, string>();
 			foreach (string selectedId in data.SelectedIds)
 			{
-				BuildRelatedTree(ret, selectedId);
+				BuildRelatedTree(ret, selectedId, data.Database);
 			}
 			return ret;
 		}
 
-		private void BuildRelatedTree(Dictionary<string, string> ret, string selectedId)
+		private void BuildRelatedTree(Dictionary<string, string> ret, string selectedId, string database)
 		{
 			using (new SecurityDisabler())
 			{
-				ScsSitecoreItem i = _sitecoreDataAccessService.GetScsSitecoreItem(selectedId).Parent;					
+				ScsSitecoreItem i = _sitecoreDataAccessService.GetScsSitecoreItem(selectedId, database).Parent;					
 				while (i != null)
 				{
 					if (!ret.ContainsKey(i.Id))

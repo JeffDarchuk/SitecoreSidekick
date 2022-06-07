@@ -84,8 +84,8 @@ namespace Sidekick.ContentMigrator
 			using (new SecurityDisabler())
 			{
 
-				IItemData item = _sitecore.GetItemData(guid);
-				var localRev = _sitecore.GetItemAndChildrenRevision(guid);
+				IItemData item = _sitecore.GetItemData(guid, data.Database);
+				var localRev = _sitecore.GetItemAndChildrenRevision(guid, data.Database);
 				List<Guid> GrandChildren = new List<Guid>();
 				var items = new List<KeyValuePair<Guid, string>>();
 				if (data.Rev == null || !data.Rev.ContainsKey(item.Id) || data.Rev[item.Id] != localRev[item.Id])
@@ -229,8 +229,8 @@ namespace Sidekick.ContentMigrator
 		{
 			using (new SecurityDisabler())
 			{
-				CompareContentTreeNode ret = new CompareContentTreeNode(_sitecore.GetItemData(model.Id), false);
-				ret.BuildDiff(model.Server);
+				CompareContentTreeNode ret = new CompareContentTreeNode(_sitecore.GetItemData(model.Id, model.Database), false);
+				ret.BuildDiff(model.Database, model.Server);
 				return ScsJson(ret);
 			}
 		}
@@ -386,7 +386,7 @@ namespace Sidekick.ContentMigrator
 				return null;
 			}
 
-			return data.Id == "" ? ContentMigrationRegistration.Root : new CompareContentTreeNode(_sitecore.GetItemData(data.Id));
+			return data.Id == "" ? ContentMigrationRegistration.Root : new CompareContentTreeNode(_sitecore.GetItemData(data.Id, data.Database));
 		}
 	}
 }

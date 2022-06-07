@@ -9,7 +9,7 @@ namespace Sidekick.ContentMigrator.Core.Interface
 	public interface IContentItemPuller
 	{
 		bool Completed { get; }
-		void StartGatheringItems(IEnumerable<Guid> rootIds, int threads, bool getChildren, string server, CancellationToken cancellationToken, bool ignoreRevId);
+		void StartGatheringItems(IEnumerable<Guid> rootIds, string database, int threads, bool getChildren, string server, CancellationToken cancellationToken, bool ignoreRevId);
 		BlockingCollection<IItemData> ItemsToInstall { get; }
 	}
 }

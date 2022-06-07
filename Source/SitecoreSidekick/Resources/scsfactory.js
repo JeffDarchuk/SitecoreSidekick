@@ -13,8 +13,8 @@
 				var data = { "id": id, "database": database, "server": server };
 				return $http.post("/scs/platform/contenttree.scsvc", data);
 			},
-			contentTreeSelectedRelated: function(selectedIds, server) {
-				var data = { "selectedIds": selectedIds, "server": server };
+			contentTreeSelectedRelated: function(selectedIds, server, database) {
+				var data = { "selectedIds": selectedIds, "server": server, "database": database };
 				return $http.post("/scs/platform/contenttreeselectedrelated.scsvc", data);
 			},
 			valid: function() {

@@ -13,8 +13,8 @@ namespace Sidekick.ContentMigrator.Services.Interface
 {
 	public interface IRemoteContentService
 	{
-		IItemData GetRemoteItemData(Guid id, string server);
-		ChildrenItemDataModel GetRemoteItemDataWithChildren(Guid id, string server, Dictionary<Guid, string> rev = null);
+		IItemData GetRemoteItemData(Guid id, string database, string server);
+		ChildrenItemDataModel GetRemoteItemDataWithChildren(Guid id, string database, string server, Dictionary<Guid, string> rev = null);
 		IItemData DeserializeYaml(string yaml, Guid id);
 		object ChecksumIsGenerating(string server);
 		bool ChecksumRegenerate(string server);

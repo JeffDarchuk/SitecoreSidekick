@@ -35,15 +35,15 @@ namespace Sidekick.ContentMigrator.Core
 			_model = model;
 			if (model.PullParent)
 			{
-				foreach (var id in model.Ids.Select(Guid.Parse).Where(x => _sitecoreAccess.GetItemData(x) == null))
+				foreach (var id in model.Ids.Select(Guid.Parse).Where(x => _sitecoreAccess.GetItemData(x, model.Database) == null))
 				{
-					var item = _remoteContent.GetRemoteItemData(id, model.Server);
-					var parent = _sitecoreAccess.GetItemData(item.ParentId);
+					var item = _remoteContent.GetRemoteItemData(id, model.Database, model.Server);
+					var parent = _sitecoreAccess.GetItemData(item.ParentId, model.Database);
 					while (parent == null)
 					{
-						item = _remoteContent.GetRemoteItemData(item.ParentId, model.Server);
+						item = _remoteContent.GetRemoteItemData(item.ParentId, model.Database, model.Server);
 						_puller.ItemsToInstall.Add(item);
-						parent = _sitecoreAccess.GetItemData(item.ParentId);
+						parent = _sitecoreAccess.GetItemData(item.ParentId, model.Database);
 					}
 				}
 			}
@@ -53,7 +53,7 @@ namespace Sidekick.ContentMigrator.Core
 				{
 					_installer.SetupTrackerForUnwantedLocalItems(model.Ids.Select(Guid.Parse));
 				}
-				_puller.StartGatheringItems(model.Ids.Select(Guid.Parse), _registration.GetScsRegistration<ContentMigrationRegistration>()?.RemoteThreads ?? 1, model.Children, model.Server, _cancellation.Token, model.IgnoreRevId);
+				_puller.StartGatheringItems(model.Ids.Select(Guid.Parse), model.Database, _registration.GetScsRegistration<ContentMigrationRegistration>()?.RemoteThreads ?? 1, model.Children, model.Server, _cancellation.Token, model.IgnoreRevId);
 				_installer.StartInstallingItems(model, _puller.ItemsToInstall, _registration.GetScsRegistration<ContentMigrationRegistration>()?.WriterThreads ?? 1, _cancellation.Token);
 			});
 		}

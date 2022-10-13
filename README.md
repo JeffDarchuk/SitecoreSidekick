@@ -150,7 +150,16 @@ You can choose to use SQL instead by following this:
 
 ### Other Audit Log Configuration Options
 
-Backups and record duration can be configured in the `zSCSAuditLog.config` file.  It is recommended that you keep only what would be useful as due to the volume of data collected, these logs can get get large on a site with a high number of events if keeping logs for more than a week.
+Backups and record duration can be configured in the `zSCSAuditLog.config` file.  
+
+* keepRecords: Number of days to keep audit log records
+* keepBackups: Number of days to keep backup files (Lucene only)
+
+#### Lucene:
+It is recommended that you keep only what would be useful as due to the volume of data collected, these logs can get get large on a site with a high number of events if keeping logs for more than a week.
+
+#### SQL: 
+If using SQL mode, a lot of data can be stored before performance is impacted. Consider setting `keepRecords` to 180 (keep 180 days of data).
 
 Additional events can be tracked using additional onSaved nodes.  Note that new registered events need to have a unique id assigned to it and while it’s not required a unique color would be preferable from a user experience standpoint.
 

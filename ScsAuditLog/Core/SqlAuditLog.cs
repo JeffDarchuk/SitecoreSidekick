@@ -1,14 +1,15 @@
-﻿using System;
+﻿using Sidekick.AuditLog.Model;
+using Sidekick.AuditLog.Model.Interface;
+using Sidekick.Core.Services.Interface;
+using Sitecore.Data.Items;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.Linq;
 using System.Dynamic;
 using System.Linq;
 using System.Text;
-using Sidekick.AuditLog.Model;
-using Sidekick.AuditLog.Model.Interface;
-using Sidekick.Core.Services.Interface;
-using Sitecore.Data.Items;
+using System.Threading.Tasks;
 
 namespace Sidekick.AuditLog.Core
 {
@@ -28,6 +29,11 @@ namespace Sidekick.AuditLog.Core
 			_logDays = daysToKeepLog;
 			_recordDays = daysToKeepRecords;
 			_logAnonymousEvents = logAnonymousEvents;
+
+			Task.Run(() =>
+			{
+				CleanupOldData();
+			});
 		}
 
 		public IEnumerable<KeyValuePair<string, int>> AutoComplete(string text, string start, string end, List<object> eventTypes)
@@ -270,6 +276,18 @@ namespace Sidekick.AuditLog.Core
 		public int RebuildLogStatus()
 		{
 			return -1;
+		}
+
+		private void CleanupOldData()
+		{
+			using (var db = new SqlAuditLogDataContext())
+			{
+				var dateCutoff = DateTime.Now.AddDays(-_logDays);
+				db.ExecuteCommand(
+				"DELETE FROM [dbo].[AuditEntry] WHERE [TimeStamp] < {0}",
+				dateCutoff
+				);
+			}
 		}
 
 		private string BuildArrayQuery(IEnumerable<object> terms, string key, Dictionary<string, bool> databases)

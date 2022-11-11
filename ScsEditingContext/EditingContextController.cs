@@ -1,26 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web;
-using System.Web.Mvc;
-using System.Web.Security;
-using System.Xml;
-using Sitecore.Data;
-using Sitecore.Data.Managers;
-using Sitecore.SecurityModel;
-using Sidekick.Core;
-using Sidekick.Core.ContentTree;
-using Sidekick.Core;
+﻿using Sidekick.Core;
 using Sidekick.Core.Pipelines.HttpRequestBegin;
 using Sidekick.Core.Services.Interface;
-using Sidekick.Core.Shared.IoC;
-using System.Web.Configuration;
+using System.Collections.Generic;
 using System.Configuration;
-using System.Text.RegularExpressions;
-using Sitecore.Diagnostics;
+using System.Dynamic;
+using System.Web.Configuration;
+using System.Web.Mvc;
 
 namespace Sidekick.EditingContext
 {

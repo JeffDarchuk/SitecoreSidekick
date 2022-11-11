@@ -1,23 +1,17 @@
-using System.Web.Mvc;
-using Sidekick.Core;
-using Sitecore.Configuration;
-using System.Web;
-using System.IO;
-using System.Linq;
-using Sidekick.Core.Services.Interface;
-using System.Collections.Generic;
-using Sidekick.SitecoreResourceManager.Models;
-using System.Text;
-using Sidekick.SitecoreResourceManager.Services;
-using Sidekick.SitecoreResourceManager.Data.Properties;
-using Sidekick.SitecoreResourceManager.Data.Properties.Collectors;
-using System;
-using System.IO.Compression;
-using System.Text.RegularExpressions;
-using Sitecore.Pipelines;
-using Sidekick.SitecoreResourceManager.Pipelines.SitecoreResourceManager;
 using Sidekick.Core;
 using Sidekick.Core.ContentTree;
+using Sidekick.Core.Services.Interface;
+using Sidekick.SitecoreResourceManager.Data.Properties;
+using Sidekick.SitecoreResourceManager.Data.Properties.Collectors;
+using Sidekick.SitecoreResourceManager.Models;
+using Sidekick.SitecoreResourceManager.Pipelines.SitecoreResourceManager;
+using Sidekick.SitecoreResourceManager.Services;
+using Sitecore.Pipelines;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Web.Mvc;
 
 namespace Sidekick.SitecoreResourceManager
 {

@@ -24,11 +24,13 @@ namespace Sidekick.AuditLog.Pipelines
 					Field field = item.Fields[fieldChange.FieldID];
 					if (!field.Name.StartsWith("__") && fieldChange.OriginalValue != field.Value)
 					{
+						var originalValue = fieldChange.OriginalValue ?? string.Empty;
+						var newValue = field.Value ?? string.Empty;
 						flag = true;
 						sb.Append("<tr><td>");
 						sb.Append(Cleanse(field.Name));
 						sb.Append("</td><td>");
-						HtmlDiff.HtmlDiff diff = new HtmlDiff.HtmlDiff(HttpUtility.HtmlEncode(fieldChange.OriginalValue), HttpUtility.HtmlEncode(field.Value));
+						HtmlDiff.HtmlDiff diff = new HtmlDiff.HtmlDiff(HttpUtility.HtmlEncode(originalValue), HttpUtility.HtmlEncode(newValue));
 						sb.Append(diff.Build());
 						sb.Append("</td></tr>");
 					}

@@ -51,7 +51,10 @@ namespace Sidekick.AuditLog.Model
 				Icon = item[FieldIDs.Icon];
 				if (string.IsNullOrWhiteSpace(Icon))
 				{
-					Icon = item.Template.InnerItem[FieldIDs.Icon];
+					if (item.Template != null)
+					{
+						Icon = item.Template.InnerItem[FieldIDs.Icon];
+					}
 				}
 			}
 			TimeStamp = DateTime.Now;
